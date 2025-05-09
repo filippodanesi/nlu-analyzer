@@ -82,15 +82,6 @@ const EntitiesTab: React.FC<EntitiesTabProps> = ({ entities, containsTargetKeywo
         </Table>
       </ScrollArea>
       
-      {!hasMultiWordEntities && (
-        <div className="flex items-center space-x-2 text-sm bg-amber-50 border border-amber-200 p-3 rounded-md">
-          <Info className="h-4 w-4 text-amber-500 flex-shrink-0" />
-          <p className="text-amber-800">
-            In un'implementazione reale di Watson NLU, l'API rileva frequentemente entità composte da più parole (come "Natural Language Understanding"). 
-            L'analisi presentata è semplificata per scopi dimostrativi.
-          </p>
-        </div>
-      )}
     </div>
   );
 };
