@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Github, CheckCircle } from "lucide-react";
+import { Github, CheckCircle, Info } from "lucide-react";
 import { ThemeProvider } from './ThemeProvider';
 import { ThemeToggle } from './ThemeToggle';
 import ApiConfigPanel from './ApiConfigPanel';
@@ -9,7 +9,6 @@ import ResultsPanel from './ResultsPanel';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useWatsonAnalyzer } from './hooks/useWatsonAnalyzer';
-import { InfoCircle } from "lucide-react";
 
 const WatsonAnalyzer: React.FC = () => {
   const {
@@ -77,7 +76,7 @@ const WatsonAnalyzer: React.FC = () => {
             )}
             {!credentialsFileExists && hasWatsonEnvVars && (
               <div className="flex items-center text-blue-500 ml-2" title="IBM Credentials from Environment">
-                <InfoCircle className="h-5 w-5 mr-1" />
+                <Info className="h-5 w-5 mr-1" />
                 <span className="text-sm font-medium">Env Variables Found</span>
               </div>
             )}
@@ -148,7 +147,7 @@ const WatsonAnalyzer: React.FC = () => {
                   )}
                   {!credentialsFileExists && hasWatsonEnvVars && (
                     <div className="flex items-center text-blue-500 ml-2">
-                      <InfoCircle className="h-4 w-4 mr-1" />
+                      <Info className="h-4 w-4 mr-1" />
                       <span className="text-xs">environment variables found</span>
                     </div>
                   )}
