@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Github, Info } from "lucide-react";
+import { Github } from "lucide-react";
 import { ThemeProvider } from './ThemeProvider';
 import { ThemeToggle } from './ThemeToggle';
 import ApiConfigPanel from './ApiConfigPanel';
@@ -62,12 +62,16 @@ const WatsonAnalyzer: React.FC = () => {
             <h1 className="text-xl font-semibold">IBM Watson Natural Language Understanding API</h1>
           </div>
           <div className="flex items-center space-x-2">
-            <Button variant="outline" size="icon" className="rounded-full">
-              <Info className="h-4 w-4" />
-            </Button>
-            <Button variant="outline" size="icon" className="rounded-full">
-              <Github className="h-4 w-4" />
-            </Button>
+            <a 
+              href="https://github.com/filippodanesi/watson-insight-explorer" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              title="Go to the GitHub repository"
+            >
+              <Button variant="outline" size="icon" className="rounded-full">
+                <Github className="h-4 w-4" />
+              </Button>
+            </a>
             <ThemeToggle />
           </div>
         </div>
