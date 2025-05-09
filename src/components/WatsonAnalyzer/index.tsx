@@ -13,6 +13,8 @@ import { useWatsonAnalyzer } from './hooks/useWatsonAnalyzer';
 const WatsonAnalyzer: React.FC = () => {
   const {
     // API Configuration
+    useSecrets,
+    setUseSecrets,
     apiKey,
     setApiKey,
     url,
@@ -31,6 +33,10 @@ const WatsonAnalyzer: React.FC = () => {
     // Language
     language,
     setLanguage,
+    
+    // Tone model
+    toneModel,
+    setToneModel,
     
     // Input
     text,
@@ -91,6 +97,8 @@ const WatsonAnalyzer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-1 space-y-6">
             <ApiConfigPanel
+              useSecrets={useSecrets}
+              setUseSecrets={setUseSecrets}
               apiKey={apiKey}
               setApiKey={setApiKey}
               url={url}
@@ -105,6 +113,8 @@ const WatsonAnalyzer: React.FC = () => {
               setLimits={setLimits}
               language={language}
               setLanguage={setLanguage}
+              toneModel={toneModel}
+              setToneModel={setToneModel}
             />
           </div>
 

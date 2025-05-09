@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   Card, 
   CardContent, 
@@ -14,7 +14,8 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
+import { Upload, File } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 interface InputPanelProps {
   text: string;
@@ -37,19 +38,45 @@ const InputPanel: React.FC<InputPanelProps> = ({
   onAnalyze,
   isAnalyzing
 }) => {
-  const [fileContent, setFileContent] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Update the file name display
+    setFileName(file.name);
+
+    // Check file size (limit to 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Please select a file smaller than 2MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = (event) => {
       const content = event.target?.result as string;
       setText(content);
-      setFileContent(content);
+    };
+    reader.onerror = () => {
+      toast({
+        title: "Error reading file",
+        description: "Could not read the selected file",
+        variant: "destructive",
+      });
     };
     reader.readAsText(file);
+  };
+
+  const handleUploadClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
 
   const targetKeywordsList = targetKeywords
@@ -69,7 +96,13 @@ const InputPanel: React.FC<InputPanelProps> = ({
       <CardContent className="space-y-4">
         <RadioGroup 
           value={inputMethod} 
-          onValueChange={(value) => setInputMethod(value as "text" | "file")}
+          onValueChange={(value) => {
+            setInputMethod(value as "text" | "file");
+            if (value === "file" && !fileName) {
+              // When switching to file mode without having uploaded yet, show the file picker
+              setTimeout(() => handleUploadClick(), 100);
+            }
+          }}
           className="flex items-center space-x-4 mb-4"
         >
           <div className="flex items-center space-x-2">
@@ -91,32 +124,49 @@ const InputPanel: React.FC<InputPanelProps> = ({
           />
         ) : (
           <div className="space-y-4">
-            <div className="grid w-full max-w-sm items-center gap-1.5">
-              <Label htmlFor="text-file" className="text-sm">Upload text file</Label>
-              <div className="flex items-center gap-2">
-                <Input 
-                  id="text-file" 
-                  type="file" 
-                  accept=".txt"
-                  onChange={handleFileUpload}
-                  className="flex-1"
-                />
-                <Button size="sm" variant="outline" className="px-2">
-                  <Upload className="h-4 w-4 mr-1" />
-                  Upload
-                </Button>
+            <div className="flex flex-col gap-2">
+              <input 
+                id="text-file" 
+                type="file" 
+                ref={fileInputRef}
+                accept=".txt,.doc,.docx,.rtf,.pdf,.md,.html,.json,.csv"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+              
+              <div className="flex flex-col items-center justify-center border-2 border-dashed border-border rounded-md p-6 cursor-pointer hover:bg-muted/50 transition-colors" onClick={handleUploadClick}>
+                <File className="h-10 w-10 text-muted-foreground mb-2" />
+                <p className="text-sm font-medium mb-1">
+                  {fileName ? fileName : "Click to upload a text file"}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  TXT, DOC, DOCX, PDF, RTF, MD, HTML, JSON, CSV
+                </p>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Only .txt files are supported
-              </p>
+              
+              {fileName && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full mt-2"
+                  onClick={handleUploadClick}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Change file
+                </Button>
+              )}
             </div>
 
-            {fileContent && (
-              <Textarea
-                value={fileContent}
-                readOnly
-                className="min-h-[150px] font-mono text-sm"
-              />
+            {text && (
+              <div className="space-y-2">
+                <Label htmlFor="file-preview">Preview</Label>
+                <Textarea
+                  id="file-preview"
+                  value={text}
+                  readOnly
+                  className="min-h-[150px] font-mono text-sm"
+                />
+              </div>
             )}
           </div>
         )}

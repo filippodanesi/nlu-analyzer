@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { toast } from "@/components/ui/use-toast";
 import { calculateTextStats } from '../utils/mockDataUtils';
@@ -32,13 +33,15 @@ const SECRETS = {
 };
 
 export const useWatsonAnalyzer = () => {
-  // Secrets usage state
-  const [useSecrets, setUseSecrets] = useState(false);
+  // Secrets usage state - check if environment variables are present
+  const [useSecrets, setUseSecrets] = useState(
+    !!(process.env.WATSON_API_KEY || process.env.WATSON_INSTANCE_ID)
+  );
   
   // API Configuration state
   const [apiKey, setApiKey] = useState("");
   const [url, setUrl] = useState("");
-  const [region, setRegion] = useState("us-south");
+  const [region, setRegion] = useState("eu-de"); // Changed default to eu-de
   const [instanceId, setInstanceId] = useState("");
   
   // Features state
@@ -79,6 +82,15 @@ export const useWatsonAnalyzer = () => {
     charCount: 0,
   });
 
+  // Set up initial state based on environment variables
+  useEffect(() => {
+    if (useSecrets) {
+      setApiKey(SECRETS.apiKey);
+      setRegion(SECRETS.region);
+      setInstanceId(SECRETS.instanceId);
+    }
+  }, [useSecrets]);
+
   // Handle secrets toggle
   const handleUseSecretsChange = (value: boolean) => {
     setUseSecrets(value);
@@ -91,7 +103,7 @@ export const useWatsonAnalyzer = () => {
     } else {
       // If disabled, reset the fields
       setApiKey("");
-      setRegion("us-south");
+      setRegion("eu-de"); // Changed default to eu-de
       setInstanceId("");
     }
   };
