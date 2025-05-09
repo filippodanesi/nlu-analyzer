@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
   Card, 
@@ -25,6 +24,8 @@ import {
 } from "@/components/ui/accordion";
 
 interface ApiConfigPanelProps {
+  useSecrets: boolean;
+  setUseSecrets: (value: boolean) => void;
   apiKey: string;
   setApiKey: (key: string) => void;
   url: string;
@@ -39,6 +40,7 @@ interface ApiConfigPanelProps {
     concepts: boolean;
     relations: boolean;
     categories: boolean;
+    classifications: boolean;
   };
   setFeatures: (features: any) => void;
   limits: {
@@ -50,6 +52,8 @@ interface ApiConfigPanelProps {
   setLimits: (limits: any) => void;
   language: string;
   setLanguage: (lang: string) => void;
+  toneModel: string;
+  setToneModel: (model: string) => void;
 }
 
 const regionOptions = {
@@ -64,6 +68,8 @@ const regionOptions = {
 };
 
 const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
+  useSecrets,
+  setUseSecrets,
   apiKey,
   setApiKey,
   url,
@@ -78,9 +84,9 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
   setLimits,
   language,
   setLanguage,
+  toneModel,
+  setToneModel,
 }) => {
-  const [useSecrets, setUseSecrets] = useState(false);
-  
   const handleFeatureChange = (feature: string, value: boolean) => {
     setFeatures({ ...features, [feature]: value });
   };
@@ -225,6 +231,36 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
               />
               <Label htmlFor="categories">Categories</Label>
             </div>
+          </div>
+          
+          <div className="space-y-2">
+            <h4 className="text-xs font-medium text-muted-foreground">Tone Analysis</h4>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="classifications"
+                checked={features.classifications}
+                onCheckedChange={(checked) => handleFeatureChange("classifications", checked)}
+              />
+              <Label htmlFor="classifications">Tone Analysis</Label>
+            </div>
+            
+            {features.classifications && (
+              <div className="space-y-2 pl-6 mt-2">
+                <Label htmlFor="tone-model" className="text-xs">Tone Model</Label>
+                <Select value={toneModel} onValueChange={setToneModel}>
+                  <SelectTrigger id="tone-model" className="h-8">
+                    <SelectValue placeholder="Select tone model" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="tone-classifications-en-v1">English</SelectItem>
+                    <SelectItem value="tone-classifications-fr-v1">French</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Note: Tone analytics is only available for English and French languages.
+                </p>
+              </div>
+            )}
           </div>
           
           <Accordion type="single" collapsible className="w-full">
