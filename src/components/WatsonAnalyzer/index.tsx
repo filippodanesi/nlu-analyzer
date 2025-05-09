@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Github, Info } from "lucide-react";
 import { ThemeProvider } from './ThemeProvider';
@@ -182,7 +181,7 @@ const WatsonAnalyzer: React.FC = () => {
     .filter(Boolean);
 
   return (
-    <ThemeProvider defaultTheme="dark">
+    <ThemeProvider defaultTheme="light">
       <div className="min-h-screen bg-background text-foreground font-inter">
         {/* Header */}
         <header className="border-b border-border">
