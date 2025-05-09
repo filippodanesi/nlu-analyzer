@@ -10,6 +10,13 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useWatsonAnalyzer } from './hooks/useWatsonAnalyzer';
 
+// Check for environment variables presence
+const hasWatsonEnvVars = !!(
+  process.env.NATURAL_LANGUAGE_UNDERSTANDING_APIKEY || 
+  process.env.NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY ||
+  process.env.NATURAL_LANGUAGE_UNDERSTANDING_URL
+);
+
 const WatsonAnalyzer: React.FC = () => {
   const {
     // API Configuration
@@ -95,27 +102,66 @@ const WatsonAnalyzer: React.FC = () => {
       {/* Main content */}
       <main className="container max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Only render the API configuration panel if we're not using environment variables OR useSecrets is false */}
           <div className="md:col-span-1 space-y-6">
-            <ApiConfigPanel
-              useSecrets={useSecrets}
-              setUseSecrets={setUseSecrets}
-              apiKey={apiKey}
-              setApiKey={setApiKey}
-              url={url}
-              setUrl={setUrl}
-              region={region}
-              setRegion={setRegion}
-              instanceId={instanceId}
-              setInstanceId={setInstanceId}
-              features={features}
-              setFeatures={setFeatures}
-              limits={limits}
-              setLimits={setLimits}
-              language={language}
-              setLanguage={setLanguage}
-              toneModel={toneModel}
-              setToneModel={setToneModel}
-            />
+            {(!hasWatsonEnvVars || !useSecrets) && (
+              <ApiConfigPanel
+                useSecrets={useSecrets}
+                setUseSecrets={setUseSecrets}
+                apiKey={apiKey}
+                setApiKey={setApiKey}
+                url={url}
+                setUrl={setUrl}
+                region={region}
+                setRegion={setRegion}
+                instanceId={instanceId}
+                setInstanceId={setInstanceId}
+                features={features}
+                setFeatures={setFeatures}
+                limits={limits}
+                setLimits={setLimits}
+                language={language}
+                setLanguage={setLanguage}
+                toneModel={toneModel}
+                setToneModel={setToneModel}
+              />
+            )}
+            {/* If environment variables are in use, show a confirmation message */}
+            {hasWatsonEnvVars && useSecrets && (
+              <div className="bg-background border border-border rounded-lg p-4 space-y-3">
+                <h3 className="text-sm font-medium">API Configuration</h3>
+                <div className="px-4 py-3 bg-secondary text-secondary-foreground rounded-md text-sm">
+                  <p>Using Watson NLU credentials from environment variables:</p>
+                  <ul className="list-disc ml-5 mt-2 text-xs space-y-1">
+                    <li>NATURAL_LANGUAGE_UNDERSTANDING_APIKEY</li>
+                    <li>NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY</li>
+                    <li>NATURAL_LANGUAGE_UNDERSTANDING_URL</li>
+                    <li>NATURAL_LANGUAGE_UNDERSTANDING_AUTH_TYPE</li>
+                  </ul>
+                </div>
+                {/* Still show the features configuration part */}
+                <ApiConfigPanel
+                  useSecrets={useSecrets}
+                  setUseSecrets={setUseSecrets}
+                  apiKey={apiKey}
+                  setApiKey={setApiKey}
+                  url={url}
+                  setUrl={setUrl}
+                  region={region}
+                  setRegion={setRegion}
+                  instanceId={instanceId}
+                  setInstanceId={setInstanceId}
+                  features={features}
+                  setFeatures={setFeatures}
+                  limits={limits}
+                  setLimits={setLimits}
+                  language={language}
+                  setLanguage={setLanguage}
+                  toneModel={toneModel}
+                  setToneModel={setToneModel}
+                />
+              </div>
+            )}
           </div>
 
           <div className="md:col-span-2 space-y-6">
@@ -157,3 +203,4 @@ const WatsonAnalyzer: React.FC = () => {
 };
 
 export default WatsonAnalyzer;
+

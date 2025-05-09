@@ -25,23 +25,42 @@ export interface TextStats {
   charCount: number;
 }
 
-// Default credentials for secrets (in a real app, these would come from environment variables)
+// Updated environment variable names according to the .env format
 const SECRETS = {
-  apiKey: process.env.WATSON_API_KEY || "",
-  region: process.env.WATSON_REGION || "eu-de",
-  instanceId: process.env.WATSON_INSTANCE_ID || "",
+  apiKey: process.env.NATURAL_LANGUAGE_UNDERSTANDING_APIKEY || 
+          process.env.NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY || "",
+  url: process.env.NATURAL_LANGUAGE_UNDERSTANDING_URL || "",
+  authType: process.env.NATURAL_LANGUAGE_UNDERSTANDING_AUTH_TYPE || "iam",
+  // Extract region from URL if available
+  region: (() => {
+    const url = process.env.NATURAL_LANGUAGE_UNDERSTANDING_URL || "";
+    // Try to extract region from URL (format: https://api.{region}.natural-language-understanding...)
+    const match = url.match(/api\.(.*?)\.natural-language-understanding/);
+    return match ? match[1] : "eu-de";
+  })(),
+  instanceId: (() => {
+    const url = process.env.NATURAL_LANGUAGE_UNDERSTANDING_URL || "";
+    // Try to extract instance ID from URL (format: .../instances/{instanceId}/...)
+    const match = url.match(/instances\/(.*?)\//);
+    return match ? match[1] : "";
+  })(),
 };
 
 export const useWatsonAnalyzer = () => {
-  // Secrets usage state - check if environment variables are present
-  const [useSecrets, setUseSecrets] = useState(
-    !!(process.env.WATSON_API_KEY || process.env.WATSON_INSTANCE_ID)
+  // Check if any of the Watson environment variables are present
+  const hasWatsonEnvVars = !!(
+    process.env.NATURAL_LANGUAGE_UNDERSTANDING_APIKEY || 
+    process.env.NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY ||
+    process.env.NATURAL_LANGUAGE_UNDERSTANDING_URL
   );
+  
+  // Secrets usage state - check if environment variables are present
+  const [useSecrets, setUseSecrets] = useState(hasWatsonEnvVars);
   
   // API Configuration state
   const [apiKey, setApiKey] = useState("");
   const [url, setUrl] = useState("");
-  const [region, setRegion] = useState("eu-de"); // Changed default to eu-de
+  const [region, setRegion] = useState("eu-de"); // Default to eu-de
   const [instanceId, setInstanceId] = useState("");
   
   // Features state
@@ -84,26 +103,29 @@ export const useWatsonAnalyzer = () => {
 
   // Set up initial state based on environment variables
   useEffect(() => {
-    if (useSecrets) {
+    if (useSecrets && hasWatsonEnvVars) {
       setApiKey(SECRETS.apiKey);
+      setUrl(SECRETS.url);
       setRegion(SECRETS.region);
       setInstanceId(SECRETS.instanceId);
     }
-  }, [useSecrets]);
+  }, [useSecrets, hasWatsonEnvVars]);
 
   // Handle secrets toggle
   const handleUseSecretsChange = (value: boolean) => {
     setUseSecrets(value);
     
     // If enabled, use credentials from secrets
-    if (value) {
+    if (value && hasWatsonEnvVars) {
       setApiKey(SECRETS.apiKey);
+      setUrl(SECRETS.url);
       setRegion(SECRETS.region);
       setInstanceId(SECRETS.instanceId);
     } else {
       // If disabled, reset the fields
       setApiKey("");
-      setRegion("eu-de"); // Changed default to eu-de
+      setUrl("");
+      setRegion("eu-de");
       setInstanceId("");
     }
   };
@@ -130,13 +152,25 @@ export const useWatsonAnalyzer = () => {
 
     // Check credentials (both manual and from secrets)
     const currentApiKey = useSecrets ? SECRETS.apiKey : apiKey;
-    const currentRegion = useSecrets ? SECRETS.region : region;
-    const currentInstanceId = useSecrets ? SECRETS.instanceId : instanceId;
+    const currentUrl = useSecrets ? SECRETS.url : (
+      region !== "custom" ? 
+        `https://api.${region}.natural-language-understanding.watson.cloud.ibm.com/instances/${instanceId}/v1/analyze?version=2022-04-07` : 
+        url
+    );
 
-    if (!currentApiKey && currentRegion !== "custom") {
+    if (!currentApiKey) {
       toast({
         title: "API Key required",
         description: "Please enter your IBM Watson NLU API key or enable secrets.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!currentUrl) {
+      toast({
+        title: "URL required",
+        description: "Please provide a valid URL for the IBM Watson NLU service.",
         variant: "destructive",
       });
       return;
@@ -158,12 +192,6 @@ export const useWatsonAnalyzer = () => {
     // Calculate text statistics
     const stats = calculateTextStats(text);
     setTextStats(stats);
-
-    // Build API URL
-    let apiUrl = url;
-    if (currentRegion !== "custom") {
-      apiUrl = `https://api.${currentRegion}.natural-language-understanding.watson.cloud.ibm.com/instances/${currentInstanceId}/v1/analyze?version=2022-04-07`;
-    }
 
     // Prepare parameters for API request
     const featuresParams: any = {};
@@ -211,12 +239,22 @@ export const useWatsonAnalyzer = () => {
     };
 
     try {
-      const response = await fetch(apiUrl, {
+      // Determine the authorization method based on environment variables
+      const authType = SECRETS.authType || "iam";
+      let headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      // Add authorization header based on auth type
+      if (authType === "iam") {
+        headers['Authorization'] = `Basic ${btoa(`apikey:${currentApiKey}`)}`;
+      } else {
+        headers['Authorization'] = `Bearer ${currentApiKey}`;
+      }
+
+      const response = await fetch(currentUrl, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Basic ${btoa(`apikey:${currentApiKey}`)}`
-        },
+        headers,
         body: JSON.stringify(requestData)
       });
 
@@ -299,3 +337,4 @@ export const useWatsonAnalyzer = () => {
     getTargetKeywordsList,
   };
 };
+
