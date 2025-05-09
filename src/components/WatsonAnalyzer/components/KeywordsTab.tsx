@@ -86,15 +86,6 @@ const KeywordsTab: React.FC<KeywordsTabProps> = ({ keywords, containsTargetKeywo
         </Table>
       </ScrollArea>
       
-      {!hasMultiWordKeywords && (
-        <div className="flex items-center space-x-2 text-sm bg-amber-50 border border-amber-200 p-3 rounded-md">
-          <Info className="h-4 w-4 text-amber-500 flex-shrink-0" />
-          <p className="text-amber-800">
-            In un'implementazione reale di Watson NLU, l'API può identificare parole chiave composte da più termini (come "natural language processing"). 
-            Questa versione demo riporta solo parole singole per semplicità.
-          </p>
-        </div>
-      )}
     </div>
   );
 };
