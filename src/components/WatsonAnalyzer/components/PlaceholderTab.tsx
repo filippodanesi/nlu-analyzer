@@ -20,7 +20,7 @@ const PlaceholderTab: React.FC<PlaceholderTabProps> = ({ message, helpText }) =>
       {helpText && (
         <Alert variant="default" className="bg-blue-50 border-blue-200">
           <Info className="h-4 w-4" />
-          <AlertTitle>Nota sull'analisi del testo</AlertTitle>
+          <AlertTitle>Note on text analysis</AlertTitle>
           <AlertDescription className="text-sm">
             {helpText}
           </AlertDescription>
