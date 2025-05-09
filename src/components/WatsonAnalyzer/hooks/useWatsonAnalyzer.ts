@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from "@/components/ui/use-toast";
 import { calculateTextStats } from '../utils/mockDataUtils';
 
@@ -8,6 +8,7 @@ export interface WatsonFeatures {
   concepts: boolean;
   relations: boolean;
   categories: boolean;
+  classifications: boolean; // Added support for tone analysis
 }
 
 export interface WatsonLimits {
@@ -23,7 +24,17 @@ export interface TextStats {
   charCount: number;
 }
 
+// Default credentials for secrets (in a real app, these would come from environment variables)
+const SECRETS = {
+  apiKey: process.env.WATSON_API_KEY || "",
+  region: process.env.WATSON_REGION || "us-south",
+  instanceId: process.env.WATSON_INSTANCE_ID || "",
+};
+
 export const useWatsonAnalyzer = () => {
+  // Secrets usage state
+  const [useSecrets, setUseSecrets] = useState(false);
+  
   // API Configuration state
   const [apiKey, setApiKey] = useState("");
   const [url, setUrl] = useState("");
@@ -37,6 +48,7 @@ export const useWatsonAnalyzer = () => {
     concepts: true,
     relations: false,
     categories: true,
+    classifications: false, // Default disabled for tone analysis
   });
   
   // Limits state
@@ -49,6 +61,9 @@ export const useWatsonAnalyzer = () => {
   
   // Language state
   const [language, setLanguage] = useState("en");
+  
+  // Tone model state
+  const [toneModel, setToneModel] = useState("tone-classifications-en-v1");
   
   // Input state
   const [text, setText] = useState("");
@@ -64,72 +79,62 @@ export const useWatsonAnalyzer = () => {
     charCount: 0,
   });
 
-  // Costruisce l'URL completo per le chiamate API
-  const buildApiUrl = () => {
-    if (region === "custom") {
-      return url;
-    }
+  // Handle secrets toggle
+  const handleUseSecretsChange = (value: boolean) => {
+    setUseSecrets(value);
     
-    return `https://api.${region}.natural-language-understanding.watson.cloud.ibm.com/instances/${instanceId}/v1/analyze?version=2022-04-07`;
+    // If enabled, use credentials from secrets
+    if (value) {
+      setApiKey(SECRETS.apiKey);
+      setRegion(SECRETS.region);
+      setInstanceId(SECRETS.instanceId);
+    } else {
+      // If disabled, reset the fields
+      setApiKey("");
+      setRegion("us-south");
+      setInstanceId("");
+    }
   };
 
-  // Prepara le opzioni per la chiamata API
-  const buildRequestOptions = () => {
-    // Costruzione delle feature richieste
-    const featuresObj: any = {};
-    
-    if (features.keywords) {
-      featuresObj.keywords = { limit: limits.keywords, sentiment: true };
+  // Update tone model based on selected language
+  useEffect(() => {
+    // Tone analysis is only available for English and French
+    if (language === "en") {
+      setToneModel("tone-classifications-en-v1");
+    } else if (language === "fr") {
+      setToneModel("tone-classifications-fr-v1");
     }
-    
-    if (features.entities) {
-      featuresObj.entities = { limit: limits.entities, sentiment: true };
-    }
-    
-    if (features.concepts) {
-      featuresObj.concepts = { limit: limits.concepts };
-    }
-    
-    if (features.relations) {
-      featuresObj.relations = {};
-    }
-    
-    if (features.categories) {
-      featuresObj.categories = { limit: limits.categories };
-    }
-
-    // Corpo della richiesta
-    const requestBody = {
-      text,
-      features: featuresObj,
-      language
-    };
-
-    // Opzioni di fetch
-    return {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Basic ${btoa(`apikey:${apiKey}`)}`,
-      },
-      body: JSON.stringify(requestBody),
-    };
-  };
+  }, [language]);
 
   const handleAnalyze = async () => {
     if (!text) {
       toast({
-        title: "Nessun testo fornito",
-        description: "Inserisci il testo da analizzare.",
+        title: "No text provided",
+        description: "Please enter text to analyze.",
         variant: "destructive",
       });
       return;
     }
 
-    if (!apiKey && region !== "custom") {
+    // Check credentials (both manual and from secrets)
+    const currentApiKey = useSecrets ? SECRETS.apiKey : apiKey;
+    const currentRegion = useSecrets ? SECRETS.region : region;
+    const currentInstanceId = useSecrets ? SECRETS.instanceId : instanceId;
+
+    if (!currentApiKey && currentRegion !== "custom") {
       toast({
-        title: "API Key richiesta",
-        description: "Inserisci la tua API Key di IBM Watson NLU.",
+        title: "API Key required",
+        description: "Please enter your IBM Watson NLU API key or enable secrets.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check for tone analysis - only available for en and fr
+    if (features.classifications && language !== "en" && language !== "fr") {
+      toast({
+        title: "Language not supported",
+        description: "Tone analysis is only available for English and French languages.",
         variant: "destructive",
       });
       return;
@@ -142,34 +147,84 @@ export const useWatsonAnalyzer = () => {
     const stats = calculateTextStats(text);
     setTextStats(stats);
 
-    try {
-      // Costruisce l'URL dell'API
-      const apiUrl = buildApiUrl();
+    // Build API URL
+    let apiUrl = url;
+    if (currentRegion !== "custom") {
+      apiUrl = `https://api.${currentRegion}.natural-language-understanding.watson.cloud.ibm.com/instances/${currentInstanceId}/v1/analyze?version=2022-04-07`;
+    }
 
-      // Chiama l'API di Watson NLU
-      const response = await fetch(apiUrl, buildRequestOptions());
-      
+    // Prepare parameters for API request
+    const featuresParams: any = {};
+    
+    if (features.keywords) {
+      featuresParams.keywords = { 
+        limit: limits.keywords,
+        sentiment: true 
+      };
+    }
+    
+    if (features.entities) {
+      featuresParams.entities = { 
+        limit: limits.entities,
+        sentiment: true 
+      };
+    }
+    
+    if (features.concepts) {
+      featuresParams.concepts = { 
+        limit: limits.concepts 
+      };
+    }
+    
+    if (features.relations) {
+      featuresParams.relations = {};
+    }
+    
+    if (features.categories) {
+      featuresParams.categories = { 
+        limit: limits.categories 
+      };
+    }
+    
+    if (features.classifications) {
+      featuresParams.classifications = {
+        model: toneModel
+      };
+    }
+
+    const requestData = {
+      text: text,
+      features: featuresParams,
+      language: language
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Basic ${btoa(`apikey:${currentApiKey}`)}`
+        },
+        body: JSON.stringify(requestData)
+      });
+
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Errore API (${response.status}): ${errorText}`);
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'API request failed');
       }
 
       const data = await response.json();
-      console.log("IBM Watson API response:", data);
-      
-      // Imposta i risultati
       setResults(data);
       
       toast({
-        title: "Analisi completata",
-        description: "Il testo è stato analizzato con successo.",
+        title: "Analysis complete",
+        description: "Text has been successfully analyzed.",
       });
     } catch (error) {
-      console.error("Error calling IBM Watson API:", error);
-      
+      console.error('Error analyzing text:', error);
       toast({
-        title: "Errore nell'analisi",
-        description: error instanceof Error ? error.message : "Si è verificato un errore durante l'analisi del testo.",
+        title: "Analysis failed",
+        description: error instanceof Error ? error.message : "An error occurred during analysis.",
         variant: "destructive",
       });
     } finally {
@@ -186,6 +241,10 @@ export const useWatsonAnalyzer = () => {
   };
 
   return {
+    // Secrets state
+    useSecrets,
+    setUseSecrets: handleUseSecretsChange,
+    
     // API Configuration
     apiKey,
     setApiKey,
@@ -205,6 +264,10 @@ export const useWatsonAnalyzer = () => {
     // Language
     language,
     setLanguage,
+    
+    // Tone model
+    toneModel,
+    setToneModel,
     
     // Input
     text,
