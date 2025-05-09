@@ -27,7 +27,7 @@ export interface TextStats {
 // Default credentials for secrets (in a real app, these would come from environment variables)
 const SECRETS = {
   apiKey: process.env.WATSON_API_KEY || "",
-  region: process.env.WATSON_REGION || "us-south",
+  region: process.env.WATSON_REGION || "eu-de",
   instanceId: process.env.WATSON_INSTANCE_ID || "",
 };
 
