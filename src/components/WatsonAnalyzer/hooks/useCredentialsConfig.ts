@@ -4,19 +4,19 @@ import { toast } from "@/components/ui/use-toast";
 
 // Estratto delle variabili d'ambiente per Watson
 export const SECRETS = {
-  apiKey: process.env.NATURAL_LANGUAGE_UNDERSTANDING_APIKEY || 
-          process.env.NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY || "",
-  url: process.env.NATURAL_LANGUAGE_UNDERSTANDING_URL || "",
-  authType: process.env.NATURAL_LANGUAGE_UNDERSTANDING_AUTH_TYPE || "iam",
+  apiKey: import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_APIKEY || 
+          import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY || "",
+  url: import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_URL || "",
+  authType: import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_AUTH_TYPE || "iam",
   // Estrai la regione dall'URL se disponibile
   region: (() => {
-    const url = process.env.NATURAL_LANGUAGE_UNDERSTANDING_URL || "";
+    const url = import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_URL || "";
     // Prova a estrarre la regione dall'URL (formato: https://api.{region}.natural-language-understanding...)
     const match = url.match(/api\.(.*?)\.natural-language-understanding/);
     return match ? match[1] : "eu-de";
   })(),
   instanceId: (() => {
-    const url = process.env.NATURAL_LANGUAGE_UNDERSTANDING_URL || "";
+    const url = import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_URL || "";
     // Prova a estrarre l'ID istanza dall'URL (formato: .../instances/{instanceId}/...)
     const match = url.match(/instances\/(.*?)\//);
     return match ? match[1] : "";
@@ -27,9 +27,9 @@ export const SECRETS = {
 export const useCredentialsConfig = () => {
   // Verifica se sono presenti variabili d'ambiente Watson
   const hasWatsonEnvVars = !!(
-    process.env.NATURAL_LANGUAGE_UNDERSTANDING_APIKEY || 
-    process.env.NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY ||
-    process.env.NATURAL_LANGUAGE_UNDERSTANDING_URL
+    import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_APIKEY || 
+    import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY ||
+    import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_URL
   );
   
   // Stato per l'utilizzo dei segreti - verifica se sono presenti variabili d'ambiente

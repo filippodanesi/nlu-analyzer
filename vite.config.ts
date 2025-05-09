@@ -1,3 +1,4 @@
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
@@ -19,4 +20,6 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // Define environment variables prefixes that should be available to the client
+  envPrefix: ['NATURAL_LANGUAGE_UNDERSTANDING_'],
 }));
