@@ -64,11 +64,63 @@ export const useWatsonAnalyzer = () => {
     charCount: 0,
   });
 
+  // Costruisce l'URL completo per le chiamate API
+  const buildApiUrl = () => {
+    if (region === "custom") {
+      return url;
+    }
+    
+    return `https://api.${region}.natural-language-understanding.watson.cloud.ibm.com/instances/${instanceId}/v1/analyze?version=2022-04-07`;
+  };
+
+  // Prepara le opzioni per la chiamata API
+  const buildRequestOptions = () => {
+    // Costruzione delle feature richieste
+    const featuresObj: any = {};
+    
+    if (features.keywords) {
+      featuresObj.keywords = { limit: limits.keywords, sentiment: true };
+    }
+    
+    if (features.entities) {
+      featuresObj.entities = { limit: limits.entities, sentiment: true };
+    }
+    
+    if (features.concepts) {
+      featuresObj.concepts = { limit: limits.concepts };
+    }
+    
+    if (features.relations) {
+      featuresObj.relations = {};
+    }
+    
+    if (features.categories) {
+      featuresObj.categories = { limit: limits.categories };
+    }
+
+    // Corpo della richiesta
+    const requestBody = {
+      text,
+      features: featuresObj,
+      language
+    };
+
+    // Opzioni di fetch
+    return {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Basic ${btoa(`apikey:${apiKey}`)}`,
+      },
+      body: JSON.stringify(requestBody),
+    };
+  };
+
   const handleAnalyze = async () => {
     if (!text) {
       toast({
-        title: "No text provided",
-        description: "Please enter text to analyze.",
+        title: "Nessun testo fornito",
+        description: "Inserisci il testo da analizzare.",
         variant: "destructive",
       });
       return;
@@ -76,8 +128,8 @@ export const useWatsonAnalyzer = () => {
 
     if (!apiKey && region !== "custom") {
       toast({
-        title: "API Key required",
-        description: "Please enter your IBM Watson NLU API key.",
+        title: "API Key richiesta",
+        description: "Inserisci la tua API Key di IBM Watson NLU.",
         variant: "destructive",
       });
       return;
@@ -90,78 +142,34 @@ export const useWatsonAnalyzer = () => {
     const stats = calculateTextStats(text);
     setTextStats(stats);
 
-    // Costruisci l'URL dell'API
-    let apiUrl = url;
-    if (region !== "custom") {
-      apiUrl = `https://api.${region}.natural-language-understanding.watson.cloud.ibm.com/instances/${instanceId}/v1/analyze?version=2022-04-07`;
-    }
-
-    // Prepara i parametri per la richiesta API
-    const featuresParams: any = {};
-    
-    if (features.keywords) {
-      featuresParams.keywords = { 
-        limit: limits.keywords,
-        sentiment: true 
-      };
-    }
-    
-    if (features.entities) {
-      featuresParams.entities = { 
-        limit: limits.entities,
-        sentiment: true 
-      };
-    }
-    
-    if (features.concepts) {
-      featuresParams.concepts = { 
-        limit: limits.concepts 
-      };
-    }
-    
-    if (features.relations) {
-      featuresParams.relations = {};
-    }
-    
-    if (features.categories) {
-      featuresParams.categories = { 
-        limit: limits.categories 
-      };
-    }
-
-    const requestData = {
-      text: text,
-      features: featuresParams,
-      language: language
-    };
-
     try {
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Basic ${btoa(`apikey:${apiKey}`)}`
-        },
-        body: JSON.stringify(requestData)
-      });
+      // Costruisce l'URL dell'API
+      const apiUrl = buildApiUrl();
 
+      // Chiama l'API di Watson NLU
+      const response = await fetch(apiUrl, buildRequestOptions());
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'API request failed');
+        const errorText = await response.text();
+        throw new Error(`Errore API (${response.status}): ${errorText}`);
       }
 
       const data = await response.json();
+      console.log("IBM Watson API response:", data);
+      
+      // Imposta i risultati
       setResults(data);
       
       toast({
-        title: "Analysis complete",
-        description: "Text has been successfully analyzed.",
+        title: "Analisi completata",
+        description: "Il testo è stato analizzato con successo.",
       });
     } catch (error) {
-      console.error('Error analyzing text:', error);
+      console.error("Error calling IBM Watson API:", error);
+      
       toast({
-        title: "Analysis failed",
-        description: error instanceof Error ? error.message : "An error occurred during analysis.",
+        title: "Errore nell'analisi",
+        description: error instanceof Error ? error.message : "Si è verificato un errore durante l'analisi del testo.",
         variant: "destructive",
       });
     } finally {
