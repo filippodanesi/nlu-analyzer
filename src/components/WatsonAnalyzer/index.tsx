@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Github, Info } from "lucide-react";
 import { ThemeProvider } from './ThemeProvider';
@@ -86,82 +87,19 @@ const WatsonAnalyzer: React.FC = () => {
     // In a real implementation, you would call the IBM Watson API here
     // For now, let's mock the API call with a timeout and sample data
     setTimeout(() => {
-      // Mock response data for demonstration
+      // Analyze input text to extract keywords
+      const inputWords = text.toLowerCase().split(/\s+/).filter(Boolean);
+      const uniqueWords = [...new Set(inputWords)];
+      const frequentWords = getFrequentWords(text);
+
+      // Generate mock response based on actual text input
       const mockResponse = {
         language: language,
-        keywords: features.keywords ? [
-          { text: "artificial intelligence", relevance: 0.98, sentiment: { score: 0.8 } },
-          { text: "natural language processing", relevance: 0.93, sentiment: { score: 0.6 } },
-          { text: "machine learning", relevance: 0.89, sentiment: { score: 0.7 } },
-          { text: "data analysis", relevance: 0.84, sentiment: { score: 0.5 } },
-          { text: "text mining", relevance: 0.81, sentiment: { score: 0.4 } },
-          { text: "cognitive computing", relevance: 0.76, sentiment: { score: 0.6 } },
-          { text: "watson", relevance: 0.72, sentiment: { score: 0.9 } },
-          { text: "ibm", relevance: 0.68, sentiment: { score: 0.3 } },
-          { text: "language models", relevance: 0.65, sentiment: { score: 0.2 } },
-          { text: "analytics", relevance: 0.61, sentiment: { score: 0.1 } },
-        ] : [],
-        entities: features.entities ? [
-          { text: "IBM", type: "Organization", relevance: 0.95, sentiment: { score: 0.4 } },
-          { text: "Watson", type: "Person", relevance: 0.92, sentiment: { score: 0.8 } },
-          { text: "Natural Language Understanding", type: "Technology", relevance: 0.90, sentiment: { score: 0.7 } },
-          { text: "AI", type: "Technology", relevance: 0.87, sentiment: { score: 0.6 } },
-          { text: "API", type: "Technology", relevance: 0.82, sentiment: { score: 0.3 } },
-          { text: "United States", type: "Location", relevance: 0.67, sentiment: { score: 0.1 } },
-          { text: "2022", type: "Date", relevance: 0.55, sentiment: { score: 0 } },
-        ] : [],
-        concepts: features.concepts ? [
-          { text: "Artificial intelligence", relevance: 0.98 },
-          { text: "Natural language processing", relevance: 0.95 },
-          { text: "Machine learning", relevance: 0.92 },
-          { text: "IBM Watson", relevance: 0.87 },
-          { text: "Computational linguistics", relevance: 0.82 },
-        ] : [],
-        categories: features.categories ? [
-          { label: "technology and computing/artificial intelligence", score: 0.95 },
-          { label: "science/computer science", score: 0.82 },
-          { label: "business and industrial/business software", score: 0.74 },
-        ] : [],
-        relations: features.relations ? [
-          {
-            type: "agentOf",
-            sentence: "IBM developed Watson for natural language processing tasks.",
-            score: 0.87,
-            arguments: [
-              { 
-                text: "IBM", 
-                entities: [{ type: "Organization" }] 
-              },
-              { 
-                text: "developed", 
-                entities: [{ type: "Action" }] 
-              },
-              { 
-                text: "Watson", 
-                entities: [{ type: "Technology" }] 
-              }
-            ]
-          },
-          {
-            type: "partOf",
-            sentence: "Natural Language Understanding is a component of Watson's AI capabilities.",
-            score: 0.82,
-            arguments: [
-              { 
-                text: "Natural Language Understanding", 
-                entities: [{ type: "Technology" }] 
-              },
-              { 
-                text: "component", 
-                entities: [{ type: "Concept" }] 
-              },
-              { 
-                text: "Watson's AI capabilities", 
-                entities: [{ type: "Technology" }] 
-              }
-            ]
-          }
-        ] : []
+        keywords: features.keywords ? generateMockKeywords(frequentWords) : [],
+        entities: features.entities ? generateMockEntities(text) : [],
+        concepts: features.concepts ? generateMockConcepts(text) : [],
+        categories: features.categories ? generateMockCategories(text) : [],
+        relations: features.relations ? generateMockRelations(text) : [],
       };
 
       setResults(mockResponse);
@@ -174,6 +112,157 @@ const WatsonAnalyzer: React.FC = () => {
     }, 2000);
   };
 
+  // Helper functions for generating realistic mock data based on input text
+  const getFrequentWords = (text: string) => {
+    const words = text.toLowerCase()
+      .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+      .split(/\s+/);
+    
+    const wordFrequency: Record<string, number> = {};
+    words.forEach(word => {
+      if (word.length > 3) { // Only consider words with more than 3 characters
+        wordFrequency[word] = (wordFrequency[word] || 0) + 1;
+      }
+    });
+    
+    return Object.entries(wordFrequency)
+      .sort((a, b) => b[1] - a[1])
+      .map(entry => entry[0])
+      .slice(0, 10);
+  };
+
+  const generateMockKeywords = (words: string[]) => {
+    return words.map((word, index) => {
+      const relevance = 0.98 - (index * 0.04);
+      const sentimentScore = (Math.random() * 1.4) - 0.2; // Between -0.2 and 1.2
+      return {
+        text: word,
+        relevance: parseFloat(relevance.toFixed(2)),
+        sentiment: { score: parseFloat(sentimentScore.toFixed(2)) }
+      };
+    });
+  };
+
+  const generateMockEntities = (text: string) => {
+    const possibleEntities = [
+      { text: "Triumph", type: "Organization" },
+      { text: "bras", type: "Product" },
+      { text: "straps", type: "Feature" },
+      { text: "support", type: "Concept" },
+      { text: "design", type: "Concept" },
+      { text: "fabrics", type: "Material" },
+      { text: "dresses", type: "Product" },
+      { text: "tops", type: "Product" },
+    ];
+    
+    return possibleEntities
+      .filter(entity => text.toLowerCase().includes(entity.text.toLowerCase()))
+      .map((entity, index) => {
+        const relevance = 0.95 - (index * 0.05);
+        const sentimentScore = (Math.random() * 1.2) - 0.2;
+        return {
+          ...entity,
+          relevance: parseFloat(relevance.toFixed(2)),
+          sentiment: { score: parseFloat(sentimentScore.toFixed(2)) }
+        };
+      });
+  };
+
+  const generateMockConcepts = (text: string) => {
+    const possibleConcepts = [
+      "Lingerie",
+      "Fashion",
+      "Apparel",
+      "Clothing",
+      "Undergarments",
+      "Style",
+      "Comfort",
+      "Support"
+    ];
+    
+    return possibleConcepts
+      .slice(0, 5)
+      .map((concept, index) => ({
+        text: concept,
+        relevance: parseFloat((0.98 - (index * 0.04)).toFixed(2))
+      }));
+  };
+
+  const generateMockCategories = (text: string) => {
+    const lowerText = text.toLowerCase();
+    
+    const categories = [];
+    
+    if (lowerText.includes("bra") || lowerText.includes("support") || lowerText.includes("comfortable")) {
+      categories.push({
+        label: "shopping/apparel/underwear",
+        score: 0.95
+      });
+    }
+    
+    if (lowerText.includes("style") || lowerText.includes("design") || lowerText.includes("dress")) {
+      categories.push({
+        label: "style and fashion/clothing",
+        score: 0.82
+      });
+    }
+
+    if (lowerText.includes("comfort") || lowerText.includes("fabric") || lowerText.includes("quality")) {
+      categories.push({
+        label: "shopping/consumer resources/product reviews",
+        score: 0.74
+      });
+    }
+    
+    return categories.length > 0 ? categories : [
+      { label: "shopping/apparel/underwear", score: 0.95 }
+    ];
+  };
+
+  const generateMockRelations = (text: string) => {
+    if (!features.relations) return [];
+    
+    const relations = [];
+    
+    if (text.toLowerCase().includes("triumph") && text.toLowerCase().includes("bra")) {
+      relations.push({
+        type: "providerOf",
+        sentence: "Triumph provides strapless bras designed for secure support.",
+        score: 0.87,
+        args: [
+          { 
+            text: "Triumph", 
+            entities: [{ type: "Organization" }] 
+          },
+          { 
+            text: "strapless bras", 
+            entities: [{ type: "Product" }] 
+          }
+        ]
+      });
+    }
+    
+    if (text.toLowerCase().includes("support") && text.toLowerCase().includes("bra")) {
+      relations.push({
+        type: "featureOf",
+        sentence: "Support is a key feature of the strapless bras.",
+        score: 0.82,
+        args: [
+          { 
+            text: "Support", 
+            entities: [{ type: "Feature" }] 
+          },
+          { 
+            text: "strapless bras", 
+            entities: [{ type: "Product" }] 
+          }
+        ]
+      });
+    }
+    
+    return relations;
+  };
+
   // Process target keywords into an array
   const targetKeywordsList = targetKeywords
     .split(',')
@@ -182,91 +271,89 @@ const WatsonAnalyzer: React.FC = () => {
 
   return (
     <ThemeProvider defaultTheme="light">
-      <div className="min-h-screen bg-background text-foreground font-inter">
-        {/* Header */}
-        <header className="border-b border-border">
-          <div className="container max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <h1 className="text-xl font-semibold">IBM Watson Natural Language Understanding API</h1>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button variant="outline" size="icon" className="rounded-full">
-                <Info className="h-4 w-4" />
-              </Button>
-              <Button variant="outline" size="icon" className="rounded-full">
-                <Github className="h-4 w-4" />
-              </Button>
-              <ThemeToggle />
-            </div>
+      {/* Header */}
+      <header className="border-b border-border">
+        <div className="container max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="flex items-center space-x-2">
+            <h1 className="text-xl font-semibold">IBM Watson Natural Language Understanding API</h1>
           </div>
-        </header>
-
-        {/* Description */}
-        <div className="container max-w-7xl mx-auto px-4 py-4 border-b border-border">
-          <p className="text-sm text-muted-foreground">
-            Enterprise-grade natural language processing for extracting metadata from text such as keywords, 
-            entities, categories, and relationships. This tool leverages advanced linguistic analysis and 
-            machine learning to identify key textual elements and provide insights about content structure.
-          </p>
+          <div className="flex items-center space-x-2">
+            <Button variant="outline" size="icon" className="rounded-full">
+              <Info className="h-4 w-4" />
+            </Button>
+            <Button variant="outline" size="icon" className="rounded-full">
+              <Github className="h-4 w-4" />
+            </Button>
+            <ThemeToggle />
+          </div>
         </div>
+      </header>
 
-        {/* Main content */}
-        <main className="container max-w-7xl mx-auto px-4 py-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-1 space-y-6">
-              <ApiConfigPanel
-                apiKey={apiKey}
-                setApiKey={setApiKey}
-                url={url}
-                setUrl={setUrl}
-                region={region}
-                setRegion={setRegion}
-                instanceId={instanceId}
-                setInstanceId={setInstanceId}
-                features={features}
-                setFeatures={setFeatures}
-                limits={limits}
-                setLimits={setLimits}
-                language={language}
-                setLanguage={setLanguage}
-              />
-            </div>
-
-            <div className="md:col-span-2 space-y-6">
-              <InputPanel
-                text={text}
-                setText={setText}
-                inputMethod={inputMethod}
-                setInputMethod={setInputMethod}
-                targetKeywords={targetKeywords}
-                setTargetKeywords={setTargetKeywords}
-                onAnalyze={handleAnalyze}
-                isAnalyzing={isAnalyzing}
-              />
-
-              {results && (
-                <ResultsPanel 
-                  results={results} 
-                  targetKeywords={targetKeywordsList}
-                  textStats={textStats}
-                />
-              )}
-            </div>
-          </div>
-        </main>
-
-        {/* Footer */}
-        <footer className="border-t border-border mt-8">
-          <div className="container max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div className="text-xs text-muted-foreground">
-              IBM Watson Natural Language Understanding API Explorer - v1.0.0
-            </div>
-            <div className="text-xs text-muted-foreground">
-              Built with React & Tailwind CSS
-            </div>
-          </div>
-        </footer>
+      {/* Description */}
+      <div className="container max-w-7xl mx-auto px-4 py-4 border-b border-border">
+        <p className="text-sm text-muted-foreground">
+          Enterprise-grade natural language processing for extracting metadata from text such as keywords, 
+          entities, categories, and relationships. This tool leverages advanced linguistic analysis and 
+          machine learning to identify key textual elements and provide insights about content structure.
+        </p>
       </div>
+
+      {/* Main content */}
+      <main className="container max-w-7xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="md:col-span-1 space-y-6">
+            <ApiConfigPanel
+              apiKey={apiKey}
+              setApiKey={setApiKey}
+              url={url}
+              setUrl={setUrl}
+              region={region}
+              setRegion={setRegion}
+              instanceId={instanceId}
+              setInstanceId={setInstanceId}
+              features={features}
+              setFeatures={setFeatures}
+              limits={limits}
+              setLimits={setLimits}
+              language={language}
+              setLanguage={setLanguage}
+            />
+          </div>
+
+          <div className="md:col-span-2 space-y-6">
+            <InputPanel
+              text={text}
+              setText={setText}
+              inputMethod={inputMethod}
+              setInputMethod={setInputMethod}
+              targetKeywords={targetKeywords}
+              setTargetKeywords={setTargetKeywords}
+              onAnalyze={handleAnalyze}
+              isAnalyzing={isAnalyzing}
+            />
+
+            {results && (
+              <ResultsPanel 
+                results={results} 
+                targetKeywords={targetKeywordsList}
+                textStats={textStats}
+              />
+            )}
+          </div>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-border mt-8">
+        <div className="container max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+          <div className="text-xs text-muted-foreground">
+            IBM Watson Natural Language Understanding API Explorer - v1.0.0
+          </div>
+          <div className="text-xs text-muted-foreground">
+            Built with React & Tailwind CSS
+          </div>
+        </div>
+      </footer>
     </ThemeProvider>
   );
 };

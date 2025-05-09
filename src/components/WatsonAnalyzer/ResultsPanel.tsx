@@ -144,8 +144,8 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
                         {results.entities.map((entity: any, index: number) => {
                           const hasTargetKeyword = containsTargetKeyword(entity.text);
                           return (
-                            <TableRow key={index} className={hasTargetKeyword ? "bg-vercel-green/10" : ""}>
-                              <TableCell className={`font-medium ${hasTargetKeyword ? "text-vercel-green" : ""}`}>
+                            <TableRow key={index} className={hasTargetKeyword ? "bg-green-500/10" : ""}>
+                              <TableCell className={`font-medium ${hasTargetKeyword ? "text-green-600" : ""}`}>
                                 {entity.text}
                               </TableCell>
                               <TableCell>{entity.type}</TableCell>
@@ -191,8 +191,8 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
                         {results.keywords.map((keyword: any, index: number) => {
                           const hasTargetKeyword = containsTargetKeyword(keyword.text);
                           return (
-                            <TableRow key={index} className={hasTargetKeyword ? "bg-vercel-green/10" : ""}>
-                              <TableCell className={`font-medium ${hasTargetKeyword ? "text-vercel-green" : ""}`}>
+                            <TableRow key={index} className={hasTargetKeyword ? "bg-green-500/10" : ""}>
+                              <TableCell className={`font-medium ${hasTargetKeyword ? "text-green-600" : ""}`}>
                                 {keyword.text}
                               </TableCell>
                               <TableCell>{(keyword.relevance * 100).toFixed(1)}%</TableCell>
@@ -236,8 +236,8 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
                         {results.concepts.map((concept: any, index: number) => {
                           const hasTargetKeyword = containsTargetKeyword(concept.text);
                           return (
-                            <TableRow key={index} className={hasTargetKeyword ? "bg-vercel-green/10" : ""}>
-                              <TableCell className={`font-medium ${hasTargetKeyword ? "text-vercel-green" : ""}`}>
+                            <TableRow key={index} className={hasTargetKeyword ? "bg-green-500/10" : ""}>
+                              <TableCell className={`font-medium ${hasTargetKeyword ? "text-green-600" : ""}`}>
                                 {concept.text}
                               </TableCell>
                               <TableCell>{(concept.relevance * 100).toFixed(1)}%</TableCell>
@@ -276,17 +276,19 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
                           const hasTargetKeyword = containsTargetKeyword(sentence);
                           
                           // Extract entities involved
-                          const relationArgs = relation.arguments?.map((arg: any) => {
-                            const text = arg.text;
-                            const entityType = arg.entities?.[0]?.type || "";
-                            return `${text} (${entityType})`;
-                          }).join(" → ") || "";
+                          const relationArgs = relation.args ? 
+                            relation.args.map((arg: any) => {
+                              const text = arg.text;
+                              const entityType = arg.entities?.[0]?.type || "";
+                              return `${text} (${entityType})`;
+                            }).join(" → ") 
+                            : "";
 
                           return (
-                            <TableRow key={index} className={hasTargetKeyword ? "bg-vercel-green/10" : ""}>
+                            <TableRow key={index} className={hasTargetKeyword ? "bg-green-500/10" : ""}>
                               <TableCell>{relation.type}</TableCell>
                               <TableCell>{relationArgs}</TableCell>
-                              <TableCell className={hasTargetKeyword ? "text-vercel-green" : ""}>{sentence}</TableCell>
+                              <TableCell className={hasTargetKeyword ? "text-green-600" : ""}>{sentence}</TableCell>
                               <TableCell>{(relation.score * 100).toFixed(1)}%</TableCell>
                             </TableRow>
                           );
@@ -320,8 +322,8 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
                   {results.categories.map((category: any, index: number) => {
                     const hasTargetKeyword = containsTargetKeyword(category.label);
                     return (
-                      <TableRow key={index} className={hasTargetKeyword ? "bg-vercel-green/10" : ""}>
-                        <TableCell className={`font-medium ${hasTargetKeyword ? "text-vercel-green" : ""}`}>
+                      <TableRow key={index} className={hasTargetKeyword ? "bg-green-500/10" : ""}>
+                        <TableCell className={`font-medium ${hasTargetKeyword ? "text-green-600" : ""}`}>
                           {category.label}
                         </TableCell>
                         <TableCell>{(category.score * 100).toFixed(1)}%</TableCell>
