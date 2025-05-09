@@ -1,7 +1,6 @@
-
 import { useState } from 'react';
 import { toast } from "@/components/ui/use-toast";
-import { calculateTextStats, generateMockResponse } from '../utils/mockDataUtils';
+import { calculateTextStats } from '../utils/mockDataUtils';
 
 export interface WatsonFeatures {
   keywords: boolean;
@@ -65,7 +64,7 @@ export const useWatsonAnalyzer = () => {
     charCount: 0,
   });
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     if (!text) {
       toast({
         title: "No text provided",
@@ -78,7 +77,7 @@ export const useWatsonAnalyzer = () => {
     if (!apiKey && region !== "custom") {
       toast({
         title: "API Key required",
-        description: "Please enter your IBM Watson NLU API Key.",
+        description: "Please enter your IBM Watson NLU API key.",
         variant: "destructive",
       });
       return;
@@ -91,18 +90,83 @@ export const useWatsonAnalyzer = () => {
     const stats = calculateTextStats(text);
     setTextStats(stats);
 
-    // In a real implementation, you would call the IBM Watson API here
-    // For now, let's mock the API call with a timeout and sample data
-    setTimeout(() => {
-      const mockResponse = generateMockResponse(text, features, language);
-      setResults(mockResponse);
-      setIsAnalyzing(false);
+    // Costruisci l'URL dell'API
+    let apiUrl = url;
+    if (region !== "custom") {
+      apiUrl = `https://api.${region}.natural-language-understanding.watson.cloud.ibm.com/instances/${instanceId}/v1/analyze?version=2022-04-07`;
+    }
+
+    // Prepara i parametri per la richiesta API
+    const featuresParams: any = {};
+    
+    if (features.keywords) {
+      featuresParams.keywords = { 
+        limit: limits.keywords,
+        sentiment: true 
+      };
+    }
+    
+    if (features.entities) {
+      featuresParams.entities = { 
+        limit: limits.entities,
+        sentiment: true 
+      };
+    }
+    
+    if (features.concepts) {
+      featuresParams.concepts = { 
+        limit: limits.concepts 
+      };
+    }
+    
+    if (features.relations) {
+      featuresParams.relations = {};
+    }
+    
+    if (features.categories) {
+      featuresParams.categories = { 
+        limit: limits.categories 
+      };
+    }
+
+    const requestData = {
+      text: text,
+      features: featuresParams,
+      language: language
+    };
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Basic ${btoa(`apikey:${apiKey}`)}`
+        },
+        body: JSON.stringify(requestData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'API request failed');
+      }
+
+      const data = await response.json();
+      setResults(data);
       
       toast({
         title: "Analysis complete",
         description: "Text has been successfully analyzed.",
       });
-    }, 2000);
+    } catch (error) {
+      console.error('Error analyzing text:', error);
+      toast({
+        title: "Analysis failed",
+        description: error instanceof Error ? error.message : "An error occurred during analysis.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   // Process target keywords into an array
