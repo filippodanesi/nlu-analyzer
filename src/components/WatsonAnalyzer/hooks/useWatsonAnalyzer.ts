@@ -44,6 +44,7 @@ const SECRETS = {
     const match = url.match(/instances\/(.*?)\//);
     return match ? match[1] : "";
   })(),
+  credentialsFileExists: false // Default to false, we'll check in useEffect
 };
 
 export const useWatsonAnalyzer = () => {
@@ -62,6 +63,9 @@ export const useWatsonAnalyzer = () => {
   const [url, setUrl] = useState("");
   const [region, setRegion] = useState("eu-de"); // Default to eu-de
   const [instanceId, setInstanceId] = useState("");
+  
+  // Credentials file state
+  const [credentialsFileExists, setCredentialsFileExists] = useState(false);
   
   // Features state
   const [features, setFeatures] = useState<WatsonFeatures>({
@@ -100,6 +104,25 @@ export const useWatsonAnalyzer = () => {
     sentenceCount: 0,
     charCount: 0,
   });
+
+  // Check for ibm-credentials.env file existence
+  useEffect(() => {
+    const checkCredentialsFile = async () => {
+      try {
+        // We'll try to fetch the file to check if it exists
+        // This is a simple approach that works in browser environments
+        const response = await fetch('/ibm-credentials.env', { method: 'HEAD' });
+        if (response.ok) {
+          setCredentialsFileExists(true);
+          setUseSecrets(true); // If file exists, enable secrets by default
+        }
+      } catch (error) {
+        console.log('IBM credentials file not found');
+      }
+    };
+    
+    checkCredentialsFile();
+  }, []);
 
   // Set up initial state based on environment variables
   useEffect(() => {
@@ -294,6 +317,7 @@ export const useWatsonAnalyzer = () => {
     // Secrets state
     useSecrets,
     setUseSecrets: handleUseSecretsChange,
+    credentialsFileExists,
     
     // API Configuration
     apiKey,
@@ -337,4 +361,3 @@ export const useWatsonAnalyzer = () => {
     getTargetKeywordsList,
   };
 };
-

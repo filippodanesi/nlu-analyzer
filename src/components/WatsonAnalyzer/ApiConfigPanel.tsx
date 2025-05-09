@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
   Card, 
@@ -16,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { CheckCircle } from "lucide-react";
 import { 
   Accordion, 
   AccordionContent, 
@@ -54,6 +56,7 @@ interface ApiConfigPanelProps {
   setLanguage: (lang: string) => void;
   toneModel: string;
   setToneModel: (model: string) => void;
+  credentialsFileExists?: boolean;
 }
 
 const regionOptions = {
@@ -86,6 +89,7 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
   setLanguage,
   toneModel,
   setToneModel,
+  credentialsFileExists = false,
 }) => {
   const handleFeatureChange = (feature: string, value: boolean) => {
     setFeatures({ ...features, [feature]: value });
@@ -105,7 +109,15 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
   return (
     <Card className="w-full bg-background border-border">
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-medium">API Configuration</CardTitle>
+        <CardTitle className="text-sm font-medium flex items-center justify-between">
+          <span>API Configuration</span>
+          {credentialsFileExists && (
+            <div className="flex items-center text-green-500 ml-2">
+              <CheckCircle className="h-4 w-4 mr-1" />
+              <span className="text-xs">ibm-credentials.env found</span>
+            </div>
+          )}
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
@@ -115,11 +127,11 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
               checked={useSecrets}
               onCheckedChange={setUseSecrets}
             />
-            <Label htmlFor="use-secrets">Use credentials from secrets file</Label>
+            <Label htmlFor="use-secrets">Use credentials from {credentialsFileExists ? 'ibm-credentials.env' : 'environment'}</Label>
           </div>
           {useSecrets ? (
             <div className="px-4 py-2 bg-secondary text-secondary-foreground rounded-md text-sm">
-              Using API credentials from secrets file
+              Using API credentials from {credentialsFileExists ? 'ibm-credentials.env file' : 'environment variables'}
             </div>
           ) : (
             <>

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Github } from "lucide-react";
+import { Github, CheckCircle } from "lucide-react";
 import { ThemeProvider } from './ThemeProvider';
 import { ThemeToggle } from './ThemeToggle';
 import ApiConfigPanel from './ApiConfigPanel';
@@ -30,6 +30,7 @@ const WatsonAnalyzer: React.FC = () => {
     setRegion,
     instanceId,
     setInstanceId,
+    credentialsFileExists,
     
     // Features and limits
     features,
@@ -73,6 +74,12 @@ const WatsonAnalyzer: React.FC = () => {
         <div className="container max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <h1 className="text-xl font-semibold">IBM Watson Natural Language Understanding API</h1>
+            {credentialsFileExists && (
+              <div className="flex items-center text-green-500 ml-2" title="IBM Credentials File Found">
+                <CheckCircle className="h-5 w-5 mr-1" />
+                <span className="text-sm font-medium">Credentials File Found</span>
+              </div>
+            )}
           </div>
           <div className="flex items-center space-x-2">
             <a 
@@ -124,14 +131,23 @@ const WatsonAnalyzer: React.FC = () => {
                 setLanguage={setLanguage}
                 toneModel={toneModel}
                 setToneModel={setToneModel}
+                credentialsFileExists={credentialsFileExists}
               />
             )}
             {/* If environment variables are in use, show a confirmation message */}
-            {hasWatsonEnvVars && useSecrets && (
+            {(hasWatsonEnvVars && useSecrets) || (credentialsFileExists && useSecrets) ? (
               <div className="bg-background border border-border rounded-lg p-4 space-y-3">
-                <h3 className="text-sm font-medium">API Configuration</h3>
+                <h3 className="text-sm font-medium flex items-center">
+                  API Configuration
+                  {credentialsFileExists && (
+                    <div className="flex items-center text-green-500 ml-2">
+                      <CheckCircle className="h-4 w-4 mr-1" />
+                      <span className="text-xs">ibm-credentials.env found</span>
+                    </div>
+                  )}
+                </h3>
                 <div className="px-4 py-3 bg-secondary text-secondary-foreground rounded-md text-sm">
-                  <p>Using Watson NLU credentials from environment variables:</p>
+                  <p>Using Watson NLU credentials from {credentialsFileExists ? 'ibm-credentials.env' : 'environment variables'}:</p>
                   <ul className="list-disc ml-5 mt-2 text-xs space-y-1">
                     <li>NATURAL_LANGUAGE_UNDERSTANDING_APIKEY</li>
                     <li>NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY</li>
@@ -159,9 +175,10 @@ const WatsonAnalyzer: React.FC = () => {
                   setLanguage={setLanguage}
                   toneModel={toneModel}
                   setToneModel={setToneModel}
+                  credentialsFileExists={credentialsFileExists}
                 />
               </div>
-            )}
+            ) : null}
           </div>
 
           <div className="md:col-span-2 space-y-6">
@@ -203,4 +220,3 @@ const WatsonAnalyzer: React.FC = () => {
 };
 
 export default WatsonAnalyzer;
-
