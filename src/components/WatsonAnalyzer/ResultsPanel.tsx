@@ -153,7 +153,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
                               {entity.sentiment && (
                                 <TableCell>
                                   <Badge 
-                                    variant={entity.sentiment.score > 0 ? "success" : entity.sentiment.score < 0 ? "destructive" : "outline"}
+                                    variant={entity.sentiment.score > 0 ? "default" : entity.sentiment.score < 0 ? "destructive" : "outline"}
                                   >
                                     {entity.sentiment.score.toFixed(2)}
                                   </Badge>
@@ -199,7 +199,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
                               {keyword.sentiment && (
                                 <TableCell>
                                   <Badge 
-                                    variant={keyword.sentiment.score > 0 ? "success" : keyword.sentiment.score < 0 ? "destructive" : "outline"}
+                                    variant={keyword.sentiment.score > 0 ? "default" : keyword.sentiment.score < 0 ? "destructive" : "outline"}
                                   >
                                     {keyword.sentiment.score.toFixed(2)}
                                   </Badge>
@@ -276,7 +276,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
                           const hasTargetKeyword = containsTargetKeyword(sentence);
                           
                           // Extract entities involved
-                          const arguments = relation.arguments?.map((arg: any) => {
+                          const relationArgs = relation.arguments?.map((arg: any) => {
                             const text = arg.text;
                             const entityType = arg.entities?.[0]?.type || "";
                             return `${text} (${entityType})`;
@@ -285,7 +285,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
                           return (
                             <TableRow key={index} className={hasTargetKeyword ? "bg-vercel-green/10" : ""}>
                               <TableCell>{relation.type}</TableCell>
-                              <TableCell>{arguments}</TableCell>
+                              <TableCell>{relationArgs}</TableCell>
                               <TableCell className={hasTargetKeyword ? "text-vercel-green" : ""}>{sentence}</TableCell>
                               <TableCell>{(relation.score * 100).toFixed(1)}%</TableCell>
                             </TableRow>
