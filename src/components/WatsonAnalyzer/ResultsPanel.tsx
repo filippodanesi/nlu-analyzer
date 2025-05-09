@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { 
   Card, 
@@ -91,11 +92,17 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
 
           {/* Other tabs */}
           <TabsContent value="linguistics" className="pt-4">
-            <PlaceholderTab message="To enable linguistic analysis, select the corresponding options." />
+            <PlaceholderTab 
+              message="To enable linguistic analysis, select the corresponding options." 
+              helpText="L'analisi linguistica estrae informazioni come parti del discorso, relazioni sintattiche e funzioni grammaticali dal testo."
+            />
           </TabsContent>
 
           <TabsContent value="custom" className="pt-4">
-            <PlaceholderTab message="To use custom models, configure the appropriate settings." />
+            <PlaceholderTab 
+              message="To use custom models, configure the appropriate settings." 
+              helpText="Watson NLU può riconoscere frasi composte da più parole come entità o parole chiave. In un'implementazione reale, potresti vedere termini come 'natural language processing' o 'strapless bras' identificati come singole entità di analisi."
+            />
           </TabsContent>
         </Tabs>
 

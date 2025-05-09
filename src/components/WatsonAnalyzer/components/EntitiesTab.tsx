@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Info } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Table,
@@ -29,42 +29,69 @@ const EntitiesTab: React.FC<EntitiesTabProps> = ({ entities, containsTargetKeywo
     );
   }
 
+  // Check if there are any multi-word entities
+  const hasMultiWordEntities = entities.some(entity => entity.text.includes(' '));
+  
+  // Count words in a phrase
+  const countWords = (text: string) => {
+    return text.trim().split(/\s+/).length;
+  };
+
   return (
-    <ScrollArea className="h-[400px]">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Text</TableHead>
-            <TableHead>Type</TableHead>
-            <TableHead>Relevance</TableHead>
-            {entities[0].sentiment && <TableHead>Sentiment</TableHead>}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {entities.map((entity: any, index: number) => {
-            const hasTargetKeyword = containsTargetKeyword(entity.text);
-            return (
-              <TableRow key={index} className={hasTargetKeyword ? "bg-green-500/10" : ""}>
-                <TableCell className={`font-medium ${hasTargetKeyword ? "text-green-600" : ""}`}>
-                  {entity.text}
-                </TableCell>
-                <TableCell>{entity.type}</TableCell>
-                <TableCell>{(entity.relevance * 100).toFixed(1)}%</TableCell>
-                {entity.sentiment && (
+    <div className="space-y-4">
+      <ScrollArea className="h-[400px]">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-1/3">Text</TableHead>
+              <TableHead>Words</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Relevance</TableHead>
+              {entities[0].sentiment && <TableHead>Sentiment</TableHead>}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {entities.map((entity: any, index: number) => {
+              const hasTargetKeyword = containsTargetKeyword(entity.text);
+              const wordCount = countWords(entity.text);
+              return (
+                <TableRow key={index} className={hasTargetKeyword ? "bg-green-500/10" : ""}>
+                  <TableCell className={`font-medium ${hasTargetKeyword ? "text-green-600" : ""}`}>
+                    {entity.text}
+                  </TableCell>
                   <TableCell>
-                    <Badge 
-                      variant={entity.sentiment.score > 0 ? "default" : entity.sentiment.score < 0 ? "destructive" : "outline"}
-                    >
-                      {entity.sentiment.score.toFixed(2)}
+                    <Badge variant="outline" className="bg-secondary/50">
+                      {wordCount}
                     </Badge>
                   </TableCell>
-                )}
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    </ScrollArea>
+                  <TableCell>{entity.type}</TableCell>
+                  <TableCell>{(entity.relevance * 100).toFixed(1)}%</TableCell>
+                  {entity.sentiment && (
+                    <TableCell>
+                      <Badge 
+                        variant={entity.sentiment.score > 0 ? "default" : entity.sentiment.score < 0 ? "destructive" : "outline"}
+                      >
+                        {entity.sentiment.score.toFixed(2)}
+                      </Badge>
+                    </TableCell>
+                  )}
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </ScrollArea>
+      
+      {!hasMultiWordEntities && (
+        <div className="flex items-center space-x-2 text-sm bg-amber-50 border border-amber-200 p-3 rounded-md">
+          <Info className="h-4 w-4 text-amber-500 flex-shrink-0" />
+          <p className="text-amber-800">
+            In un'implementazione reale di Watson NLU, l'API rileva frequentemente entità composte da più parole (come "Natural Language Understanding"). 
+            L'analisi presentata è semplificata per scopi dimostrativi.
+          </p>
+        </div>
+      )}
+    </div>
   );
 };
 
