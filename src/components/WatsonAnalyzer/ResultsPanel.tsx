@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Card, 
@@ -28,6 +27,7 @@ import ExtractionTab from './components/ExtractionTab';
 import ClassificationTab from './components/ClassificationTab';
 import PlaceholderTab from './components/PlaceholderTab';
 import JsonResponseDisplay from './components/JsonResponseDisplay';
+import ToneTab from './components/ToneTab'; // Import the new ToneTab component
 
 interface ResultsPanelProps {
   results: any;
@@ -70,9 +70,10 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
 
         {/* Main Results Tabs */}
         <Tabs defaultValue="extraction" className="w-full">
-          <TabsList className="w-full grid grid-cols-4">
+          <TabsList className="w-full grid grid-cols-5">
             <TabsTrigger value="extraction">Extraction</TabsTrigger>
             <TabsTrigger value="classification">Classification</TabsTrigger>
+            <TabsTrigger value="tone">Tone Analysis</TabsTrigger>
             <TabsTrigger value="linguistics">Linguistics</TabsTrigger>
             <TabsTrigger value="custom">Custom</TabsTrigger>
           </TabsList>
@@ -89,19 +90,31 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
               containsTargetKeyword={containsTargetKeyword} 
             />
           </TabsContent>
+          
+          {/* Tone Analysis Tab */}
+          <TabsContent value="tone" className="pt-4">
+            {results.classifications ? (
+              <ToneTab classifications={results.classifications} />
+            ) : (
+              <PlaceholderTab 
+                message="To enable tone analysis, select the Tone Analysis option in the features panel." 
+                helpText="Tone analysis is only available for English and French languages, and detects seven emotional tones in text."
+              />
+            )}
+          </TabsContent>
 
           {/* Other tabs */}
           <TabsContent value="linguistics" className="pt-4">
             <PlaceholderTab 
               message="To enable linguistic analysis, select the corresponding options." 
-              helpText="L'analisi linguistica estrae informazioni come parti del discorso, relazioni sintattiche e funzioni grammaticali dal testo."
+              helpText="Linguistic analysis extracts information such as parts of speech, syntactic relationships, and grammatical functions from text."
             />
           </TabsContent>
 
           <TabsContent value="custom" className="pt-4">
             <PlaceholderTab 
               message="To use custom models, configure the appropriate settings." 
-              helpText="Watson NLU può riconoscere frasi composte da più parole come entità o parole chiave. In un'implementazione reale, potresti vedere termini come 'natural language processing' o 'strapless bras' identificati come singole entità di analisi."
+              helpText="Watson NLU can recognize multi-word phrases as entities or keywords. In a real implementation, you might see terms like 'natural language processing' or 'strapless bras' identified as single analysis entities."
             />
           </TabsContent>
         </Tabs>
