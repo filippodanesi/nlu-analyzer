@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from "@/components/ui/use-toast";
 import { calculateTextStats } from '../utils/mockDataUtils';
+import { useCredentialsConfig } from './useCredentialsConfig';
 
 export interface WatsonFeatures {
   keywords: boolean;
@@ -9,7 +10,7 @@ export interface WatsonFeatures {
   concepts: boolean;
   relations: boolean;
   categories: boolean;
-  classifications: boolean; // Added support for tone analysis
+  classifications: boolean; // Supporto per analisi del tono
 }
 
 export interface WatsonLimits {
@@ -25,47 +26,9 @@ export interface TextStats {
   charCount: number;
 }
 
-// Updated environment variable names according to the .env format
-const SECRETS = {
-  apiKey: process.env.NATURAL_LANGUAGE_UNDERSTANDING_APIKEY || 
-          process.env.NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY || "",
-  url: process.env.NATURAL_LANGUAGE_UNDERSTANDING_URL || "",
-  authType: process.env.NATURAL_LANGUAGE_UNDERSTANDING_AUTH_TYPE || "iam",
-  // Extract region from URL if available
-  region: (() => {
-    const url = process.env.NATURAL_LANGUAGE_UNDERSTANDING_URL || "";
-    // Try to extract region from URL (format: https://api.{region}.natural-language-understanding...)
-    const match = url.match(/api\.(.*?)\.natural-language-understanding/);
-    return match ? match[1] : "eu-de";
-  })(),
-  instanceId: (() => {
-    const url = process.env.NATURAL_LANGUAGE_UNDERSTANDING_URL || "";
-    // Try to extract instance ID from URL (format: .../instances/{instanceId}/...)
-    const match = url.match(/instances\/(.*?)\//);
-    return match ? match[1] : "";
-  })(),
-  credentialsFileExists: false // Default to false, we'll check in useEffect
-};
-
 export const useWatsonAnalyzer = () => {
-  // Check if any of the Watson environment variables are present
-  const hasWatsonEnvVars = !!(
-    process.env.NATURAL_LANGUAGE_UNDERSTANDING_APIKEY || 
-    process.env.NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY ||
-    process.env.NATURAL_LANGUAGE_UNDERSTANDING_URL
-  );
-  
-  // Secrets usage state - check if environment variables are present
-  const [useSecrets, setUseSecrets] = useState(hasWatsonEnvVars);
-  
-  // API Configuration state
-  const [apiKey, setApiKey] = useState("");
-  const [url, setUrl] = useState("");
-  const [region, setRegion] = useState("eu-de"); // Default to eu-de
-  const [instanceId, setInstanceId] = useState("");
-  
-  // Credentials file state
-  const [credentialsFileExists, setCredentialsFileExists] = useState(false);
+  // Ottieni la configurazione delle credenziali
+  const credentials = useCredentialsConfig();
   
   // Features state
   const [features, setFeatures] = useState<WatsonFeatures>({
@@ -74,7 +37,7 @@ export const useWatsonAnalyzer = () => {
     concepts: true,
     relations: false,
     categories: true,
-    classifications: false, // Default disabled for tone analysis
+    classifications: false, // Default disabilitato per l'analisi del tono
   });
   
   // Limits state
@@ -105,57 +68,9 @@ export const useWatsonAnalyzer = () => {
     charCount: 0,
   });
 
-  // Check for ibm-credentials.env file existence
+  // Aggiorna il modello di tono in base alla lingua selezionata
   useEffect(() => {
-    const checkCredentialsFile = async () => {
-      try {
-        // We'll try to fetch the file to check if it exists
-        // This is a simple approach that works in browser environments
-        const response = await fetch('/ibm-credentials.env', { method: 'HEAD' });
-        if (response.ok) {
-          setCredentialsFileExists(true);
-          setUseSecrets(true); // If file exists, enable secrets by default
-        }
-      } catch (error) {
-        console.log('IBM credentials file not found');
-      }
-    };
-    
-    checkCredentialsFile();
-  }, []);
-
-  // Set up initial state based on environment variables
-  useEffect(() => {
-    if (useSecrets && hasWatsonEnvVars) {
-      setApiKey(SECRETS.apiKey);
-      setUrl(SECRETS.url);
-      setRegion(SECRETS.region);
-      setInstanceId(SECRETS.instanceId);
-    }
-  }, [useSecrets, hasWatsonEnvVars]);
-
-  // Handle secrets toggle
-  const handleUseSecretsChange = (value: boolean) => {
-    setUseSecrets(value);
-    
-    // If enabled, use credentials from secrets
-    if (value && hasWatsonEnvVars) {
-      setApiKey(SECRETS.apiKey);
-      setUrl(SECRETS.url);
-      setRegion(SECRETS.region);
-      setInstanceId(SECRETS.instanceId);
-    } else {
-      // If disabled, reset the fields
-      setApiKey("");
-      setUrl("");
-      setRegion("eu-de");
-      setInstanceId("");
-    }
-  };
-
-  // Update tone model based on selected language
-  useEffect(() => {
-    // Tone analysis is only available for English and French
+    // L'analisi del tono è disponibile solo per inglese e francese
     if (language === "en") {
       setToneModel("tone-classifications-en-v1");
     } else if (language === "fr") {
@@ -166,25 +81,21 @@ export const useWatsonAnalyzer = () => {
   const handleAnalyze = async () => {
     if (!text) {
       toast({
-        title: "No text provided",
-        description: "Please enter text to analyze.",
+        title: "Nessun testo fornito",
+        description: "Per favore inserisci un testo da analizzare.",
         variant: "destructive",
       });
       return;
     }
 
-    // Check credentials (both manual and from secrets)
-    const currentApiKey = useSecrets ? SECRETS.apiKey : apiKey;
-    const currentUrl = useSecrets ? SECRETS.url : (
-      region !== "custom" ? 
-        `https://api.${region}.natural-language-understanding.watson.cloud.ibm.com/instances/${instanceId}/v1/analyze?version=2022-04-07` : 
-        url
-    );
+    // Ottieni le credenziali correnti
+    const currentApiKey = credentials.getCurrentApiKey();
+    const currentUrl = credentials.getCurrentUrl();
 
     if (!currentApiKey) {
       toast({
-        title: "API Key required",
-        description: "Please enter your IBM Watson NLU API key or enable secrets.",
+        title: "API Key richiesta",
+        description: "Per favore inserisci la tua API key IBM Watson NLU o abilita i segreti.",
         variant: "destructive",
       });
       return;
@@ -192,31 +103,31 @@ export const useWatsonAnalyzer = () => {
 
     if (!currentUrl) {
       toast({
-        title: "URL required",
-        description: "Please provide a valid URL for the IBM Watson NLU service.",
+        title: "URL richiesto",
+        description: "Per favore fornisci un URL valido per il servizio IBM Watson NLU.",
         variant: "destructive",
       });
       return;
     }
 
-    // Check for tone analysis - only available for en and fr
+    // Verifica per l'analisi del tono - disponibile solo per en e fr
     if (features.classifications && language !== "en" && language !== "fr") {
       toast({
-        title: "Language not supported",
-        description: "Tone analysis is only available for English and French languages.",
+        title: "Lingua non supportata",
+        description: "L'analisi del tono è disponibile solo per le lingue inglese e francese.",
         variant: "destructive",
       });
       return;
     }
 
-    // Start analysis
+    // Avvia analisi
     setIsAnalyzing(true);
 
-    // Calculate text statistics
+    // Calcola le statistiche del testo
     const stats = calculateTextStats(text);
     setTextStats(stats);
 
-    // Prepare parameters for API request
+    // Prepara i parametri per la richiesta API
     const featuresParams: any = {};
     
     if (features.keywords) {
@@ -262,13 +173,13 @@ export const useWatsonAnalyzer = () => {
     };
 
     try {
-      // Determine the authorization method based on environment variables
-      const authType = SECRETS.authType || "iam";
+      // Determina il metodo di autorizzazione in base alle variabili d'ambiente
+      const authType = credentials.getAuthType();
       let headers = {
         'Content-Type': 'application/json'
       };
       
-      // Add authorization header based on auth type
+      // Aggiungi l'header di autorizzazione in base al tipo di auth
       if (authType === "iam") {
         headers['Authorization'] = `Basic ${btoa(`apikey:${currentApiKey}`)}`;
       } else {
@@ -283,21 +194,21 @@ export const useWatsonAnalyzer = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'API request failed');
+        throw new Error(errorData.error || 'Richiesta API fallita');
       }
 
       const data = await response.json();
       setResults(data);
       
       toast({
-        title: "Analysis complete",
-        description: "Text has been successfully analyzed.",
+        title: "Analisi completata",
+        description: "Il testo è stato analizzato con successo.",
       });
     } catch (error) {
-      console.error('Error analyzing text:', error);
+      console.error('Errore nell\'analizzare il testo:', error);
       toast({
-        title: "Analysis failed",
-        description: error instanceof Error ? error.message : "An error occurred during analysis.",
+        title: "Analisi fallita",
+        description: error instanceof Error ? error.message : "Si è verificato un errore durante l'analisi.",
         variant: "destructive",
       });
     } finally {
@@ -305,7 +216,7 @@ export const useWatsonAnalyzer = () => {
     }
   };
 
-  // Process target keywords into an array
+  // Elabora le parole chiave target in un array
   const getTargetKeywordsList = () => {
     return targetKeywords
       .split(',')
@@ -314,32 +225,20 @@ export const useWatsonAnalyzer = () => {
   };
 
   return {
-    // Secrets state
-    useSecrets,
-    setUseSecrets: handleUseSecretsChange,
-    credentialsFileExists,
+    // Passa tutti gli stati e le funzioni delle credenziali
+    ...credentials,
     
-    // API Configuration
-    apiKey,
-    setApiKey,
-    url,
-    setUrl,
-    region,
-    setRegion,
-    instanceId,
-    setInstanceId,
-    
-    // Features and limits
+    // Features e limiti
     features,
     setFeatures,
     limits,
     setLimits,
     
-    // Language
+    // Lingua
     language,
     setLanguage,
     
-    // Tone model
+    // Modello di tono
     toneModel,
     setToneModel,
     
@@ -351,12 +250,12 @@ export const useWatsonAnalyzer = () => {
     targetKeywords,
     setTargetKeywords,
     
-    // Analysis
+    // Analisi
     isAnalyzing,
     results,
     textStats,
     
-    // Actions
+    // Azioni
     handleAnalyze,
     getTargetKeywordsList,
   };

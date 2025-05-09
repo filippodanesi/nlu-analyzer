@@ -9,13 +9,7 @@ import ResultsPanel from './ResultsPanel';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useWatsonAnalyzer } from './hooks/useWatsonAnalyzer';
-
-// Check for environment variables presence
-const hasWatsonEnvVars = !!(
-  process.env.NATURAL_LANGUAGE_UNDERSTANDING_APIKEY || 
-  process.env.NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY ||
-  process.env.NATURAL_LANGUAGE_UNDERSTANDING_URL
-);
+import { InfoCircle } from "lucide-react";
 
 const WatsonAnalyzer: React.FC = () => {
   const {
@@ -31,6 +25,7 @@ const WatsonAnalyzer: React.FC = () => {
     instanceId,
     setInstanceId,
     credentialsFileExists,
+    hasWatsonEnvVars,
     
     // Features and limits
     features,
@@ -78,6 +73,12 @@ const WatsonAnalyzer: React.FC = () => {
               <div className="flex items-center text-green-500 ml-2" title="IBM Credentials File Found">
                 <CheckCircle className="h-5 w-5 mr-1" />
                 <span className="text-sm font-medium">Credentials File Found</span>
+              </div>
+            )}
+            {!credentialsFileExists && hasWatsonEnvVars && (
+              <div className="flex items-center text-blue-500 ml-2" title="IBM Credentials from Environment">
+                <InfoCircle className="h-5 w-5 mr-1" />
+                <span className="text-sm font-medium">Env Variables Found</span>
               </div>
             )}
           </div>
@@ -145,6 +146,12 @@ const WatsonAnalyzer: React.FC = () => {
                       <span className="text-xs">ibm-credentials.env found</span>
                     </div>
                   )}
+                  {!credentialsFileExists && hasWatsonEnvVars && (
+                    <div className="flex items-center text-blue-500 ml-2">
+                      <InfoCircle className="h-4 w-4 mr-1" />
+                      <span className="text-xs">environment variables found</span>
+                    </div>
+                  )}
                 </h3>
                 <div className="px-4 py-3 bg-secondary text-secondary-foreground rounded-md text-sm">
                   <p>Using Watson NLU credentials from {credentialsFileExists ? 'ibm-credentials.env' : 'environment variables'}:</p>
@@ -154,6 +161,11 @@ const WatsonAnalyzer: React.FC = () => {
                     <li>NATURAL_LANGUAGE_UNDERSTANDING_URL</li>
                     <li>NATURAL_LANGUAGE_UNDERSTANDING_AUTH_TYPE</li>
                   </ul>
+                  <p className="mt-2 text-xs italic">
+                    {credentialsFileExists ? 
+                      "Credentials from file have higher priority than environment variables." : 
+                      "You can also set these variables in your hosting provider (like Vercel) for production."}
+                  </p>
                 </div>
                 {/* Still show the features configuration part */}
                 <ApiConfigPanel
