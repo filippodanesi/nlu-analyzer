@@ -64,8 +64,7 @@ const regionOptions = {
   "eu-gb": "London (eu-gb)",
   "au-syd": "Sydney (au-syd)",
   "jp-tok": "Tokyo (jp-tok)",
-  "kr-seo": "Seoul (kr-seo)",
-  "custom": "Custom",
+  "kr-seo": "Seoul (kr-seo)"
 };
 
 const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
@@ -255,27 +254,15 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
             </Select>
           </div>
 
-          {region === "custom" ? (
-            <div className="space-y-2">
-              <Label htmlFor="custom-url">Custom API URL</Label>
-              <Input
-                id="custom-url"
-                placeholder="Enter the full URL of your IBM Watson NLU instance"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-              />
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <Label htmlFor="instance-id">Instance ID</Label>
-              <Input
-                id="instance-id"
-                placeholder="Enter your IBM Watson NLU instance ID"
-                value={instanceId}
-                onChange={(e) => setInstanceId(e.target.value)}
-              />
-            </div>
-          )}
+          <div className="space-y-2">
+            <Label htmlFor="instance-id">Instance ID</Label>
+            <Input
+              id="instance-id"
+              placeholder="Enter your IBM Watson NLU instance ID"
+              value={instanceId}
+              onChange={(e) => setInstanceId(e.target.value)}
+            />
+          </div>
         </div>
 
         <Separator />

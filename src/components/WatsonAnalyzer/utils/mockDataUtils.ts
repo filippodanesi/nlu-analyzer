@@ -56,7 +56,8 @@ export const generateMockEntities = (text: string) => {
     .map((entity, index) => {
       const relevance = 0.95 - (index * 0.05);
       return {
-        ...entity,
+        text: entity.text,
+        type: entity.type,
         relevance: parseFloat(relevance.toFixed(2))
       };
     });
