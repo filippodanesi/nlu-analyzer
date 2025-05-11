@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { CheckCircle, Copy, Clipboard, Save } from "lucide-react";
+import { CheckCircle, Copy, Clipboard, Save, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { 
@@ -156,7 +156,43 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
       setUrl(`https://api.${value}.natural-language-understanding.watson.cloud.ibm.com/instances/`);
     }
   };
-  
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      const lines = content.split('\n');
+      
+      let apiKey = '';
+      let url = '';
+      
+      lines.forEach(line => {
+        if (line.startsWith('NATURAL_LANGUAGE_UNDERSTANDING_APIKEY=')) {
+          apiKey = line.split('=')[1].trim();
+        }
+        if (line.startsWith('NATURAL_LANGUAGE_UNDERSTANDING_URL=')) {
+          url = line.split('=')[1].trim();
+        }
+      });
+
+      if (apiKey && url) {
+        setApiKey(apiKey);
+        const urlObj = new URL(url);
+        const region = urlObj.hostname.split('.')[1];
+        setRegion(region);
+        setUrl(url);
+        setInstanceId(url.split('/').pop() || '');
+        toast.success("Credentials imported successfully");
+      } else {
+        toast.error("Invalid .env file format");
+      }
+    };
+    reader.readAsText(file);
+  };
+
   return (
     <Card className="w-full bg-background border-border">
       <CardHeader className="pb-3">
@@ -169,24 +205,24 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
                 <span className="text-xs">ibm-credentials.env found</span>
               </div>
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleSaveCredentials}
-              className="h-8"
-            >
-              <Save className="h-4 w-4 mr-1" />
-              <span className="text-xs">Save</span>
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleLoadCredentials}
-              className="h-8"
-            >
-              <Clipboard className="h-4 w-4 mr-1" />
-              <span className="text-xs">Load</span>
-            </Button>
+            <div className="relative">
+              <input
+                type="file"
+                accept=".env"
+                onChange={handleFileUpload}
+                className="hidden"
+                id="env-upload"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => document.getElementById('env-upload')?.click()}
+                className="h-8"
+              >
+                <Upload className="h-4 w-4 mr-1" />
+                <span className="text-xs">Import .env</span>
+              </Button>
+            </div>
           </div>
         </CardTitle>
       </CardHeader>
