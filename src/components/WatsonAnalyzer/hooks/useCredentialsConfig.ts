@@ -1,72 +1,80 @@
-
 import { useState, useEffect } from 'react';
 import { toast } from "@/components/ui/use-toast";
 
-// Estratto delle variabili d'ambiente per Watson
+// Extract environment variables for Watson
 export const SECRETS = {
-  apiKey: import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_APIKEY || 
-          import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY || "",
-  url: import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_URL || "",
-  authType: import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_AUTH_TYPE || "iam",
-  // Estrai la regione dall'URL se disponibile
+  apiKey: import.meta.env.VITE_NATURAL_LANGUAGE_UNDERSTANDING_APIKEY || 
+          import.meta.env.VITE_NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY || "",
+  url: import.meta.env.VITE_NATURAL_LANGUAGE_UNDERSTANDING_URL || "",
+  authType: import.meta.env.VITE_NATURAL_LANGUAGE_UNDERSTANDING_AUTH_TYPE || "iam",
+  // Extract region from URL if available
   region: (() => {
-    const url = import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_URL || "";
-    // Prova a estrarre la regione dall'URL (formato: https://api.{region}.natural-language-understanding...)
+    const url = import.meta.env.VITE_NATURAL_LANGUAGE_UNDERSTANDING_URL || "";
+    // Try to extract region from URL (format: https://api.{region}.natural-language-understanding...)
     const match = url.match(/api\.(.*?)\.natural-language-understanding/);
     return match ? match[1] : "eu-de";
   })(),
   instanceId: (() => {
-    const url = import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_URL || "";
-    // Prova a estrarre l'ID istanza dall'URL (formato: .../instances/{instanceId}/...)
+    const url = import.meta.env.VITE_NATURAL_LANGUAGE_UNDERSTANDING_URL || "";
+    // Try to extract instance ID from URL (format: .../instances/{instanceId}/...)
     const match = url.match(/instances\/(.*?)\//);
     return match ? match[1] : "";
   })(),
-  credentialsFileExists: false // Default a false, controlleremo nell'useEffect
+  credentialsFileExists: false // Default to false, we'll check in useEffect
 };
 
 export const useCredentialsConfig = () => {
-  // Verifica se sono presenti variabili d'ambiente Watson
+  // Debug: check which variables are available
+  useEffect(() => {
+    console.log('Environment variables check:');
+    console.log('VITE_APIKEY:', !!import.meta.env.VITE_NATURAL_LANGUAGE_UNDERSTANDING_APIKEY);
+    console.log('VITE_IAM_APIKEY:', !!import.meta.env.VITE_NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY);
+    console.log('VITE_URL:', !!import.meta.env.VITE_NATURAL_LANGUAGE_UNDERSTANDING_URL);
+    console.log('VITE_AUTH_TYPE:', !!import.meta.env.VITE_NATURAL_LANGUAGE_UNDERSTANDING_AUTH_TYPE);
+  }, []);
+
+  // Check if Watson environment variables are present
   const hasWatsonEnvVars = !!(
-    import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_APIKEY || 
-    import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY ||
-    import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_URL
+    import.meta.env.VITE_NATURAL_LANGUAGE_UNDERSTANDING_APIKEY || 
+    import.meta.env.VITE_NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY ||
+    import.meta.env.VITE_NATURAL_LANGUAGE_UNDERSTANDING_URL
   );
   
-  // Stato per l'utilizzo dei segreti - verifica se sono presenti variabili d'ambiente
+  // State for using secrets - check if environment variables are present
   const [useSecrets, setUseSecrets] = useState(hasWatsonEnvVars);
   
-  // Configurazione dell'API
+  // API configuration
   const [apiKey, setApiKey] = useState("");
   const [url, setUrl] = useState("");
-  const [region, setRegion] = useState("eu-de"); // Default a eu-de
+  const [region, setRegion] = useState("eu-de"); // Default to eu-de
   const [instanceId, setInstanceId] = useState("");
   
-  // Stato del file credenziali
+  // Credentials file state
   const [credentialsFileExists, setCredentialsFileExists] = useState(false);
 
-  // Verifica l'esistenza del file ibm-credentials.env
+  // Check if ibm-credentials.env file exists
   useEffect(() => {
     const checkCredentialsFile = async () => {
       try {
-        // Proviamo a recuperare il file per verificare se esiste
+        // Try to fetch the file to check if it exists
         const response = await fetch('/ibm-credentials.env', { method: 'HEAD' });
         if (response.ok) {
           setCredentialsFileExists(true);
-          setUseSecrets(true); // Se il file esiste, abilita i segreti di default
+          setUseSecrets(true); // If file exists, enable secrets by default
           toast({
-            title: "File credenziali IBM trovato",
-            description: "Il file ibm-credentials.env è stato rilevato e verrà utilizzato per l'autenticazione.",
+            title: "IBM credentials file found",
+            description: "The ibm-credentials.env file was detected and will be used for authentication.",
           });
         }
       } catch (error) {
-        console.log('File credenziali IBM non trovato');
+        console.log('IBM credentials file not found');
       }
     };
     
     checkCredentialsFile();
   }, []);
 
-  // Imposta lo stato iniziale in base alle variabili d'ambiente
+  // Set initial state based on environment variables
   useEffect(() => {
     if (useSecrets && hasWatsonEnvVars) {
       setApiKey(SECRETS.apiKey);
@@ -76,18 +84,18 @@ export const useCredentialsConfig = () => {
     }
   }, [useSecrets, hasWatsonEnvVars]);
 
-  // Gestione toggle dei segreti
+  // Handle secrets toggle
   const handleUseSecretsChange = (value: boolean) => {
     setUseSecrets(value);
     
-    // Se abilitato, usa credenziali dai segreti
+    // If enabled, use credentials from secrets
     if (value && hasWatsonEnvVars) {
       setApiKey(SECRETS.apiKey);
       setUrl(SECRETS.url);
       setRegion(SECRETS.region);
       setInstanceId(SECRETS.instanceId);
     } else {
-      // Se disabilitato, reimposta i campi
+      // If disabled, reset fields
       setApiKey("");
       setUrl("");
       setRegion("eu-de");
@@ -95,15 +103,15 @@ export const useCredentialsConfig = () => {
     }
   };
   
-  // Restituisci valori che verranno utilizzati dal componente
+  // Return values that will be used by the component
   return {
-    // Stato segreti
+    // Secrets state
     useSecrets,
     setUseSecrets: handleUseSecretsChange,
     credentialsFileExists,
     hasWatsonEnvVars,
     
-    // Configurazione API
+    // API configuration
     apiKey,
     setApiKey,
     url,
@@ -113,7 +121,7 @@ export const useCredentialsConfig = () => {
     instanceId,
     setInstanceId,
     
-    // Funzioni di utilità
+    // Utility functions
     getCurrentApiKey: () => useSecrets ? SECRETS.apiKey : apiKey,
     getCurrentUrl: () => {
       if (useSecrets) return SECRETS.url;
