@@ -1,6 +1,6 @@
-# IBM Watson Text Analyzer
+# IBM Watson NLU Analyzer
 
-Powerful tool for analyzing text content using IBM Watson's Natural Language Understanding (NLU) service. This application provides an elegant way to extract insights from text data through advanced NLP techniques.
+Powerful tool for analyzing text content using IBM Watson's Natural Language Understanding (NLU) service. This application provides an elegant way to extract insights from text data through advanced NLU techniques.
 
 ## Features
 
