@@ -138,7 +138,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
       <CardFooter className="flex justify-between pt-2 text-xs text-muted-foreground">
         <span className="flex items-center gap-1">
           <FileJson className="h-3.5 w-3.5" />
-          IBM Watson Natural Language Understanding API Explorer
+          IBM Watson Natural Language Understanding Analyzer
         </span>
         <span>v1.0.0</span>
       </CardFooter>

@@ -14,7 +14,7 @@ const Header: React.FC<HeaderProps> = ({ credentialsFileExists, hasWatsonEnvVars
     <header className="border-b border-border">
       <div className="container max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
         <div className="flex items-center space-x-2">
-          <h1 className="text-xl font-semibold">IBM Watson Natural Language Understanding API</h1>
+          <h1 className="text-xl font-semibold">IBM Watson Natural Language Understanding Analyzer</h1>
           {credentialsFileExists && (
             <div className="flex items-center text-green-500 ml-2" title="IBM Credentials File Found">
               <CheckCircle className="h-5 w-5 mr-1" />
