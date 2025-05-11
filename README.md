@@ -1,4 +1,3 @@
-
 # IBM Watson Natural Language Understanding API Explorer
 
 A modern, Vercel-inspired interface for analyzing text content using IBM Watson's Natural Language Understanding (NLU) service. This application provides an elegant way to extract insights from text data through advanced NLP techniques.
@@ -29,9 +28,10 @@ The application is built using a modern React stack:
 
 The application provides several options for authenticating with IBM Watson's NLU API:
 
-1. **Direct API Key** - Enter your API key directly in the configuration panel
-2. **Region Selection** - Choose from predefined IBM Cloud regions or specify a custom URL
-3. **Instance ID** - Specify your service instance ID for the selected region
+1. **Environment Variables** - Use credentials from environment variables or `ibm-credentials.env` file
+2. **Direct API Key** - Enter your API key directly in the configuration panel
+3. **Region Selection** - Choose from predefined IBM Cloud regions or specify a custom URL
+4. **Instance ID** - Specify your service instance ID for the selected region
 
 ### Available Regions
 
@@ -91,7 +91,31 @@ npm install
 yarn install
 ```
 
-3. Start the development server:
+3. Configure API credentials (choose one method):
+
+#### Method 1: Using ibm-credentials.env (Recommended for local development)
+
+Create a file named `ibm-credentials.env` in the project root:
+
+```env
+NATURAL_LANGUAGE_UNDERSTANDING_APIKEY=your-api-key-here
+NATURAL_LANGUAGE_UNDERSTANDING_URL=your-service-url-here
+NATURAL_LANGUAGE_UNDERSTANDING_AUTH_TYPE=iam
+```
+
+**Important**: This file is automatically ignored by git. Never commit it to the repository!
+
+#### Method 2: Using .env file
+
+Create a `.env` file in the project root:
+
+```env
+VITE_NATURAL_LANGUAGE_UNDERSTANDING_APIKEY=your-api-key-here
+VITE_NATURAL_LANGUAGE_UNDERSTANDING_URL=your-service-url-here
+VITE_NATURAL_LANGUAGE_UNDERSTANDING_AUTH_TYPE=iam
+```
+
+4. Start the development server:
 
 ```bash
 npm run dev
@@ -99,7 +123,7 @@ npm run dev
 yarn dev
 ```
 
-4. Open your browser to `http://localhost:8080`
+5. Open your browser to `http://localhost:8080`
 
 ### Required API Credentials
 
@@ -109,13 +133,50 @@ To use this application, you'll need:
 2. An active Watson Natural Language Understanding service instance
 3. API key and URL from your service credentials
 
+## Production Deployment
+
+### Vercel Deployment
+
+1. Deploy the repository to Vercel
+2. Add the following environment variables in your Vercel project settings:
+   - `NATURAL_LANGUAGE_UNDERSTANDING_APIKEY`
+   - `NATURAL_LANGUAGE_UNDERSTANDING_URL`
+   - `NATURAL_LANGUAGE_UNDERSTANDING_AUTH_TYPE`
+
+The application automatically detects and uses these environment variables in production.
+
 ## Usage Guide
 
-1. Configure the API in the left sidebar
+1. Configure the API credentials (automatic if using environment variables)
 2. Enter text directly or upload a text file
 3. (Optional) Add target keywords for highlighting
 4. Click "Analyze" to process your content
 5. View results in organized tabs based on feature categories
+
+## Security Best Practices
+
+- **Never commit credentials**: The `ibm-credentials.env` and `.env` files are gitignored
+- **Use environment variables**: Store credentials in your hosting platform's environment variables
+- **Rotate API keys**: Regularly update your IBM Watson API keys
+- **Limit access**: Restrict API key permissions to only what's needed
+
+## Development
+
+### Building for Production
+
+```bash
+npm run build
+# or
+yarn build
+```
+
+### Running Tests
+
+```bash
+npm test
+# or
+yarn test
+```
 
 ## Technical Implementation Details
 
@@ -144,25 +205,25 @@ Text analysis is performed by sending requests to the IBM Watson NLU API with:
 - Feature-specific parameters and limits
 - Language specification
 
-## Development
+## Troubleshooting
 
-### Building for Production
+### Environment Variables Not Loading
 
-```bash
-npm run build
-# or
-yarn build
-```
+If the application doesn't detect your environment variables:
 
-### Running Tests
+1. Ensure the file names are correct (`ibm-credentials.env` or `.env`)
+2. Restart the development server after creating/modifying env files
+3. Check that variables are properly formatted
+4. For Vercel deployments, ensure variables are added to the project settings
 
-```bash
-npm test
-# or
-yarn test
-```
+### API Authentication Errors
 
-## Acknowledgments
+1. Verify your API key is correct
+2. Check that the URL matches your IBM Watson instance
+3. Ensure your Watson NLU service is active
+4. Confirm the auth type is set correctly (usually `iam`)
+
+## Contributors
 
 - Built with React, Typescript, and Tailwind CSS
 - UI inspired by Vercel's minimalist design principles
