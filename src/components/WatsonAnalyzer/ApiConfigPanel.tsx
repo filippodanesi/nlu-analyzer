@@ -16,7 +16,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Copy, Clipboard, Save } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 import { 
   Accordion, 
   AccordionContent, 
@@ -85,6 +87,61 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
   setToneModel,
   credentialsFileExists = false,
 }) => {
+  const [quickInput, setQuickInput] = useState("");
+
+  const handleQuickInput = () => {
+    try {
+      // Try to parse as JSON first
+      const data = JSON.parse(quickInput);
+      if (data.apikey) setApiKey(data.apikey);
+      if (data.url) {
+        const url = new URL(data.url);
+        const region = url.hostname.split('.')[1];
+        setRegion(region);
+        setUrl(data.url);
+      }
+      if (data.instance_id) setInstanceId(data.instance_id);
+      toast.success("Credentials imported successfully");
+    } catch {
+      // If not JSON, try to parse as URL
+      try {
+        const url = new URL(quickInput);
+        if (url.hostname.includes('natural-language-understanding')) {
+          const region = url.hostname.split('.')[1];
+          setRegion(region);
+          setUrl(quickInput);
+          toast.success("URL imported successfully");
+        }
+      } catch {
+        toast.error("Invalid input format");
+      }
+    }
+    setQuickInput("");
+  };
+
+  const handleSaveCredentials = () => {
+    const credentials = {
+      apiKey,
+      url,
+      region,
+      instanceId
+    };
+    localStorage.setItem('watson_credentials', JSON.stringify(credentials));
+    toast.success("Credentials saved locally");
+  };
+
+  const handleLoadCredentials = () => {
+    const saved = localStorage.getItem('watson_credentials');
+    if (saved) {
+      const credentials = JSON.parse(saved);
+      setApiKey(credentials.apiKey);
+      setUrl(credentials.url);
+      setRegion(credentials.region);
+      setInstanceId(credentials.instanceId);
+      toast.success("Credentials loaded from local storage");
+    }
+  };
+
   const handleFeatureChange = (feature: string, value: boolean) => {
     setFeatures({ ...features, [feature]: value });
   };
@@ -105,16 +162,53 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium flex items-center justify-between">
           <span>API Configuration</span>
-          {credentialsFileExists && (
-            <div className="flex items-center text-green-500 ml-2">
-              <CheckCircle className="h-4 w-4 mr-1" />
-              <span className="text-xs">ibm-credentials.env found</span>
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            {credentialsFileExists && (
+              <div className="flex items-center text-green-500">
+                <CheckCircle className="h-4 w-4 mr-1" />
+                <span className="text-xs">ibm-credentials.env found</span>
+              </div>
+            )}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSaveCredentials}
+              className="h-8"
+            >
+              <Save className="h-4 w-4 mr-1" />
+              <span className="text-xs">Save</span>
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleLoadCredentials}
+              className="h-8"
+            >
+              <Clipboard className="h-4 w-4 mr-1" />
+              <span className="text-xs">Load</span>
+            </Button>
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
+          <div className="space-y-2">
+            <Label>Quick Input</Label>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Paste API URL or JSON credentials"
+                value={quickInput}
+                onChange={(e) => setQuickInput(e.target.value)}
+              />
+              <Button onClick={handleQuickInput}>
+                <Clipboard className="h-4 w-4 mr-1" />
+                Import
+              </Button>
+            </div>
+          </div>
+
+          <Separator />
+
           <div className="space-y-2">
             <Label htmlFor="api-key">API Key</Label>
             <Input
