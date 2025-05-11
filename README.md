@@ -1,6 +1,6 @@
-# IBM Watson Natural Language Understanding API Explorer
+# IBM Watson Text Analyzer
 
-A modern, Vercel-inspired interface for analyzing text content using IBM Watson's Natural Language Understanding (NLU) service. This application provides an elegant way to extract insights from text data through advanced NLP techniques.
+Powerful tool for analyzing text content using IBM Watson's Natural Language Understanding (NLU) service. This application provides an elegant way to extract insights from text data through advanced NLP techniques.
 
 ## Features
 
