@@ -62,8 +62,8 @@ export const useAnalysisExecution = ({
       return;
     }
 
-    // Check for tone analysis - only available for en and fr
-    if (features.classifications && language !== "en" && language !== "fr") {
+    // Check for tone analysis - only block if language is not auto, en, or fr
+    if (features.classifications && (language !== "auto" && language !== "en" && language !== "fr")) {
       toast({
         title: "Unsupported language",
         description: "Tone analysis is only available for English and French languages.",
