@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { toast } from "@/components/ui/use-toast";
 import { TextStats } from './useInputManagement';
@@ -102,17 +101,14 @@ export const useAnalysisExecution = ({
       };
     }
     
-    if (features.relations) {
-      featuresParams.relations = {};
-    }
-    
     if (features.categories) {
       featuresParams.categories = { 
         limit: limits.categories 
       };
     }
     
-    if (features.classifications) {
+    // Tone Analysis: se la lingua è auto, includi sempre classifications se abilitato
+    if (features.classifications && (language === 'auto' || language === 'en' || language === 'fr')) {
       featuresParams.classifications = {
         model: toneModel
       };
