@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 import { toast } from "@/components/ui/use-toast";
 
+// Temporary debug code - remove after testing
+console.log('All VITE env vars:', Object.keys(import.meta.env).filter(key => key.startsWith('VITE_')));
+console.log('VITE_NATURAL_LANGUAGE_UNDERSTANDING_APIKEY:', import.meta.env.VITE_NATURAL_LANGUAGE_UNDERSTANDING_APIKEY);
+console.log('VITE_NATURAL_LANGUAGE_UNDERSTANDING_URL:', import.meta.env.VITE_NATURAL_LANGUAGE_UNDERSTANDING_URL);
+
 // Extract environment variables for Watson
 export const SECRETS = {
   apiKey: import.meta.env.VITE_NATURAL_LANGUAGE_UNDERSTANDING_APIKEY || 
