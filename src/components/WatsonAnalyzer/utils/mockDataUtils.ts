@@ -243,34 +243,76 @@ export const generateMockSyntax = (text: string) => {
 };
 
 /**
- * Generate complete mock Watson NLU API response
+ * Generate mock classifications (tone analysis)
  */
-export const generateMockResponse = (text: string, features: {
+export const generateMockClassifications = (text: string) => {
+  const tones = [
+    { tone_id: "excited", score: Math.random() * 0.5 },
+    { tone_id: "frustrated", score: Math.random() * 0.3 },
+    { tone_id: "impolite", score: Math.random() * 0.2 },
+    { tone_id: "polite", score: Math.random() * 0.4 },
+    { tone_id: "sad", score: Math.random() * 0.3 },
+    { tone_id: "satisfied", score: Math.random() * 0.6 },
+    { tone_id: "sympathetic", score: Math.random() * 0.4 }
+  ];
+
+  return {
+    document: {
+      tones: tones.filter(tone => tone.score > 0.1)
+    }
+  };
+};
+
+interface WatsonFeatures {
   keywords: boolean;
   entities: boolean;
   concepts: boolean;
-  relations: boolean;
   categories: boolean;
-  emotion: boolean;
-  sentiment: boolean;
-  semantic_roles: boolean;
-  syntax: boolean;
-}, language: string) => {
-  // Analyze input text to extract keywords
-  const frequentWords = getFrequentWords(text);
+  classifications: boolean;
+}
 
-  return {
-    language: language,
-    keywords: features.keywords ? generateMockKeywords(frequentWords) : [],
-    entities: features.entities ? generateMockEntities(text) : [],
-    concepts: features.concepts ? generateMockConcepts(text) : [],
-    categories: features.categories ? generateMockCategories(text) : [],
-    relations: features.relations ? generateMockRelations(text, features.relations) : [],
-    emotion: features.emotion ? generateMockEmotion(text) : undefined,
-    sentiment: features.sentiment ? generateMockSentiment(text) : undefined,
-    semantic_roles: features.semantic_roles ? generateMockSemanticRoles(text) : [],
-    syntax: features.syntax ? generateMockSyntax(text) : undefined
+interface WatsonLimits {
+  keywords: number;
+  entities: number;
+  concepts: number;
+  categories: number;
+}
+
+export const generateMockResponse = (
+  text: string,
+  features: WatsonFeatures,
+  limits: WatsonLimits
+): any => {
+  const response: any = {
+    language: "en",
+    usage: {
+      text_units: 1,
+      text_characters: text.length,
+      features: Object.keys(features).filter((key) => features[key as keyof WatsonFeatures]).length,
+    },
   };
+
+  if (features.keywords) {
+    response.keywords = generateMockKeywords(getFrequentWords(text));
+  }
+
+  if (features.entities) {
+    response.entities = generateMockEntities(text);
+  }
+
+  if (features.concepts) {
+    response.concepts = generateMockConcepts(text);
+  }
+
+  if (features.categories) {
+    response.categories = generateMockCategories(text);
+  }
+
+  if (features.classifications) {
+    response.classifications = generateMockClassifications(text);
+  }
+
+  return response;
 };
 
 /**

@@ -1,16 +1,11 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export interface WatsonFeatures {
   keywords: boolean;
   entities: boolean;
   concepts: boolean;
-  relations: boolean;
   categories: boolean;
   classifications: boolean; // Support for tone analysis
-  emotion: boolean; // New: Emotion analysis
-  sentiment: boolean; // New: Sentiment analysis
-  semantic_roles: boolean; // New: Semantic roles analysis
-  syntax: boolean; // New: Syntax analysis
 }
 
 export interface WatsonLimits {
@@ -18,7 +13,6 @@ export interface WatsonLimits {
   entities: number;
   concepts: number;
   categories: number;
-  semantic_roles: number; // New: Limit for semantic roles
 }
 
 export const useAnalysisFeatures = () => {
@@ -27,13 +21,8 @@ export const useAnalysisFeatures = () => {
     keywords: true,
     entities: true,
     concepts: true,
-    relations: false,
     categories: true,
     classifications: false, // Default disabled for tone analysis
-    emotion: false, // Default disabled for emotion analysis
-    sentiment: false, // Default disabled for sentiment analysis
-    semantic_roles: false, // Default disabled for semantic roles
-    syntax: false, // Default disabled for syntax analysis
   });
   
   // Limits state
@@ -42,11 +31,10 @@ export const useAnalysisFeatures = () => {
     entities: 10,
     concepts: 5,
     categories: 3,
-    semantic_roles: 10, // Default limit for semantic roles
   });
   
   // Language state
-  const [language, setLanguage] = useState("en");
+  const [language, setLanguage] = useState("auto"); // Default to auto-detect
   
   // Tone model state
   const [toneModel, setToneModel] = useState("tone-classifications-en-v1");
