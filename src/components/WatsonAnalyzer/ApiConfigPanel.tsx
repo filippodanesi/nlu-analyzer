@@ -40,6 +40,10 @@ interface ApiConfigPanelProps {
     relations: boolean;
     categories: boolean;
     classifications: boolean;
+    emotion: boolean;
+    sentiment: boolean;
+    semantic_roles: boolean;
+    syntax: boolean;
   };
   setFeatures: (features: any) => void;
   limits: {
@@ -47,6 +51,7 @@ interface ApiConfigPanelProps {
     entities: number;
     concepts: number;
     categories: number;
+    semantic_roles: number;
   };
   setLimits: (limits: any) => void;
   language: string;
@@ -235,6 +240,52 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
               <Label htmlFor="classifications">Tone Analysis</Label>
             </div>
           </div>
+
+          <div className="space-y-2">
+            <h4 className="text-xs font-medium text-muted-foreground">Emotion & Sentiment</h4>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="emotion"
+                  checked={features.emotion}
+                  onCheckedChange={(checked) => handleFeatureChange("emotion", checked)}
+                />
+                <Label htmlFor="emotion">Emotion Analysis</Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="sentiment"
+                  checked={features.sentiment}
+                  onCheckedChange={(checked) => handleFeatureChange("sentiment", checked)}
+                />
+                <Label htmlFor="sentiment">Sentiment Analysis</Label>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <h4 className="text-xs font-medium text-muted-foreground">Advanced Analysis</h4>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="semantic_roles"
+                  checked={features.semantic_roles}
+                  onCheckedChange={(checked) => handleFeatureChange("semantic_roles", checked)}
+                />
+                <Label htmlFor="semantic_roles">Semantic Roles</Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="syntax"
+                  checked={features.syntax}
+                  onCheckedChange={(checked) => handleFeatureChange("syntax", checked)}
+                />
+                <Label htmlFor="syntax">Syntax Analysis</Label>
+              </div>
+            </div>
+          </div>
         </div>
 
         <Separator />
@@ -310,6 +361,18 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
                   max="50"
                   value={limits.categories}
                   onChange={(e) => handleLimitChange("categories", parseInt(e.target.value))}
+                />
+              </div>
+
+              <div className="space-y-1">
+                <Label htmlFor="semantic_roles-limit">Semantic Roles</Label>
+                <Input
+                  id="semantic_roles-limit"
+                  type="number"
+                  min="1"
+                  max="50"
+                  value={limits.semantic_roles}
+                  onChange={(e) => handleLimitChange("semantic_roles", parseInt(e.target.value))}
                 />
               </div>
             </div>

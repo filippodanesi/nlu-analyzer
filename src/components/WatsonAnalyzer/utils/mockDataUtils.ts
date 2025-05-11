@@ -1,4 +1,3 @@
-
 /**
  * Mock data generation utilities for Watson NLU API responses
  */
@@ -172,6 +171,78 @@ export const generateMockRelations = (text: string, featuresEnabled: boolean) =>
 };
 
 /**
+ * Generate mock emotion analysis
+ */
+export const generateMockEmotion = (text: string) => {
+  return {
+    document: {
+      emotion: {
+        sadness: Math.random() * 0.5,
+        joy: Math.random() * 0.5,
+        fear: Math.random() * 0.5,
+        disgust: Math.random() * 0.5,
+        anger: Math.random() * 0.5
+      }
+    }
+  };
+};
+
+/**
+ * Generate mock sentiment analysis
+ */
+export const generateMockSentiment = (text: string) => {
+  const score = (Math.random() * 2) - 1; // Random score between -1 and 1
+  return {
+    document: {
+      score: parseFloat(score.toFixed(2)),
+      label: score > 0 ? "positive" : score < 0 ? "negative" : "neutral"
+    }
+  };
+};
+
+/**
+ * Generate mock semantic roles analysis
+ */
+export const generateMockSemanticRoles = (text: string) => {
+  const sentences = text.split(/[.!?]+/).filter(Boolean);
+  return sentences.map(sentence => ({
+    sentence,
+    subject: {
+      text: sentence.split(" ")[0]
+    },
+    action: {
+      text: sentence.split(" ")[1] || "",
+      verb: {
+        text: sentence.split(" ")[1] || "",
+        tense: "present"
+      }
+    },
+    object: {
+      text: sentence.split(" ").slice(2).join(" ")
+    }
+  }));
+};
+
+/**
+ * Generate mock syntax analysis
+ */
+export const generateMockSyntax = (text: string) => {
+  const sentences = text.split(/[.!?]+/).filter(Boolean);
+  return {
+    tokens: text.split(/\s+/).map((word, index) => ({
+      text: word,
+      location: [index * 10, (index + 1) * 10],
+      part_of_speech: "NOUN", // Simplified for mock data
+      lemma: word.toLowerCase()
+    })),
+    sentences: sentences.map((sentence, index) => ({
+      text: sentence,
+      location: [index * 100, (index + 1) * 100]
+    }))
+  };
+};
+
+/**
  * Generate complete mock Watson NLU API response
  */
 export const generateMockResponse = (text: string, features: {
@@ -180,6 +251,10 @@ export const generateMockResponse = (text: string, features: {
   concepts: boolean;
   relations: boolean;
   categories: boolean;
+  emotion: boolean;
+  sentiment: boolean;
+  semantic_roles: boolean;
+  syntax: boolean;
 }, language: string) => {
   // Analyze input text to extract keywords
   const frequentWords = getFrequentWords(text);
@@ -191,6 +266,10 @@ export const generateMockResponse = (text: string, features: {
     concepts: features.concepts ? generateMockConcepts(text) : [],
     categories: features.categories ? generateMockCategories(text) : [],
     relations: features.relations ? generateMockRelations(text, features.relations) : [],
+    emotion: features.emotion ? generateMockEmotion(text) : undefined,
+    sentiment: features.sentiment ? generateMockSentiment(text) : undefined,
+    semantic_roles: features.semantic_roles ? generateMockSemanticRoles(text) : [],
+    syntax: features.syntax ? generateMockSyntax(text) : undefined
   };
 };
 
