@@ -25,3 +25,4 @@ dist-ssr
 ibm-credentials.env
 .env
 .env.*
+.vercel
