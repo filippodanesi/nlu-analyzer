@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { AlertCircle, Info } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -52,7 +51,6 @@ const KeywordsTab: React.FC<KeywordsTabProps> = ({ keywords, containsTargetKeywo
               <TableHead className="w-1/2">Text</TableHead>
               <TableHead>Words</TableHead>
               <TableHead>Relevance</TableHead>
-              {keywords[0].sentiment && <TableHead>Sentiment</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -70,15 +68,6 @@ const KeywordsTab: React.FC<KeywordsTabProps> = ({ keywords, containsTargetKeywo
                     </Badge>
                   </TableCell>
                   <TableCell>{(keyword.relevance * 100).toFixed(1)}%</TableCell>
-                  {keyword.sentiment && (
-                    <TableCell>
-                      <Badge 
-                        variant={keyword.sentiment.score > 0 ? "default" : keyword.sentiment.score < 0 ? "destructive" : "outline"}
-                      >
-                        {keyword.sentiment.score.toFixed(2)}
-                      </Badge>
-                    </TableCell>
-                  )}
                 </TableRow>
               );
             })}

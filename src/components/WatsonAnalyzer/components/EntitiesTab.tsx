@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { AlertCircle, Info } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -47,7 +46,6 @@ const EntitiesTab: React.FC<EntitiesTabProps> = ({ entities, containsTargetKeywo
               <TableHead>Words</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Relevance</TableHead>
-              {entities[0].sentiment && <TableHead>Sentiment</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -66,15 +64,6 @@ const EntitiesTab: React.FC<EntitiesTabProps> = ({ entities, containsTargetKeywo
                   </TableCell>
                   <TableCell>{entity.type}</TableCell>
                   <TableCell>{(entity.relevance * 100).toFixed(1)}%</TableCell>
-                  {entity.sentiment && (
-                    <TableCell>
-                      <Badge 
-                        variant={entity.sentiment.score > 0 ? "default" : entity.sentiment.score < 0 ? "destructive" : "outline"}
-                      >
-                        {entity.sentiment.score.toFixed(2)}
-                      </Badge>
-                    </TableCell>
-                  )}
                 </TableRow>
               );
             })}
