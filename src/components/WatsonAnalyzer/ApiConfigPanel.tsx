@@ -229,23 +229,6 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
       <CardContent className="space-y-4">
         <div className="space-y-2">
           <div className="space-y-2">
-            <Label>Quick Input</Label>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Paste API URL or JSON credentials"
-                value={quickInput}
-                onChange={(e) => setQuickInput(e.target.value)}
-              />
-              <Button onClick={handleQuickInput}>
-                <Clipboard className="h-4 w-4 mr-1" />
-                Import
-              </Button>
-            </div>
-          </div>
-
-          <Separator />
-
-          <div className="space-y-2">
             <Label htmlFor="api-key">API Key</Label>
             <Input
               id="api-key"

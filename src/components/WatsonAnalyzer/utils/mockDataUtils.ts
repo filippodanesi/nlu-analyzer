@@ -29,11 +29,9 @@ export const getFrequentWords = (text: string) => {
 export const generateMockKeywords = (words: string[]) => {
   return words.map((word, index) => {
     const relevance = 0.98 - (index * 0.04);
-    const sentimentScore = (Math.random() * 1.4) - 0.2; // Between -0.2 and 1.2
     return {
       text: word,
-      relevance: parseFloat(relevance.toFixed(2)),
-      sentiment: { score: parseFloat(sentimentScore.toFixed(2)) }
+      relevance: parseFloat(relevance.toFixed(2))
     };
   });
 };
@@ -57,11 +55,9 @@ export const generateMockEntities = (text: string) => {
     .filter(entity => text.toLowerCase().includes(entity.text.toLowerCase()))
     .map((entity, index) => {
       const relevance = 0.95 - (index * 0.05);
-      const sentimentScore = (Math.random() * 1.2) - 0.2;
       return {
         ...entity,
-        relevance: parseFloat(relevance.toFixed(2)),
-        sentiment: { score: parseFloat(sentimentScore.toFixed(2)) }
+        relevance: parseFloat(relevance.toFixed(2))
       };
     });
 };
