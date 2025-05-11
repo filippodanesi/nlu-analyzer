@@ -1,27 +1,39 @@
 import { useState, useEffect } from 'react';
 import { toast } from "@/components/ui/use-toast";
 
+// Define types for our environment variables
+interface WatsonEnvVars {
+  VITE_NATURAL_LANGUAGE_UNDERSTANDING_APIKEY?: string;
+  VITE_NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY?: string;
+  VITE_NATURAL_LANGUAGE_UNDERSTANDING_URL?: string;
+  VITE_NATURAL_LANGUAGE_UNDERSTANDING_AUTH_TYPE?: string;
+  NATURAL_LANGUAGE_UNDERSTANDING_APIKEY?: string;
+  NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY?: string;
+  NATURAL_LANGUAGE_UNDERSTANDING_URL?: string;
+  NATURAL_LANGUAGE_UNDERSTANDING_AUTH_TYPE?: string;
+}
+
 // Extract environment variables for Watson - support both formats
 export const SECRETS = {
-  apiKey: import.meta.env.VITE_NATURAL_LANGUAGE_UNDERSTANDING_APIKEY || 
-          import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_APIKEY ||
-          import.meta.env.VITE_NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY || 
-          import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY || "",
-  url: import.meta.env.VITE_NATURAL_LANGUAGE_UNDERSTANDING_URL || 
-       import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_URL || "",
-  authType: import.meta.env.VITE_NATURAL_LANGUAGE_UNDERSTANDING_AUTH_TYPE || 
-            import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_AUTH_TYPE || "iam",
+  apiKey: (import.meta.env as WatsonEnvVars).VITE_NATURAL_LANGUAGE_UNDERSTANDING_APIKEY || 
+          (import.meta.env as WatsonEnvVars).NATURAL_LANGUAGE_UNDERSTANDING_APIKEY ||
+          (import.meta.env as WatsonEnvVars).VITE_NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY || 
+          (import.meta.env as WatsonEnvVars).NATURAL_LANGUAGE_UNDERSTANDING_IAM_APIKEY || "",
+  url: (import.meta.env as WatsonEnvVars).VITE_NATURAL_LANGUAGE_UNDERSTANDING_URL || 
+       (import.meta.env as WatsonEnvVars).NATURAL_LANGUAGE_UNDERSTANDING_URL || "",
+  authType: (import.meta.env as WatsonEnvVars).VITE_NATURAL_LANGUAGE_UNDERSTANDING_AUTH_TYPE || 
+            (import.meta.env as WatsonEnvVars).NATURAL_LANGUAGE_UNDERSTANDING_AUTH_TYPE || "iam",
   // Extract region from URL if available
   region: (() => {
-    const url = import.meta.env.VITE_NATURAL_LANGUAGE_UNDERSTANDING_URL || 
-                import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_URL || "";
+    const url = (import.meta.env as WatsonEnvVars).VITE_NATURAL_LANGUAGE_UNDERSTANDING_URL || 
+                (import.meta.env as WatsonEnvVars).NATURAL_LANGUAGE_UNDERSTANDING_URL || "";
     // Try to extract region from URL (format: https://api.{region}.natural-language-understanding...)
     const match = url.match(/api\.(.*?)\.natural-language-understanding/);
     return match ? match[1] : "eu-de";
   })(),
   instanceId: (() => {
-    const url = import.meta.env.VITE_NATURAL_LANGUAGE_UNDERSTANDING_URL || 
-                import.meta.env.NATURAL_LANGUAGE_UNDERSTANDING_URL || "";
+    const url = (import.meta.env as WatsonEnvVars).VITE_NATURAL_LANGUAGE_UNDERSTANDING_URL || 
+                (import.meta.env as WatsonEnvVars).NATURAL_LANGUAGE_UNDERSTANDING_URL || "";
     // Try to extract instance ID from URL (format: .../instances/{instanceId}/...)
     const match = url.match(/instances\/(.*?)\//);
     return match ? match[1] : "";

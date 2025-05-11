@@ -5,18 +5,26 @@ import { componentTagger } from "lovable-tagger";
 import fs from 'fs';
 import dotenv from 'dotenv';
 
+// Define the type for our environment variables
+interface EnvVariables {
+  NATURAL_LANGUAGE_UNDERSTANDING_APIKEY?: string;
+  NATURAL_LANGUAGE_UNDERSTANDING_URL?: string;
+  NATURAL_LANGUAGE_UNDERSTANDING_AUTH_TYPE?: string;
+  [key: string]: string | undefined;
+}
+
 export default defineConfig(({ mode }) => {
   // Load environment variables
-  const env = loadEnv(mode, process.cwd(), '');
+  const env = loadEnv(mode, process.cwd(), '') as EnvVariables;
   
   // Try to load from ibm-credentials.env if it exists
-  let ibmCredentials = {};
+  let ibmCredentials: EnvVariables = {};
   if (fs.existsSync('./ibm-credentials.env')) {
-    ibmCredentials = dotenv.parse(fs.readFileSync('./ibm-credentials.env'));
+    ibmCredentials = dotenv.parse(fs.readFileSync('./ibm-credentials.env')) as EnvVariables;
   }
   
   // Merge environment variables (Vercel env vars take precedence)
-  const finalEnv = {
+  const finalEnv: EnvVariables = {
     ...ibmCredentials,
     ...env
   };
