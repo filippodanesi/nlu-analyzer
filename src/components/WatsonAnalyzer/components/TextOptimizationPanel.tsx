@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,7 +25,7 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
   onOptimizedTextSelect
 }) => {
   const [apiKey, setApiKey] = useState<string>("");
-  const [aiModel, setAiModel] = useState<string>("gpt-4o");
+  const [aiModel, setAiModel] = useState<string>("gpt-4o-mini");
   const [isOptimizing, setIsOptimizing] = useState<boolean>(false);
   const [optimizedText, setOptimizedText] = useState<string>("");
   
@@ -42,7 +43,7 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
     if (!apiKey) {
       toast({
         title: "API Key Required",
-        description: "Please enter a valid API key to proceed with optimization.",
+        description: "Please enter a valid OpenAI API key to proceed with optimization.",
         variant: "destructive",
       });
       return;
@@ -93,7 +94,7 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
           <div>
             <CardTitle className="text-lg font-semibold">AI Optimization</CardTitle>
             <CardDescription>
-              Optimize text for target keywords
+              Optimize text for target keywords using OpenAI
             </CardDescription>
           </div>
           <AIOptimizationConfig 

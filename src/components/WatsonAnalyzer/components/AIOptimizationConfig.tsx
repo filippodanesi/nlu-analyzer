@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,7 +56,8 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="gpt-4o-mini">OpenAI GPT-4o-mini</SelectItem>
-                <SelectItem value="claude-3-7-sonnet">Anthropic Claude 3.7 Sonnet</SelectItem>
+                <SelectItem value="gpt-4o">OpenAI GPT-4o</SelectItem>
+                <SelectItem value="gpt-3.5-turbo">OpenAI GPT-3.5 Turbo</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -65,7 +67,7 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
             <Input
               id="api-key"
               type="password"
-              placeholder="Enter your API key"
+              placeholder="Enter your OpenAI API key"
               value={tempApiKey}
               onChange={(e) => setTempApiKey(e.target.value)}
               className="font-mono"
