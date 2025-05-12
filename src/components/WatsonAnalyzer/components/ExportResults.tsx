@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from "@/components/ui/button";
-import { FileExport, Download } from "lucide-react";
+import { FileText, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface ExportResultsProps {
@@ -9,13 +9,56 @@ interface ExportResultsProps {
   isDisabled: boolean;
 }
 
+interface ExportData {
+  metadata: {
+    language: string;
+    timestamp: string;
+    version: string;
+  };
+  statistics: Record<string, any>;
+  analysis: {
+    keywords?: Array<{
+      text: string;
+      relevance: number;
+      sentiment?: {
+        score: number;
+        label: string;
+      } | null;
+    }>;
+    entities?: Array<{
+      text: string;
+      type: string;
+      relevance: number;
+      confidence: number;
+      sentiment?: {
+        score: number;
+        label: string;
+      } | null;
+    }>;
+    concepts?: Array<{
+      text: string;
+      relevance: number;
+      dbpedia_resource: string;
+    }>;
+    categories?: Array<{
+      label: string;
+      score: number;
+      explanation: string;
+    }>;
+    classifications?: Array<{
+      class_name: string;
+      confidence: number;
+    }>;
+  };
+}
+
 const ExportResults: React.FC<ExportResultsProps> = ({ results, isDisabled }) => {
   const { toast } = useToast();
 
-  const prepareExportData = () => {
+  const prepareExportData = (): string => {
     if (!results) return "";
 
-    let exportData = {
+    const exportData: ExportData = {
       metadata: {
         language: results.language || "unknown",
         timestamp: new Date().toISOString(),
@@ -203,7 +246,7 @@ const ExportResults: React.FC<ExportResultsProps> = ({ results, isDisabled }) =>
         size="sm"
         className="flex items-center gap-1"
       >
-        <FileExport className="h-4 w-4" />
+        <FileText className="h-4 w-4" />
         Esporta JSON
       </Button>
       <Button 
