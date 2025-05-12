@@ -38,20 +38,20 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
       <DialogTrigger asChild>
         <Button variant="outline" className="gap-2">
           <Key className="h-4 w-4" />
-          Configura AI
+          Configure AI
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Configurazione AI per ottimizzazione</DialogTitle>
+          <DialogTitle>AI Optimization Configuration</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="ai-model">Modello AI</Label>
+            <Label htmlFor="ai-model">AI Model</Label>
             <Select value={aiModel} onValueChange={setAiModel}>
               <SelectTrigger>
-                <SelectValue placeholder="Seleziona un modello" />
+                <SelectValue placeholder="Select a model" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="gpt-4o-mini">OpenAI GPT-4o-mini</SelectItem>
@@ -64,7 +64,7 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
             <Input
               id="api-key"
               type="password"
-              placeholder="Inserisci la tua API key"
+              placeholder="Enter your API key"
               value={tempApiKey}
               onChange={(e) => setTempApiKey(e.target.value)}
               className="font-mono"
@@ -72,7 +72,7 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
           </div>
 
           <Button onClick={handleSave} className="w-full">
-            Salva
+            Save
           </Button>
         </div>
       </DialogContent>

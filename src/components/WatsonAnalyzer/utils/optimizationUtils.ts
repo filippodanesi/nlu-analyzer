@@ -27,22 +27,18 @@ export const generateOptimizationPrompt = (
 ): string => {
   const keywordsString = targetKeywords.join(', ');
   
-  return `
-Sei un esperto di SEO e content optimization. Il tuo compito è migliorare il seguente testo in modo che ottimizzi per le seguenti parole chiave target: ${keywordsString}.
+  return `You are an SEO and content optimization expert. Your task is to improve the following text to optimize for these target keywords: ${keywordsString}.
 
-Testo originale:
-"""
+Original text:
 ${originalText}
-"""
 
-Mantieni il senso e il tono originale del testo, ma miglioralo per:
-1. Includere le parole chiave target in posizioni strategiche (inizio, titoli, e primi paragrafi)
-2. Aumentare leggermente la densità delle parole chiave target nel testo
-3. Usare sinonimi e variazioni semantiche delle parole chiave target
-4. Mantenere il testo naturale e leggibile
+Maintain the original meaning and tone of the text, but improve it to:
+1. Include target keywords in strategic positions (beginning, headings, and first paragraphs)
+2. Slightly increase the density of target keywords in the text
+3. Use synonyms and semantic variations of the target keywords
+4. Keep the text natural and readable
 
-Fornisci solo il testo ottimizzato, senza spiegazioni aggiuntive.
-`;
+Provide only the optimized text, without any additional explanations.`;
 };
 
 /**
@@ -57,7 +53,7 @@ export const optimizeTextWithAI = async (
   try {
     const prompt = generateOptimizationPrompt(originalText, targetKeywords, analysisResults);
     
-    // Implementazione con OpenAI
+    // OpenAI implementation
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -69,7 +65,7 @@ export const optimizeTextWithAI = async (
         messages: [
           {
             role: "system",
-            content: "Sei un assistente specializzato nell'ottimizzazione di testi per SEO e parole chiave."
+            content: "You are an assistant specialized in SEO and keyword optimization."
           },
           {
             role: "user",
@@ -83,13 +79,13 @@ export const optimizeTextWithAI = async (
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(error.error?.message || "Errore nell'API di ottimizzazione");
+      throw new Error(error.error?.message || "Error in optimization API");
     }
 
     const data = await response.json();
     return data.choices[0].message.content.trim();
   } catch (error) {
-    console.error("Errore nell'ottimizzazione del testo:", error);
+    console.error("Error in text optimization:", error);
     throw error;
   }
 };
