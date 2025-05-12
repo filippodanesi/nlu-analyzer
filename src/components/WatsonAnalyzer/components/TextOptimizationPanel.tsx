@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -42,8 +41,8 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
   const handleOptimize = async () => {
     if (!apiKey) {
       toast({
-        title: "API Key richiesta",
-        description: "Inserisci una API key valida per procedere con l'ottimizzazione.",
+        title: "API Key Required",
+        description: "Please enter a valid API key to proceed with optimization.",
         variant: "destructive",
       });
       return;
@@ -59,14 +58,14 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
       );
       setOptimizedText(optimized);
       toast({
-        title: "Ottimizzazione completata",
-        description: "Il testo è stato ottimizzato con successo.",
+        title: "Optimization Completed",
+        description: "The text has been successfully optimized.",
       });
     } catch (error) {
-      console.error("Errore durante l'ottimizzazione:", error);
+      console.error("Error during optimization:", error);
       toast({
-        title: "Errore di ottimizzazione",
-        description: error instanceof Error ? error.message : "Si è verificato un errore durante l'ottimizzazione del testo.",
+        title: "Optimization Error",
+        description: error instanceof Error ? error.message : "An error occurred during text optimization.",
         variant: "destructive",
       });
     } finally {
@@ -77,8 +76,8 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
   const handleUseOptimized = () => {
     onOptimizedTextSelect(optimizedText);
     toast({
-      title: "Testo aggiornato",
-      description: "Il testo ottimizzato è stato selezionato per l'analisi.",
+      title: "Text Updated",
+      description: "The optimized text has been selected for analysis.",
     });
   };
 
@@ -91,9 +90,9 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
       <CardHeader>
         <div className="flex justify-between items-center">
           <div>
-            <CardTitle className="text-lg font-semibold">Ottimizzazione AI</CardTitle>
+            <CardTitle className="text-lg font-semibold">AI Optimization</CardTitle>
             <CardDescription>
-              Ottimizza il testo per le parole chiave target
+              Optimize text for target keywords
             </CardDescription>
           </div>
           <AIOptimizationConfig 
@@ -125,17 +124,17 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
 
         {needsOptimization ? (
           <Alert variant="default" className="bg-amber-50 text-amber-800 border-amber-200">
-            <AlertTitle>Ottimizzazione consigliata</AlertTitle>
+            <AlertTitle>Optimization Recommended</AlertTitle>
             <AlertDescription>
-              Alcune delle tue parole chiave target non sono tra le più rilevanti nell'analisi. 
-              L'ottimizzazione AI può aiutarti a migliorare la rilevanza di queste parole nel testo.
+              Some of your target keywords are not among the most relevant in the analysis.
+              AI optimization can help improve the relevance of these keywords in the text.
             </AlertDescription>
           </Alert>
         ) : (
           <Alert variant="default" className="bg-green-50 text-green-800 border-green-200">
-            <AlertTitle>Testo ben ottimizzato</AlertTitle>
+            <AlertTitle>Well Optimized Text</AlertTitle>
             <AlertDescription>
-              Tutte le tue parole chiave target sono già ben posizionate nell'analisi.
+              All your target keywords are already well positioned in the analysis.
             </AlertDescription>
           </Alert>
         )}
@@ -143,8 +142,8 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
         {optimizedText && (
           <Tabs defaultValue="original">
             <TabsList className="grid grid-cols-2 mb-2">
-              <TabsTrigger value="original">Testo originale</TabsTrigger>
-              <TabsTrigger value="optimized">Testo ottimizzato</TabsTrigger>
+              <TabsTrigger value="original">Original Text</TabsTrigger>
+              <TabsTrigger value="optimized">Optimized Text</TabsTrigger>
             </TabsList>
             <TabsContent value="original">
               <Textarea 
@@ -174,10 +173,10 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
           {isOptimizing ? (
             <>
               <Loader className="mr-2 h-4 w-4 animate-spin" /> 
-              Ottimizzazione in corso...
+              Optimizing...
             </>
           ) : (
-            'Ottimizza il testo'
+            'Optimize Text'
           )}
         </Button>
         
@@ -186,7 +185,7 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
             onClick={handleUseOptimized}
             className="flex-1"
           >
-            Usa testo ottimizzato
+            Use Optimized Text
           </Button>
         )}
       </CardFooter>
