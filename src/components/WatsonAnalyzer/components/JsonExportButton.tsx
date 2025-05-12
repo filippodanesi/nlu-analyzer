@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { prepareExportData, downloadFile, getCurrentDateString } from '../utils/exportUtils';
+import { prepareExportData, getCurrentDateString } from '../utils/exportUtils';
 
 interface JsonExportButtonProps {
   results: any;
