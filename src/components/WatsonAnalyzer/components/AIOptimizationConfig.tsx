@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,8 +54,7 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
                 <SelectValue placeholder="Seleziona un modello" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="gpt-4o">OpenAI GPT-4o</SelectItem>
-                <SelectItem value="claude-3-opus">Anthropic Claude 3 Opus</SelectItem>
+                <SelectItem value="gpt-4o-mini">OpenAI GPT-4o-mini</SelectItem>
               </SelectContent>
             </Select>
           </div>

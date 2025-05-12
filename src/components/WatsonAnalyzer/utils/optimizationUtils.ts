@@ -1,4 +1,3 @@
-
 // Funzioni di utilità per l'ottimizzazione del testo basata su AI
 
 /**
@@ -66,7 +65,7 @@ export const optimizeTextWithAI = async (
         "Authorization": `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "gpt-4o",
+        model: "gpt-4o-mini",
         messages: [
           {
             role: "system",
