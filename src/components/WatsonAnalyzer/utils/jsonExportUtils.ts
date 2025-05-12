@@ -12,7 +12,9 @@ export const prepareExportData = (results: any): string => {
       version: "1.0.0"
     },
     statistics: {},
-    analysis: {}
+    analysis: {
+      analyzedText: results.analyzedText || results.text || ""
+    }
   };
 
   // Extract keywords data if available

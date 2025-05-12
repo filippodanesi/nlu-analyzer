@@ -11,6 +11,11 @@ export const generateCsvContent = (results: any): string => {
   csvContent += "Timestamp," + new Date().toISOString() + "\n";
   csvContent += "Version,1.0.0\n\n";
   
+  // Add analyzed text section
+  csvContent += "## ANALYZED TEXT ##\n";
+  const analyzedText = results.analyzedText || results.text || "";
+  csvContent += `"${analyzedText.replace(/"/g, '""')}"\n\n`;
+  
   // Add keyword section if available
   if (results.keywords && results.keywords.length > 0) {
     csvContent += "## KEYWORDS ##\n";

@@ -8,6 +8,7 @@ export interface ExportData {
   };
   statistics: Record<string, any>;
   analysis: {
+    analyzedText?: string;
     keywords?: Array<{
       text: string;
       relevance: number;

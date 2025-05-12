@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { generateCsvContent, getCurrentDateString } from '../utils/exportUtils';
+import { generateCsvContent, downloadFile, getCurrentDateString } from '../utils/exportUtils';
 
 interface CsvExportButtonProps {
   results: any;
@@ -14,7 +14,7 @@ const CsvExportButton: React.FC<CsvExportButtonProps> = ({ results, isDisabled }
   const { toast } = useToast();
 
   const handleExport = () => {
-    if (!results || !results.keywords) {
+    if (!results) {
       toast({
         title: "Export failed",
         description: "No data available for CSV export.",
@@ -24,7 +24,7 @@ const CsvExportButton: React.FC<CsvExportButtonProps> = ({ results, isDisabled }
     }
 
     const csvContent = generateCsvContent(results);
-    const fileName = `watson-analysis-${getCurrentDateString()}.csv`;
+    const fileName = `nlu-analysis-${getCurrentDateString()}.csv`;
     
     // Create a Blob from the CSV content
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });

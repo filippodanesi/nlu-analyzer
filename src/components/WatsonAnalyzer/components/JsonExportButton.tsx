@@ -26,7 +26,7 @@ const JsonExportButton: React.FC<JsonExportButtonProps> = ({ results, isDisabled
 
     const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
-    const fileName = `watson-analysis-${getCurrentDateString()}.json`;
+    const fileName = `nlu-analysis-${getCurrentDateString()}.json`;
     
     // Create and trigger download
     const a = document.createElement('a');
