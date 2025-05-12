@@ -7,8 +7,12 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Loader } from "lucide-react";
-import { toast } from "@/components/ui/use-toast";
-import { isKeywordInTopPositions, optimizeTextWithAI } from "../utils/optimizationUtils";
+import { toast } from "@/hooks/use-toast";
+import { 
+  isExactKeywordMatch, 
+  isPartialKeywordMatch, 
+  optimizeTextWithAI 
+} from "../utils/optimizationUtils";
 import AIOptimizationConfig from "./AIOptimizationConfig";
 
 interface TextOptimizationPanelProps {
@@ -29,16 +33,40 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
   const [isOptimizing, setIsOptimizing] = useState<boolean>(false);
   const [optimizedText, setOptimizedText] = useState<string>("");
   
-  // Verifica se le parole chiave target hanno bisogno di ottimizzazione
-  const needsOptimization = targetKeywords.some(keyword => 
-    !isKeywordInTopPositions(keyword, results?.keywords || [], 3)
-  );
+  // Verifica delle parole chiave 
+  const checkKeywordStatus = (keyword: string) => {
+    if (!results || !results.keywords) return { exact: false, partial: false };
+    
+    // Check for exact matches first
+    const exactMatch = results.keywords.some(kw => isExactKeywordMatch(kw.text, keyword));
+    if (exactMatch) return { exact: true, partial: false };
+    
+    // If no exact match, check for partial matches
+    const partialMatch = results.keywords.some(kw => isPartialKeywordMatch(kw.text, keyword));
+    return { exact: false, partial: partialMatch };
+  };
   
-  // Parole chiave che necessitano ottimizzazione
-  const keywordsToOptimize = targetKeywords.filter(keyword => 
-    !isKeywordInTopPositions(keyword, results?.keywords || [], 3)
-  );
-
+  // Keywords that need optimization (no exact or partial match)
+  const keywordsToOptimize = targetKeywords.filter(keyword => {
+    const status = checkKeywordStatus(keyword);
+    return !status.exact && !status.partial;
+  });
+  
+  // Keywords with only partial matches
+  const keywordsWithPartialMatch = targetKeywords.filter(keyword => {
+    const status = checkKeywordStatus(keyword);
+    return !status.exact && status.partial;
+  });
+  
+  // Keywords with exact matches
+  const keywordsWithExactMatch = targetKeywords.filter(keyword => {
+    const status = checkKeywordStatus(keyword);
+    return status.exact;
+  });
+  
+  // Check if optimization is needed
+  const needsOptimization = keywordsToOptimize.length > 0;
+  
   const handleOptimize = async () => {
     if (!apiKey) {
       toast({
@@ -53,7 +81,7 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
     try {
       const optimized = await optimizeTextWithAI(
         text,
-        keywordsToOptimize,
+        [...keywordsToOptimize, ...keywordsWithPartialMatch],
         results,
         apiKey,
         aiModel
@@ -110,33 +138,65 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
         {targetKeywords.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {targetKeywords.map((keyword, index) => {
-              const isOptimized = isKeywordInTopPositions(keyword, results?.keywords || [], 3);
+              const status = checkKeywordStatus(keyword);
+              let badgeVariant = "default";
+              let badgeClass = "";
+              let indicator = "✗";
+              
+              if (status.exact) {
+                badgeVariant = "outline";
+                badgeClass = "bg-green-100 text-green-800";
+                indicator = "✓";
+              } else if (status.partial) {
+                badgeVariant = "outline";
+                badgeClass = "bg-amber-100 text-amber-800";
+                indicator = "~";
+              } else {
+                badgeClass = "bg-red-100 text-red-800";
+              }
+              
               return (
                 <Badge 
                   key={index} 
-                  variant={isOptimized ? "outline" : "default"}
-                  className={isOptimized ? "bg-green-100 text-green-800" : "bg-amber-100 text-amber-800"}
+                  variant={badgeVariant}
+                  className={badgeClass}
                 >
-                  {keyword} {isOptimized ? "✓" : "✗"}
+                  {keyword} {indicator}
                 </Badge>
               );
             })}
           </div>
         )}
 
+        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <Badge variant="outline" className="bg-green-100 text-green-800 h-5 w-5 flex items-center justify-center p-0">✓</Badge>
+          <span className="mr-3">Exact match</span>
+          <Badge variant="outline" className="bg-amber-100 text-amber-800 h-5 w-5 flex items-center justify-center p-0">~</Badge>
+          <span className="mr-3">Partial match</span>
+          <Badge variant="default" className="bg-red-100 text-red-800 h-5 w-5 flex items-center justify-center p-0">✗</Badge>
+          <span>No match</span>
+        </div>
+
         {needsOptimization ? (
-          <Alert variant="default" className="bg-amber-50 text-amber-800 border-amber-200">
+          <Alert variant="default" className="bg-red-50 text-red-800 border-red-200">
             <AlertTitle>Optimization Recommended</AlertTitle>
             <AlertDescription>
-              Some of your target keywords are not among the most relevant in the analysis.
-              AI optimization can help improve the relevance of these keywords in the text.
+              Some of your target keywords ({keywordsToOptimize.join(', ')}) were not found in the analysis.
+              AI optimization can help integrate these keywords into the text.
+            </AlertDescription>
+          </Alert>
+        ) : keywordsWithPartialMatch.length > 0 ? (
+          <Alert variant="default" className="bg-amber-50 text-amber-800 border-amber-200">
+            <AlertTitle>Partial Optimization Recommended</AlertTitle>
+            <AlertDescription>
+              Some keywords have only partial matches. Consider optimization to improve exact keyword matching.
             </AlertDescription>
           </Alert>
         ) : (
           <Alert variant="default" className="bg-green-50 text-green-800 border-green-200">
             <AlertTitle>Well Optimized Text</AlertTitle>
             <AlertDescription>
-              All your target keywords are already well positioned in the analysis.
+              All your target keywords have exact matches in the analysis.
             </AlertDescription>
           </Alert>
         )}
@@ -168,9 +228,9 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
       <CardFooter className="flex justify-between gap-2">
         <Button 
           onClick={handleOptimize}
-          disabled={isOptimizing || !needsOptimization || !apiKey}
+          disabled={isOptimizing || (!needsOptimization && keywordsWithPartialMatch.length === 0) || !apiKey}
           className="flex-1"
-          variant={needsOptimization ? "default" : "outline"}
+          variant={(needsOptimization || keywordsWithPartialMatch.length > 0) ? "default" : "outline"}
         >
           {isOptimizing ? (
             <>

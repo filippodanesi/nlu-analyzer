@@ -10,6 +10,10 @@ import EntitiesTab from './EntitiesTab';
 import KeywordsTab from './KeywordsTab';
 import ConceptsTab from './ConceptsTab';
 import RelationsTab from './RelationsTab';
+import { 
+  isExactKeywordMatch, 
+  isPartialKeywordMatch 
+} from "../utils/optimizationUtils";
 
 interface ExtractionTabProps {
   results: any;
@@ -39,6 +43,8 @@ const ExtractionTab: React.FC<ExtractionTabProps> = ({ results, containsTargetKe
           keywords={results.keywords || []} 
           containsTargetKeyword={containsTargetKeyword}
           targetKeywords={targetKeywords}
+          isExactKeywordMatch={isExactKeywordMatch}
+          isPartialKeywordMatch={isPartialKeywordMatch}
         />
       </TabsContent>
 
