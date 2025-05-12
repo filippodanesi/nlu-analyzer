@@ -1,4 +1,3 @@
-
 // Type definitions for export data
 export interface ExportData {
   metadata: {
@@ -112,69 +111,100 @@ export const prepareExportData = (results: any): string => {
   return JSON.stringify(exportData, null, 2);
 };
 
-// Generate CSV content from results
+// Generate CSV content from results with better organization
 export const generateCsvContent = (results: any): string => {
   if (!results) return "";
   
   let csvContent = "data:text/csv;charset=utf-8,";
   
-  // Add headers based on available data
-  let headers = ["Type", "Text", "Score/Relevance", "Sentiment"];
-  csvContent += headers.join(",") + "\n";
-
-  // Add keyword data
+  // Add metadata section header
+  csvContent += "## METADATA ##\n";
+  csvContent += "Language," + (results.language || "unknown") + "\n";
+  csvContent += "Timestamp," + new Date().toISOString() + "\n";
+  csvContent += "Version,1.0.0\n\n";
+  
+  // Add keyword section if available
   if (results.keywords && results.keywords.length > 0) {
+    csvContent += "## KEYWORDS ##\n";
+    csvContent += "Text,Relevance,Sentiment Score,Sentiment Label\n";
+    
     results.keywords.forEach((keyword: any) => {
-      const sentimentScore = keyword.sentiment ? keyword.sentiment.score : "N/A";
-      const row = ["Keyword", 
-                  `"${keyword.text.replace(/"/g, '""')}"`, 
-                  keyword.relevance, 
-                  sentimentScore];
+      const sentimentScore = keyword.sentiment ? keyword.sentiment.score : "";
+      const sentimentLabel = keyword.sentiment ? keyword.sentiment.label : "";
+      const row = [
+        `"${keyword.text.replace(/"/g, '""')}"`, 
+        keyword.relevance,
+        sentimentScore,
+        sentimentLabel
+      ];
       csvContent += row.join(",") + "\n";
     });
+    csvContent += "\n";
   }
 
-  // Add entity data
+  // Add entity section if available
   if (results.entities && results.entities.length > 0) {
+    csvContent += "## ENTITIES ##\n";
+    csvContent += "Text,Type,Relevance,Confidence,Sentiment Score,Sentiment Label\n";
+    
     results.entities.forEach((entity: any) => {
-      const sentimentScore = entity.sentiment ? entity.sentiment.score : "N/A";
-      const row = [`Entity (${entity.type})`, 
-                  `"${entity.text.replace(/"/g, '""')}"`, 
-                  entity.relevance, 
-                  sentimentScore];
+      const sentimentScore = entity.sentiment ? entity.sentiment.score : "";
+      const sentimentLabel = entity.sentiment ? entity.sentiment.label : "";
+      const row = [
+        `"${entity.text.replace(/"/g, '""')}"`,
+        entity.type,
+        entity.relevance,
+        entity.confidence,
+        sentimentScore,
+        sentimentLabel
+      ];
       csvContent += row.join(",") + "\n";
     });
+    csvContent += "\n";
   }
 
-  // Add concepts data
+  // Add concepts section if available
   if (results.concepts && results.concepts.length > 0) {
+    csvContent += "## CONCEPTS ##\n";
+    csvContent += "Text,Relevance,DBpedia Resource\n";
+    
     results.concepts.forEach((concept: any) => {
-      const row = ["Concept", 
-                  `"${concept.text.replace(/"/g, '""')}"`, 
-                  concept.relevance, 
-                  "N/A"];
+      const row = [
+        `"${concept.text.replace(/"/g, '""')}"`,
+        concept.relevance,
+        `"${concept.dbpedia_resource}"`
+      ];
       csvContent += row.join(",") + "\n";
     });
+    csvContent += "\n";
   }
 
-  // Add categories data
+  // Add categories section if available
   if (results.categories && results.categories.length > 0) {
+    csvContent += "## CATEGORIES ##\n";
+    csvContent += "Label,Score,Explanation\n";
+    
     results.categories.forEach((category: any) => {
-      const row = ["Category", 
-                  `"${category.label.replace(/"/g, '""')}"`, 
-                  category.score, 
-                  "N/A"];
+      const row = [
+        `"${category.label.replace(/"/g, '""')}"`,
+        category.score,
+        `"${category.explanation?.replace(/"/g, '""') || ""}"`
+      ];
       csvContent += row.join(",") + "\n";
     });
+    csvContent += "\n";
   }
 
-  // Add classifications/tone data
+  // Add classifications/tone section if available
   if (results.classifications && results.classifications.length > 0) {
+    csvContent += "## TONE ANALYSIS ##\n";
+    csvContent += "Class Name,Confidence\n";
+    
     results.classifications.forEach((classification: any) => {
-      const row = ["Tone", 
-                  `"${classification.class_name.replace(/"/g, '""')}"`, 
-                  classification.confidence, 
-                  "N/A"];
+      const row = [
+        `"${classification.class_name.replace(/"/g, '""')}"`,
+        classification.confidence
+      ];
       csvContent += row.join(",") + "\n";
     });
   }

@@ -16,8 +16,8 @@ const CsvExportButton: React.FC<CsvExportButtonProps> = ({ results, isDisabled }
   const handleExport = () => {
     if (!results || !results.keywords) {
       toast({
-        title: "Esportazione fallita",
-        description: "Nessun dato disponibile per l'esportazione CSV.",
+        title: "Export failed",
+        description: "No data available for CSV export.",
         variant: "destructive",
       });
       return;
@@ -36,8 +36,8 @@ const CsvExportButton: React.FC<CsvExportButtonProps> = ({ results, isDisabled }
     document.body.removeChild(link);
 
     toast({
-      title: "Esportazione completata",
-      description: "L'analisi è stata esportata in formato CSV.",
+      title: "Export completed",
+      description: "The analysis has been exported as CSV.",
     });
   };
 
@@ -50,7 +50,7 @@ const CsvExportButton: React.FC<CsvExportButtonProps> = ({ results, isDisabled }
       className="flex items-center gap-1"
     >
       <Download className="h-4 w-4" />
-      Esporta CSV
+      Export CSV
     </Button>
   );
 };
