@@ -14,9 +14,10 @@ import RelationsTab from './RelationsTab';
 interface ExtractionTabProps {
   results: any;
   containsTargetKeyword: (text: string) => boolean;
+  targetKeywords: string[];
 }
 
-const ExtractionTab: React.FC<ExtractionTabProps> = ({ results, containsTargetKeyword }) => {
+const ExtractionTab: React.FC<ExtractionTabProps> = ({ results, containsTargetKeyword, targetKeywords }) => {
   return (
     <Tabs defaultValue="entities">
       <TabsList className="w-full grid grid-cols-4">
@@ -36,7 +37,8 @@ const ExtractionTab: React.FC<ExtractionTabProps> = ({ results, containsTargetKe
       <TabsContent value="keywords" className="pt-4">
         <KeywordsTab 
           keywords={results.keywords || []} 
-          containsTargetKeyword={containsTargetKeyword} 
+          containsTargetKeyword={containsTargetKeyword}
+          targetKeywords={targetKeywords}
         />
       </TabsContent>
 

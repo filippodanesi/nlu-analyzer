@@ -19,6 +19,33 @@ export const isKeywordInTopPositions = (
 };
 
 /**
+ * Verifica se c'è una corrispondenza esatta con la keyword target
+ */
+export const isExactKeywordMatch = (
+  text: string,
+  targetKeyword: string
+): boolean => {
+  if (!text || !targetKeyword) return false;
+  
+  // Converti entrambi in minuscolo e controlla la corrispondenza esatta
+  return text.toLowerCase() === targetKeyword.toLowerCase();
+};
+
+/**
+ * Verifica se c'è una corrispondenza parziale con la keyword target
+ */
+export const isPartialKeywordMatch = (
+  text: string,
+  targetKeyword: string
+): boolean => {
+  if (!text || !targetKeyword) return false;
+  
+  // Converti entrambi in minuscolo e controlla se il testo include la keyword
+  return text.toLowerCase().includes(targetKeyword.toLowerCase()) && 
+         text.toLowerCase() !== targetKeyword.toLowerCase();
+};
+
+/**
  * Genera il prompt per l'ottimizzazione del testo
  */
 export const generateOptimizationPrompt = (

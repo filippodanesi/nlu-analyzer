@@ -85,7 +85,11 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
 
           {/* Extraction Tab */}
           <TabsContent value="extraction" className="pt-4">
-            <ExtractionTab results={results} containsTargetKeyword={containsTargetKeyword} />
+            <ExtractionTab 
+              results={results} 
+              containsTargetKeyword={containsTargetKeyword}
+              targetKeywords={targetKeywords}
+            />
           </TabsContent>
 
           {/* Classification Tab */}
