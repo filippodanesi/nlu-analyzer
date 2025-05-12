@@ -28,18 +28,22 @@ export const generateOptimizationPrompt = (
 ): string => {
   const keywordsString = targetKeywords.join(', ');
   
-  return `You are an SEO and content optimization expert. Your task is to improve the following text to optimize for these target keywords: ${keywordsString}.
+  return `Optimize this exact text for the following target keywords: ${keywordsString}.
 
 Original text:
 ${originalText}
 
-Maintain the original meaning and tone of the text, but improve it to:
-1. Include target keywords in strategic positions (beginning, headings, and first paragraphs)
-2. Slightly increase the density of target keywords in the text
-3. Use synonyms and semantic variations of the target keywords
-4. Keep the text natural and readable
+Instructions:
+1. Only optimize the EXACT text provided above.
+2. Do not add any content that isn't directly related to the original text.
+3. Do not reference any external APIs, libraries, or services that aren't mentioned in the original text.
+4. Include the target keywords in strategic positions (beginning, headings, first paragraphs)
+5. Slightly increase the density of target keywords while maintaining natural flow
+6. Use synonyms and semantic variations of the target keywords where appropriate
+7. Keep the text natural and readable
+8. Preserve the original meaning, scope, and intent
 
-Provide only the optimized text, without any additional explanations.`;
+Provide only the optimized version of the exact text, without any additional content, explanations, or references.`;
 };
 
 /**
@@ -67,7 +71,7 @@ export const optimizeTextWithAI = async (
         messages: [
           {
             role: "system",
-            content: "You are an assistant specialized in SEO and keyword optimization."
+            content: "You are an assistant specialized in SEO and keyword optimization. Your task is to optimize the exact text provided without adding any content that wasn't in the original. Never reference external tools or services not mentioned in the original text."
           },
           {
             role: "user",
