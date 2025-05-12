@@ -17,15 +17,22 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { isExactKeywordMatch, isPartialKeywordMatch } from '../utils/optimizationUtils';
 
 interface KeywordsTabProps {
   keywords: any[];
   containsTargetKeyword: (text: string) => boolean;
   targetKeywords: string[];
+  isExactKeywordMatch?: (text: string, targetKeyword: string) => boolean;
+  isPartialKeywordMatch?: (text: string, targetKeyword: string) => boolean;
 }
 
-const KeywordsTab: React.FC<KeywordsTabProps> = ({ keywords, containsTargetKeyword, targetKeywords }) => {
+const KeywordsTab: React.FC<KeywordsTabProps> = ({ 
+  keywords, 
+  containsTargetKeyword, 
+  targetKeywords,
+  isExactKeywordMatch = (text, keyword) => text.toLowerCase() === keyword.toLowerCase(),
+  isPartialKeywordMatch = (text, keyword) => text.toLowerCase().includes(keyword.toLowerCase()) && text.toLowerCase() !== keyword.toLowerCase()
+}) => {
   if (!keywords || keywords.length === 0) {
     return (
       <div className="flex items-center justify-center p-8 border rounded-md">
@@ -37,23 +44,23 @@ const KeywordsTab: React.FC<KeywordsTabProps> = ({ keywords, containsTargetKeywo
     );
   }
 
-  // Controlla il tipo di corrispondenza con le keyword target
+  // Check the type of match with target keywords
   const checkKeywordMatch = (text: string) => {
-    // Controllo per corrispondenze esatte
+    // Check for exact matches
     for (const keyword of targetKeywords) {
       if (isExactKeywordMatch(text, keyword)) {
         return "exact";
       }
     }
     
-    // Controllo per corrispondenze parziali
+    // Check for partial matches
     for (const keyword of targetKeywords) {
       if (isPartialKeywordMatch(text, keyword)) {
         return "partial";
       }
     }
     
-    // Nessuna corrispondenza
+    // No match
     return "none";
   };
   
@@ -111,11 +118,11 @@ const KeywordsTab: React.FC<KeywordsTabProps> = ({ keywords, containsTargetKeywo
         <div className="flex flex-col gap-1 mt-2 text-sm">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-green-500/70"></div>
-            <span>Corrispondenza esatta</span>
+            <span>Exact match</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-orange-500/70"></div>
-            <span>Corrispondenza parziale</span>
+            <span>Partial match</span>
           </div>
         </div>
       )}

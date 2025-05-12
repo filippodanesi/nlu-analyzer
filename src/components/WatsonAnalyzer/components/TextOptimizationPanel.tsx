@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -139,7 +138,7 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
           <div className="flex flex-wrap gap-2">
             {targetKeywords.map((keyword, index) => {
               const status = checkKeywordStatus(keyword);
-              let badgeVariant = "default";
+              let badgeVariant: "default" | "destructive" | "outline" | "secondary" = "default";
               let badgeClass = "";
               let indicator = "✗";
               
