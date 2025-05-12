@@ -1,9 +1,12 @@
+
 import React from 'react';
 import { ThemeProvider } from './ThemeProvider';
 import ApiConfigPanel from './ApiConfigPanel';
 import InputPanel from './InputPanel';
 import ResultsPanel from './ResultsPanel';
+import TextOptimizationPanel from './components/TextOptimizationPanel';
 import { useWatsonAnalyzer } from './hooks/useWatsonAnalyzer';
+import { useOptimization } from './hooks/useOptimization';
 
 // Import refactored components
 import Header from './components/Header';
@@ -55,8 +58,18 @@ const WatsonAnalyzer: React.FC = () => {
     getTargetKeywordsList,
   } = useWatsonAnalyzer();
 
+  // Optimization hook
+  const {
+    showOptimization
+  } = useOptimization();
+
   // Get target keywords list
   const targetKeywordsList = getTargetKeywordsList();
+
+  // Handle optimized text selection
+  const handleOptimizedTextSelect = (optimizedText: string) => {
+    setText(optimizedText);
+  };
 
   return (
     <ThemeProvider defaultTheme="light">
@@ -106,11 +119,20 @@ const WatsonAnalyzer: React.FC = () => {
             />
 
             {results && (
-              <ResultsPanel 
-                results={results} 
-                targetKeywords={targetKeywordsList}
-                textStats={textStats}
-              />
+              <>
+                <ResultsPanel 
+                  results={results} 
+                  targetKeywords={targetKeywordsList}
+                  textStats={textStats}
+                />
+
+                <TextOptimizationPanel
+                  text={text}
+                  results={results}
+                  targetKeywords={targetKeywordsList}
+                  onOptimizedTextSelect={handleOptimizedTextSelect}
+                />
+              </>
             )}
           </div>
         </div>
