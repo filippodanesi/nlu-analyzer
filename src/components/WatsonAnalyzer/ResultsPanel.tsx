@@ -62,9 +62,9 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
           <div>
-            <CardTitle className="text-lg font-semibold">Risultati dell'Analisi</CardTitle>
+            <CardTitle className="text-lg font-semibold">Analysis Results</CardTitle>
             <CardDescription>
-              Informazioni estratte dal testo
+              Information extracted from the text
             </CardDescription>
           </div>
           <ExportResults results={results} isDisabled={!results} />
@@ -78,9 +78,9 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
         {/* Main Results Tabs */}
         <Tabs defaultValue="extraction" className="w-full">
           <TabsList className="w-full grid grid-cols-3">
-            <TabsTrigger value="extraction">Estrazione</TabsTrigger>
-            <TabsTrigger value="classification">Classificazione</TabsTrigger>
-            <TabsTrigger value="tone">Analisi del Tono</TabsTrigger>
+            <TabsTrigger value="extraction">Extraction</TabsTrigger>
+            <TabsTrigger value="classification">Classification</TabsTrigger>
+            <TabsTrigger value="tone">Tone Analysis</TabsTrigger>
           </TabsList>
 
           {/* Extraction Tab */}
@@ -105,8 +105,8 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
             }
             {(!results.classifications || (results.language !== 'en' && results.language !== 'fr')) && (
               <PlaceholderTab 
-                message="Per attivare l'analisi del tono, seleziona l'opzione Tone Analysis nel pannello delle funzionalità." 
-                helpText="L'analisi del tono è disponibile solo per le lingue inglese e francese, e rileva sette toni emotivi nel testo."
+                message="Enable Tone Analysis in the features panel to activate this function." 
+                helpText="Tone analysis is only available for English and French languages, and detects seven emotional tones in the text."
               />
             )}
           </TabsContent>
@@ -115,7 +115,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
         {/* Raw JSON Response */}
         <Collapsible open={isJsonOpen} onOpenChange={setIsJsonOpen}>
           <div className="flex items-center justify-between py-2">
-            <h3 className="text-sm font-medium">Risposta API</h3>
+            <h3 className="text-sm font-medium">API Response</h3>
             <CollapsibleTrigger asChild>
               <Button variant="ghost" size="sm" className="p-0 h-7 w-7">
                 <ChevronDown className={`h-4 w-4 transition-transform ${isJsonOpen ? "transform rotate-180" : ""}`} />

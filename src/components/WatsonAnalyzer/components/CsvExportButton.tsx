@@ -26,14 +26,18 @@ const CsvExportButton: React.FC<CsvExportButtonProps> = ({ results, isDisabled }
     const csvContent = generateCsvContent(results);
     const fileName = `watson-analysis-${getCurrentDateString()}.csv`;
     
-    // Download the CSV file
-    const encodedUri = encodeURI(csvContent);
+    // Create a Blob from the CSV content
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    
+    // Create a download link and trigger it
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
+    link.setAttribute("href", url);
     link.setAttribute("download", fileName);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
 
     toast({
       title: "Export completed",

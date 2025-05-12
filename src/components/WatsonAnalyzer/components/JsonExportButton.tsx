@@ -17,8 +17,8 @@ const JsonExportButton: React.FC<JsonExportButtonProps> = ({ results, isDisabled
     const data = prepareExportData(results);
     if (!data) {
       toast({
-        title: "Esportazione fallita",
-        description: "Nessun dato disponibile per l'esportazione.",
+        title: "Export failed",
+        description: "No data available for export.",
         variant: "destructive",
       });
       return;
@@ -38,8 +38,8 @@ const JsonExportButton: React.FC<JsonExportButtonProps> = ({ results, isDisabled
     URL.revokeObjectURL(url);
     
     toast({
-      title: "Esportazione completata",
-      description: "L'analisi è stata esportata correttamente.",
+      title: "Export completed",
+      description: "The analysis has been successfully exported.",
     });
   };
 
@@ -52,7 +52,7 @@ const JsonExportButton: React.FC<JsonExportButtonProps> = ({ results, isDisabled
       className="flex items-center gap-1"
     >
       <FileText className="h-4 w-4" />
-      Esporta JSON
+      Export JSON
     </Button>
   );
 };

@@ -115,7 +115,7 @@ export const prepareExportData = (results: any): string => {
 export const generateCsvContent = (results: any): string => {
   if (!results) return "";
   
-  let csvContent = "data:text/csv;charset=utf-8,";
+  let csvContent = "";
   
   // Add metadata section header
   csvContent += "## METADATA ##\n";
