@@ -1,13 +1,6 @@
+
 import React from 'react';
 import { AlertCircle } from "lucide-react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 
@@ -56,51 +49,24 @@ const ToneTab: React.FC<ToneTabProps> = ({ classifications }) => {
   };
 
   return (
-    <div className="space-y-8">
-      {/* Visualization section - Grafico a barre */}
-      <div className="space-y-4">
-        <h3 className="text-sm font-semibold">Tone Strength Visualization</h3>
-        <div className="space-y-3">
-          {sortedTones.map((tone, index) => (
-            <div key={index} className="space-y-1">
-              <div className="flex justify-between items-center text-sm">
-                <div className="flex items-center gap-2">
-                  <Badge className={`${getToneColor(tone.class_name)}`}>
-                    {tone.class_name}
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">{toneDescriptions[tone.class_name]}</span>
-                </div>
-                <div>{(tone.confidence * 100).toFixed(1)}%</div>
-              </div>
-              <Progress value={tone.confidence * 100} className="h-2" />
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Detailed table */}
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Tone</TableHead>
-            <TableHead>Description</TableHead>
-            <TableHead>Confidence</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sortedTones.map((tone, index) => (
-            <TableRow key={index}>
-              <TableCell>
+    <div className="space-y-4">
+      <h3 className="text-sm font-semibold">Tone Analysis</h3>
+      <div className="space-y-3">
+        {sortedTones.map((tone, index) => (
+          <div key={index} className="space-y-1">
+            <div className="flex justify-between items-center text-sm">
+              <div className="flex items-center gap-2">
                 <Badge className={`${getToneColor(tone.class_name)}`}>
                   {tone.class_name}
                 </Badge>
-              </TableCell>
-              <TableCell>{toneDescriptions[tone.class_name]}</TableCell>
-              <TableCell>{(tone.confidence * 100).toFixed(1)}%</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+                <span className="text-xs text-muted-foreground">{toneDescriptions[tone.class_name]}</span>
+              </div>
+              <div>{(tone.confidence * 100).toFixed(1)}%</div>
+            </div>
+            <Progress value={tone.confidence * 100} className="h-2" />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
