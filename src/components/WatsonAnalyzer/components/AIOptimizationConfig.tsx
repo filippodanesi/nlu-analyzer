@@ -55,6 +55,7 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="gpt-4o-mini">OpenAI GPT-4o-mini</SelectItem>
+                <SelectItem value="claude-3-7-sonnet">Anthropic Claude 3.7 Sonnet</SelectItem>
               </SelectContent>
             </Select>
           </div>

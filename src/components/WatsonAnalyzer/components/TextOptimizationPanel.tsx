@@ -54,7 +54,8 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
         text,
         keywordsToOptimize,
         results,
-        apiKey
+        apiKey,
+        aiModel
       );
       setOptimizedText(optimized);
       toast({
