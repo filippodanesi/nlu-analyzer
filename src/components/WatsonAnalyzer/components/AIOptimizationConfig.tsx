@@ -57,7 +57,6 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
               <SelectContent>
                 <SelectItem value="gpt-4o-mini">OpenAI GPT-4o-mini</SelectItem>
                 <SelectItem value="gpt-4o">OpenAI GPT-4o</SelectItem>
-                <SelectItem value="gpt-3.5-turbo">OpenAI GPT-3.5 Turbo</SelectItem>
               </SelectContent>
             </Select>
           </div>
