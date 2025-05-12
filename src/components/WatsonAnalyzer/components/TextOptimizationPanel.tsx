@@ -1,18 +1,15 @@
-import React, { useState } from 'react';
+
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Loader } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { 
-  isExactKeywordMatch, 
-  isPartialKeywordMatch, 
-  optimizeTextWithAI 
-} from "../utils/optimizationUtils";
 import AIOptimizationConfig from "./AIOptimizationConfig";
+import KeywordStatusBadge from "./optimization/KeywordStatusBadge";
+import KeywordStatusLegend from "./optimization/KeywordStatusLegend";
+import OptimizationAlerts from "./optimization/OptimizationAlerts";
+import OptimizedTextDisplay from "./optimization/OptimizedTextDisplay";
+import { useTextOptimization } from "../hooks/useTextOptimization";
 
 interface TextOptimizationPanelProps {
   text: string;
@@ -27,81 +24,20 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
   targetKeywords,
   onOptimizedTextSelect
 }) => {
-  const [apiKey, setApiKey] = useState<string>("");
-  const [aiModel, setAiModel] = useState<string>("gpt-4o-mini");
-  const [isOptimizing, setIsOptimizing] = useState<boolean>(false);
-  const [optimizedText, setOptimizedText] = useState<string>("");
+  const {
+    apiKey,
+    setApiKey,
+    aiModel,
+    setAiModel,
+    isOptimizing,
+    optimizedText,
+    keywordsToOptimize,
+    keywordsWithPartialMatch,
+    needsOptimization,
+    handleOptimize,
+    checkKeywordStatus
+  } = useTextOptimization({ text, results, targetKeywords });
   
-  // Verifica delle parole chiave 
-  const checkKeywordStatus = (keyword: string) => {
-    if (!results || !results.keywords) return { exact: false, partial: false };
-    
-    // Check for exact matches first
-    const exactMatch = results.keywords.some(kw => isExactKeywordMatch(kw.text, keyword));
-    if (exactMatch) return { exact: true, partial: false };
-    
-    // If no exact match, check for partial matches
-    const partialMatch = results.keywords.some(kw => isPartialKeywordMatch(kw.text, keyword));
-    return { exact: false, partial: partialMatch };
-  };
-  
-  // Keywords that need optimization (no exact or partial match)
-  const keywordsToOptimize = targetKeywords.filter(keyword => {
-    const status = checkKeywordStatus(keyword);
-    return !status.exact && !status.partial;
-  });
-  
-  // Keywords with only partial matches
-  const keywordsWithPartialMatch = targetKeywords.filter(keyword => {
-    const status = checkKeywordStatus(keyword);
-    return !status.exact && status.partial;
-  });
-  
-  // Keywords with exact matches
-  const keywordsWithExactMatch = targetKeywords.filter(keyword => {
-    const status = checkKeywordStatus(keyword);
-    return status.exact;
-  });
-  
-  // Check if optimization is needed
-  const needsOptimization = keywordsToOptimize.length > 0;
-  
-  const handleOptimize = async () => {
-    if (!apiKey) {
-      toast({
-        title: "API Key Required",
-        description: "Please enter a valid OpenAI API key to proceed with optimization.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsOptimizing(true);
-    try {
-      const optimized = await optimizeTextWithAI(
-        text,
-        [...keywordsToOptimize, ...keywordsWithPartialMatch],
-        results,
-        apiKey,
-        aiModel
-      );
-      setOptimizedText(optimized);
-      toast({
-        title: "Optimization Completed",
-        description: "The text has been successfully optimized.",
-      });
-    } catch (error) {
-      console.error("Error during optimization:", error);
-      toast({
-        title: "Optimization Error",
-        description: error instanceof Error ? error.message : "An error occurred during text optimization.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsOptimizing(false);
-    }
-  };
-
   const handleUseOptimized = () => {
     onOptimizedTextSelect(optimizedText);
     toast({
@@ -136,92 +72,28 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
       <CardContent className="space-y-4">
         {targetKeywords.length > 0 && (
           <div className="flex flex-wrap gap-2">
-            {targetKeywords.map((keyword, index) => {
-              const status = checkKeywordStatus(keyword);
-              let badgeVariant: "default" | "destructive" | "outline" | "secondary" = "default";
-              let badgeClass = "";
-              let indicator = "✗";
-              
-              if (status.exact) {
-                badgeVariant = "outline";
-                badgeClass = "bg-green-100 text-green-800";
-                indicator = "✓";
-              } else if (status.partial) {
-                badgeVariant = "outline";
-                badgeClass = "bg-amber-100 text-amber-800";
-                indicator = "~";
-              } else {
-                badgeClass = "bg-red-100 text-red-800";
-              }
-              
-              return (
-                <Badge 
-                  key={index} 
-                  variant={badgeVariant}
-                  className={badgeClass}
-                >
-                  {keyword} {indicator}
-                </Badge>
-              );
-            })}
+            {targetKeywords.map((keyword, index) => (
+              <KeywordStatusBadge 
+                key={index} 
+                keyword={keyword} 
+                status={checkKeywordStatus(keyword)} 
+              />
+            ))}
           </div>
         )}
 
-        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <Badge variant="outline" className="bg-green-100 text-green-800 h-5 w-5 flex items-center justify-center p-0">✓</Badge>
-          <span className="mr-3">Exact match</span>
-          <Badge variant="outline" className="bg-amber-100 text-amber-800 h-5 w-5 flex items-center justify-center p-0">~</Badge>
-          <span className="mr-3">Partial match</span>
-          <Badge variant="default" className="bg-red-100 text-red-800 h-5 w-5 flex items-center justify-center p-0">✗</Badge>
-          <span>No match</span>
-        </div>
+        <KeywordStatusLegend />
 
-        {needsOptimization ? (
-          <Alert variant="default" className="bg-red-50 text-red-800 border-red-200">
-            <AlertTitle>Optimization Recommended</AlertTitle>
-            <AlertDescription>
-              Some of your target keywords ({keywordsToOptimize.join(', ')}) were not found in the analysis.
-              AI optimization can help integrate these keywords into the text.
-            </AlertDescription>
-          </Alert>
-        ) : keywordsWithPartialMatch.length > 0 ? (
-          <Alert variant="default" className="bg-amber-50 text-amber-800 border-amber-200">
-            <AlertTitle>Partial Optimization Recommended</AlertTitle>
-            <AlertDescription>
-              Some keywords have only partial matches. Consider optimization to improve exact keyword matching.
-            </AlertDescription>
-          </Alert>
-        ) : (
-          <Alert variant="default" className="bg-green-50 text-green-800 border-green-200">
-            <AlertTitle>Well Optimized Text</AlertTitle>
-            <AlertDescription>
-              All your target keywords have exact matches in the analysis.
-            </AlertDescription>
-          </Alert>
-        )}
+        <OptimizationAlerts 
+          needsOptimization={needsOptimization}
+          keywordsToOptimize={keywordsToOptimize}
+          keywordsWithPartialMatch={keywordsWithPartialMatch}
+        />
 
-        {optimizedText && (
-          <Tabs defaultValue="original">
-            <TabsList className="grid grid-cols-2 mb-2">
-              <TabsTrigger value="original">Original Text</TabsTrigger>
-              <TabsTrigger value="optimized">Optimized Text</TabsTrigger>
-            </TabsList>
-            <TabsContent value="original">
-              <Textarea 
-                readOnly
-                value={text}
-                className="min-h-[200px] font-mono text-sm"
-              />
-            </TabsContent>
-            <TabsContent value="optimized">
-              <Textarea 
-                readOnly
-                value={optimizedText}
-                className="min-h-[200px] font-mono text-sm"
-              />
-            </TabsContent>
-          </Tabs>
-        )}
+        <OptimizedTextDisplay 
+          originalText={text}
+          optimizedText={optimizedText}
+        />
       </CardContent>
 
       <CardFooter className="flex justify-between gap-2">
