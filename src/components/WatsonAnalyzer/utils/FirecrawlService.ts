@@ -1,3 +1,4 @@
+
 import FirecrawlApp from '@mendable/firecrawl-js';
 
 interface ErrorResponse {
@@ -21,13 +22,13 @@ export class FirecrawlService {
   private static firecrawlApp: FirecrawlApp | null = null;
 
   static saveApiKey(apiKey: string): void {
-    localStorage.setItem(this.API_KEY_STORAGE_KEY, apiKey);
+    sessionStorage.setItem(this.API_KEY_STORAGE_KEY, apiKey);
     this.firecrawlApp = new FirecrawlApp({ apiKey });
     console.log('Firecrawl API key saved successfully');
   }
 
   static getApiKey(): string | null {
-    return localStorage.getItem(this.API_KEY_STORAGE_KEY);
+    return sessionStorage.getItem(this.API_KEY_STORAGE_KEY);
   }
 
   static async scrapeUrl(url: string): Promise<ScrapingResponse> {

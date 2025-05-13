@@ -67,6 +67,9 @@ const regionOptions = {
   "kr-seo": "Seoul (kr-seo)"
 };
 
+// Storage keys
+const SESSION_STORAGE_KEY = 'watson_credentials';
+
 const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
   apiKey,
   setApiKey,
@@ -125,19 +128,19 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
       region,
       instanceId
     };
-    localStorage.setItem('watson_credentials', JSON.stringify(credentials));
-    toast.success("Credentials saved locally");
+    sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(credentials));
+    toast.success("Credentials saved to session");
   };
 
   const handleLoadCredentials = () => {
-    const saved = localStorage.getItem('watson_credentials');
+    const saved = sessionStorage.getItem(SESSION_STORAGE_KEY);
     if (saved) {
       const credentials = JSON.parse(saved);
       setApiKey(credentials.apiKey);
       setUrl(credentials.url);
       setRegion(credentials.region);
       setInstanceId(credentials.instanceId);
-      toast.success("Credentials loaded from local storage");
+      toast.success("Credentials loaded from session");
     }
   };
 

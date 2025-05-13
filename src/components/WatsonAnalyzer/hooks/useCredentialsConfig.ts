@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { toast } from "@/components/ui/use-toast";
 
@@ -23,15 +24,51 @@ export const SECRETS = {
   credentialsFileExists: false // Default to false, we'll check in useEffect
 };
 
+// Storage keys
+const SESSION_STORAGE_KEYS = {
+  API_KEY: 'watson_api_key',
+  URL: 'watson_url',
+  REGION: 'watson_region',
+  INSTANCE_ID: 'watson_instance_id'
+};
+
 export const useCredentialsConfig = () => {
   // API configuration
-  const [apiKey, setApiKey] = useState("");
-  const [url, setUrl] = useState("");
-  const [region, setRegion] = useState("eu-de"); // Default to eu-de
-  const [instanceId, setInstanceId] = useState("");
+  const [apiKey, setApiKey] = useState(() => {
+    return sessionStorage.getItem(SESSION_STORAGE_KEYS.API_KEY) || "";
+  });
   
-  // Credentials file state
+  const [url, setUrl] = useState(() => {
+    return sessionStorage.getItem(SESSION_STORAGE_KEYS.URL) || "";
+  });
+  
+  const [region, setRegion] = useState(() => {
+    return sessionStorage.getItem(SESSION_STORAGE_KEYS.REGION) || "eu-de";
+  });
+  
+  const [instanceId, setInstanceId] = useState(() => {
+    return sessionStorage.getItem(SESSION_STORAGE_KEYS.INSTANCE_ID) || "";
+  });
+  
+  // Credentialcsss file state
   const [credentialsFileExists, setCredentialsFileExists] = useState(false);
+
+  // Save to sessionStorage when values change
+  useEffect(() => {
+    if (apiKey) sessionStorage.setItem(SESSION_STORAGE_KEYS.API_KEY, apiKey);
+  }, [apiKey]);
+
+  useEffect(() => {
+    if (url) sessionStorage.setItem(SESSION_STORAGE_KEYS.URL, url);
+  }, [url]);
+
+  useEffect(() => {
+    if (region) sessionStorage.setItem(SESSION_STORAGE_KEYS.REGION, region);
+  }, [region]);
+
+  useEffect(() => {
+    if (instanceId) sessionStorage.setItem(SESSION_STORAGE_KEYS.INSTANCE_ID, instanceId);
+  }, [instanceId]);
 
   // Check if ibm-credentials.env file exists
   useEffect(() => {
