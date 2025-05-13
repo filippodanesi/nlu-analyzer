@@ -82,8 +82,8 @@ const UrlInputSection: React.FC<UrlInputSectionProps> = ({
           description: "Content has been extracted from the URL"
         });
       } else {
-        // Use type narrowing to access the error property
-        const errorMessage = 'success' in response && !response.success 
+        // Proper type handling: Access error only if it exists on the response
+        const errorMessage = typeof response === 'object' && 'error' in response 
           ? response.error 
           : "Failed to scrape the URL";
           
