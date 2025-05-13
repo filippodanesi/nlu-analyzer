@@ -103,6 +103,11 @@ const UrlInputSection: React.FC<UrlInputSectionProps> = ({
     }
   };
 
+  // Handler for text changes in the textarea
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setText(e.target.value);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2">
@@ -124,11 +129,11 @@ const UrlInputSection: React.FC<UrlInputSectionProps> = ({
 
       {text && (
         <div className="space-y-2">
-          <Label htmlFor="scraped-content">Scraped Content</Label>
+          <Label htmlFor="scraped-content">Scraped Content (editable)</Label>
           <Textarea
             id="scraped-content"
             value={text}
-            readOnly
+            onChange={handleTextChange}
             className="min-h-[200px] font-mono text-sm"
           />
         </div>
