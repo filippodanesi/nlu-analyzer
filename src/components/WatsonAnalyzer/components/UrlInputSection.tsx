@@ -82,9 +82,14 @@ const UrlInputSection: React.FC<UrlInputSectionProps> = ({
           description: "Content has been extracted from the URL"
         });
       } else {
+        // Use type narrowing to access the error property
+        const errorMessage = 'success' in response && !response.success 
+          ? response.error 
+          : "Failed to scrape the URL";
+          
         toast({
           title: "Scraping failed",
-          description: response.error,
+          description: errorMessage,
           variant: "destructive",
         });
       }
