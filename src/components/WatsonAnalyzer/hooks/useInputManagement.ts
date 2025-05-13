@@ -11,7 +11,7 @@ export interface TextStats {
 export const useInputManagement = () => {
   // Input state
   const [text, setText] = useState("");
-  const [inputMethod, setInputMethod] = useState<"text" | "file">("text");
+  const [inputMethod, setInputMethod] = useState<"text" | "file" | "url">("text");
   const [targetKeywords, setTargetKeywords] = useState("");
   
   // Text statistics

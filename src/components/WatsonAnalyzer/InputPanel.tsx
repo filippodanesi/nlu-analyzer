@@ -12,13 +12,14 @@ import { Button } from "@/components/ui/button";
 import InputMethodToggle from './components/InputMethodToggle';
 import TextInputSection from './components/TextInputSection';
 import FileUploadSection from './components/FileUploadSection';
+import UrlInputSection from './components/UrlInputSection';
 import KeywordsSection from './components/KeywordsSection';
 
 interface InputPanelProps {
   text: string;
   setText: (text: string) => void;
-  inputMethod: "text" | "file";
-  setInputMethod: (method: "text" | "file") => void;
+  inputMethod: "text" | "file" | "url";
+  setInputMethod: (method: "text" | "file" | "url") => void;
   targetKeywords: string;
   setTargetKeywords: (keywords: string) => void;
   onAnalyze: () => void;
@@ -48,7 +49,7 @@ const InputPanel: React.FC<InputPanelProps> = ({
       <CardHeader className="pb-2">
         <CardTitle className="text-lg font-semibold">Input</CardTitle>
         <CardDescription>
-          Enter or upload the text you want to analyze
+          Enter text, upload a file, or input a URL to analyze
         </CardDescription>
       </CardHeader>
       
@@ -61,8 +62,10 @@ const InputPanel: React.FC<InputPanelProps> = ({
 
         {inputMethod === "text" ? (
           <TextInputSection text={text} setText={setText} />
-        ) : (
+        ) : inputMethod === "file" ? (
           <FileUploadSection text={text} setText={setText} />
+        ) : (
+          <UrlInputSection text={text} setText={setText} />
         )}
 
         <KeywordsSection 
