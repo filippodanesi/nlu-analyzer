@@ -1,7 +1,8 @@
+
 import { useState } from 'react';
 import { toast } from "@/components/ui/use-toast";
 import { TextStats } from './useInputManagement';
-import { WatsonFeatures, WatsonLimits } from './useAnalysisFeatures';
+import { WatsonFeatures, WatsonLimits, TONE_SUPPORTED_LANGUAGES } from './useAnalysisFeatures';
 
 interface AnalysisExecutionProps {
   text: string;
@@ -62,16 +63,6 @@ export const useAnalysisExecution = ({
       return;
     }
 
-    // Check for tone analysis - only block if language is not auto, en, or fr
-    if (features.classifications && (language !== "auto" && language !== "en" && language !== "fr")) {
-      toast({
-        title: "Unsupported language",
-        description: "Tone analysis is only available for English and French languages.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     // Start analysis
     setIsAnalyzing(true);
 
@@ -107,8 +98,8 @@ export const useAnalysisExecution = ({
       };
     }
     
-    // Tone Analysis: se la lingua è auto, includi sempre classifications se abilitato
-    if (features.classifications && (language === 'auto' || language === 'en' || language === 'fr')) {
+    // For tone analysis, include classifications if enabled and language is supported or auto
+    if (features.classifications && TONE_SUPPORTED_LANGUAGES.includes(language)) {
       featuresParams.classifications = {
         model: toneModel
       };

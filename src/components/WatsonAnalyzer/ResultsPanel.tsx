@@ -30,6 +30,7 @@ import PlaceholderTab from './components/PlaceholderTab';
 import JsonResponseDisplay from './components/JsonResponseDisplay';
 import ToneTab from './components/ToneTab';
 import ExportResults from './components/ExportResults';
+import { TONE_SUPPORTED_LANGUAGES } from './hooks/useAnalysisFeatures';
 
 interface ResultsPanelProps {
   results: any;
@@ -56,6 +57,11 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
     const lowerText = text.toLowerCase();
     return targetKeywords.some(keyword => lowerText.includes(keyword.toLowerCase()));
   };
+
+  // Check if classifications are available and language is supported
+  const hasToneAnalysis = results.classifications && 
+    results.classifications.length > 0 && 
+    (TONE_SUPPORTED_LANGUAGES.includes(results.language) || results.language === 'en' || results.language === 'fr');
 
   return (
     <Card className="w-full bg-background border-border">
@@ -102,12 +108,9 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
           
           {/* Tone Analysis Tab */}
           <TabsContent value="tone" className="pt-4">
-            {results.classifications &&
-              ((results.language === 'en' || results.language === 'fr') ? (
-                <ToneTab classifications={results.classifications} />
-              ) : null)
-            }
-            {(!results.classifications || (results.language !== 'en' && results.language !== 'fr')) && (
+            {hasToneAnalysis ? (
+              <ToneTab classifications={results.classifications} />
+            ) : (
               <PlaceholderTab 
                 message="Enable Tone Analysis in the features panel to activate this function." 
                 helpText="Tone analysis is only available for English and French languages, and detects seven emotional tones in the text."

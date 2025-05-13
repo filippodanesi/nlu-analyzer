@@ -23,12 +23,13 @@ const getToneColor = (toneName: string) => {
 };
 
 const ToneTab: React.FC<ToneTabProps> = ({ classifications }) => {
+  // Check if classifications exist and are not empty
   if (!classifications || classifications.length === 0) {
     return (
       <div className="flex items-center justify-center p-8 border rounded-md">
         <div className="flex items-center space-x-2 text-muted-foreground">
           <AlertCircle size={16} />
-          <p>No tone analysis results found.</p>
+          <p>No tone analysis results found. Make sure tone analysis is enabled in the features panel.</p>
         </div>
       </div>
     );
@@ -59,7 +60,9 @@ const ToneTab: React.FC<ToneTabProps> = ({ classifications }) => {
                 <Badge className={`${getToneColor(tone.class_name)}`}>
                   {tone.class_name}
                 </Badge>
-                <span className="text-xs text-muted-foreground">{toneDescriptions[tone.class_name]}</span>
+                <span className="text-xs text-muted-foreground">
+                  {toneDescriptions[tone.class_name] || 'Tone category'}
+                </span>
               </div>
               <div>{(tone.confidence * 100).toFixed(1)}%</div>
             </div>

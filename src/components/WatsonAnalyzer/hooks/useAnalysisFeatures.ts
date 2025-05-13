@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 
 export interface WatsonFeatures {
@@ -14,6 +15,9 @@ export interface WatsonLimits {
   concepts: number;
   categories: number;
 }
+
+// Array of supported languages for tone analysis
+export const TONE_SUPPORTED_LANGUAGES = ["en", "fr", "auto"];
 
 export const useAnalysisFeatures = () => {
   // Features state
@@ -46,6 +50,9 @@ export const useAnalysisFeatures = () => {
       setToneModel("tone-classifications-en-v1");
     } else if (language === "fr") {
       setToneModel("tone-classifications-fr-v1");
+    } else if (language === "auto") {
+      // Default to English tone model for auto-detection
+      setToneModel("tone-classifications-en-v1");
     }
   }, [language]);
   
@@ -57,6 +64,7 @@ export const useAnalysisFeatures = () => {
     language,
     setLanguage,
     toneModel,
-    setToneModel
+    setToneModel,
+    isToneSupportedForLanguage: (lang: string) => TONE_SUPPORTED_LANGUAGES.includes(lang)
   };
 };
