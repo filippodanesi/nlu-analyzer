@@ -1,4 +1,3 @@
-
 import FirecrawlApp from '@mendable/firecrawl-js';
 
 interface ErrorResponse {
@@ -44,15 +43,22 @@ export class FirecrawlService {
       }
 
       const scrapeResponse = await this.firecrawlApp.scrapeUrl(url, {
-        formats: ['markdown', 'html'],
+        formats: ['markdown'],
+        onlyMainContent: true, // Focus on main content
+        excludeTags: ['code', 'pre', 'CodeGroup'], // Exclude code blocks
       });
 
       if (!scrapeResponse.success) {
-        console.error('Scrape failed:', (scrapeResponse as ErrorResponse).error);
+        console.error('Scrape failed:', 'error' in scrapeResponse ? scrapeResponse.error : 'Unknown error');
         return { 
           success: false, 
-          error: (scrapeResponse as ErrorResponse).error || 'Failed to scrape website' 
+          error: 'error' in scrapeResponse ? scrapeResponse.error : 'Failed to scrape website' 
         };
+      }
+
+      // Clean the markdown content
+      if (scrapeResponse.markdown) {
+        scrapeResponse.markdown = this.cleanMarkdownContent(scrapeResponse.markdown);
       }
 
       console.log('Scrape successful:', scrapeResponse);
@@ -67,5 +73,33 @@ export class FirecrawlService {
         error: error instanceof Error ? error.message : 'Failed to connect to Firecrawl API' 
       };
     }
+  }
+
+  /**
+   * Cleans the markdown content to make it more suitable for analysis
+   * Removes code blocks, excessive formatting, and other noise
+   */
+  private static cleanMarkdownContent(markdown: string): string {
+    if (!markdown) return '';
+
+    // Remove code blocks (content between triple backticks)
+    let cleaned = markdown.replace(/```[\s\S]*?```/g, '');
+
+    // Remove inline code (content between single backticks)
+    cleaned = cleaned.replace(/`([^`]+)`/g, '$1');
+
+    // Remove markdown links and keep only the text
+    cleaned = cleaned.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1');
+
+    // Remove image markdown
+    cleaned = cleaned.replace(/!\[[^\]]*\]\([^\)]+\)/g, '');
+
+    // Remove HTML tags
+    cleaned = cleaned.replace(/<[^>]*>/g, '');
+
+    // Remove excess whitespace
+    cleaned = cleaned.replace(/\n\s*\n/g, '\n\n').trim();
+
+    return cleaned;
   }
 }
