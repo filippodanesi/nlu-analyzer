@@ -129,7 +129,7 @@ const UrlInputSection: React.FC<UrlInputSectionProps> = ({
 
       {text && (
         <div className="space-y-2">
-          <Label htmlFor="scraped-content">Scraped Content (editable)</Label>
+          <Label htmlFor="scraped-content">Scraped Content</Label>
           <Textarea
             id="scraped-content"
             value={text}
