@@ -79,13 +79,11 @@ const UrlInputSection: React.FC<UrlInputSectionProps> = ({
         setText(response.data.markdown || '');
         toast({
           title: "Scraping successful",
-          description: "Content has been extracted from the URL"
+          description: "Clean content has been extracted from the URL"
         });
       } else {
-        // Proper type handling: Access error only if it exists on the response
-        const errorMessage = typeof response === 'object' && 'error' in response 
-          ? response.error 
-          : "Failed to scrape the URL";
+        // Safe type checking before accessing error property
+        const errorMessage = 'error' in response ? response.error : "Failed to scrape the URL"; 
           
         toast({
           title: "Scraping failed",

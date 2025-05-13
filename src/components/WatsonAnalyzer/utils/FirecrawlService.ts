@@ -46,6 +46,9 @@ export class FirecrawlService {
         formats: ['markdown'],
         onlyMainContent: true, // Focus on main content
         excludeTags: ['code', 'pre', 'CodeGroup'], // Exclude code blocks
+        blockAds: true, // Remove ads and cookie popups
+        removeBase64Images: true, // Remove base64 images to reduce noise
+        timeout: 30000, // 30 second timeout
       });
 
       if (!scrapeResponse.success) {
@@ -97,8 +100,20 @@ export class FirecrawlService {
     // Remove HTML tags
     cleaned = cleaned.replace(/<[^>]*>/g, '');
 
+    // Remove any remaining CodeGroup tags or XML-like tags
+    cleaned = cleaned.replace(/<CodeGroup>[\s\S]*?<\/CodeGroup>/g, '');
+    
+    // Remove heading markers (###) but keep the text
+    cleaned = cleaned.replace(/^#{1,6}\s+(.+)$/gm, '$1');
+
+    // Remove blockquotes (> ) but keep the text
+    cleaned = cleaned.replace(/^>\s+(.+)$/gm, '$1');
+
+    // Remove horizontal rules
+    cleaned = cleaned.replace(/^---+$/gm, '');
+
     // Remove excess whitespace
-    cleaned = cleaned.replace(/\n\s*\n/g, '\n\n').trim();
+    cleaned = cleaned.replace(/\n{3,}/g, '\n\n').trim();
 
     return cleaned;
   }
