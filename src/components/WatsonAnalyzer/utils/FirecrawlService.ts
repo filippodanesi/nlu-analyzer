@@ -1,4 +1,3 @@
-
 import FirecrawlApp from '@mendable/firecrawl-js';
 
 interface ErrorResponse {
@@ -81,7 +80,7 @@ export class FirecrawlService {
 
   /**
    * Cleans the markdown content to make it more suitable for analysis
-   * Removes code blocks, excessive formatting, and other noise
+   * Removes markdown formatting, code blocks, and other noise
    */
   private static cleanMarkdownContent(markdown: string): string {
     if (!markdown) return '';
@@ -91,6 +90,12 @@ export class FirecrawlService {
 
     // Remove inline code (content between single backticks)
     cleaned = cleaned.replace(/`([^`]+)`/g, '$1');
+
+    // Remove bold formatting (**text**)
+    cleaned = cleaned.replace(/\*\*([^*]+)\*\*/g, '$1');
+
+    // Remove italic formatting (*text*)
+    cleaned = cleaned.replace(/\*([^*]+)\*/g, '$1');
 
     // Remove markdown links and keep only the text
     cleaned = cleaned.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1');
