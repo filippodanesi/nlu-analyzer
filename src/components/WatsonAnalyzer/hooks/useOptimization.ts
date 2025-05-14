@@ -1,18 +1,14 @@
 
 import { useState } from 'react';
 
+/**
+ * Hook to manage optimization state
+ */
 export const useOptimization = () => {
-  // Stato per l'ottimizzazione
-  const [showOptimization, setShowOptimization] = useState<boolean>(false);
+  const [showOptimization, setShowOptimization] = useState(true);
   
-  // Funzione per mostrare/nascondere il pannello di ottimizzazione
-  const toggleOptimization = () => {
-    setShowOptimization(!showOptimization);
-  };
-
   return {
     showOptimization,
-    toggleOptimization,
     setShowOptimization
   };
 };

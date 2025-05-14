@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Key } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface AIOptimizationConfigProps {
   apiKey: string;
@@ -19,6 +20,9 @@ interface AIOptimizationConfigProps {
   aiModel: string;
   setAiModel: (model: string) => void;
 }
+
+// Define different AI providers
+export type AIProvider = "openai" | "anthropic";
 
 const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
   apiKey,
@@ -28,10 +32,21 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
 }) => {
   const [tempApiKey, setTempApiKey] = useState(apiKey);
   const [isOpen, setIsOpen] = useState(false);
+  const [activeProvider, setActiveProvider] = useState<AIProvider>(aiModel.startsWith("claude") ? "anthropic" : "openai");
 
   const handleSave = () => {
     setApiKey(tempApiKey);
     setIsOpen(false);
+  };
+
+  const handleProviderChange = (provider: AIProvider) => {
+    setActiveProvider(provider);
+    // Set a default model for the selected provider
+    if (provider === "openai" && aiModel.startsWith("claude")) {
+      setAiModel("gpt-4o-mini");
+    } else if (provider === "anthropic" && !aiModel.startsWith("claude")) {
+      setAiModel("claude-3-sonnet-20240229");
+    }
   };
 
   return (
@@ -48,30 +63,78 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
         </DialogHeader>
         
         <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="ai-model">AI Model</Label>
-            <Select value={aiModel} onValueChange={setAiModel}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a model" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="gpt-4o-mini">OpenAI GPT-4o-mini</SelectItem>
-                <SelectItem value="gpt-4o">OpenAI GPT-4o</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <Tabs 
+            defaultValue={activeProvider} 
+            onValueChange={(value) => handleProviderChange(value as AIProvider)}
+            value={activeProvider}
+          >
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="openai">OpenAI</TabsTrigger>
+              <TabsTrigger value="anthropic">Anthropic (Claude)</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="openai" className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="ai-model-openai">AI Model</Label>
+                <Select 
+                  value={aiModel.startsWith("gpt") ? aiModel : "gpt-4o-mini"} 
+                  onValueChange={setAiModel}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a model" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="gpt-4o-mini">OpenAI GPT-4o-mini</SelectItem>
+                    <SelectItem value="gpt-4o">OpenAI GPT-4o</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="api-key">API Key</Label>
-            <Input
-              id="api-key"
-              type="password"
-              placeholder="Enter your OpenAI API key"
-              value={tempApiKey}
-              onChange={(e) => setTempApiKey(e.target.value)}
-              className="font-mono"
-            />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="api-key-openai">API Key</Label>
+                <Input
+                  id="api-key-openai"
+                  type="password"
+                  placeholder="Enter your OpenAI API key"
+                  value={activeProvider === "openai" ? tempApiKey : ""}
+                  onChange={(e) => setTempApiKey(e.target.value)}
+                  className="font-mono"
+                />
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="anthropic" className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="ai-model-claude">AI Model</Label>
+                <Select 
+                  value={aiModel.startsWith("claude") ? aiModel : "claude-3-sonnet-20240229"} 
+                  onValueChange={setAiModel}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a model" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="claude-3-sonnet-20240229">Claude 3 Sonnet</SelectItem>
+                    <SelectItem value="claude-3-haiku-20240307">Claude 3 Haiku</SelectItem>
+                    <SelectItem value="claude-3-opus-20240229">Claude 3 Opus</SelectItem>
+                    <SelectItem value="claude-3-7-sonnet-20240620">Claude 3.7 Sonnet</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="api-key-claude">API Key</Label>
+                <Input
+                  id="api-key-claude"
+                  type="password"
+                  placeholder="Enter your Anthropic API key"
+                  value={activeProvider === "anthropic" ? tempApiKey : ""}
+                  onChange={(e) => setTempApiKey(e.target.value)}
+                  className="font-mono"
+                />
+              </div>
+            </TabsContent>
+          </Tabs>
 
           <Button onClick={handleSave} className="w-full">
             Save
