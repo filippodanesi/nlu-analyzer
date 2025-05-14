@@ -11,6 +11,9 @@ import {
 // Define the keyword status type
 export type KeywordStatus = "missing" | "exact" | "partial" | "relevant";
 
+// Define the AI provider type
+export type AIProvider = "openai" | "anthropic";
+
 interface UseTextOptimizationProps {
   text: string;
   results: any;
@@ -26,6 +29,11 @@ export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOp
   const [aiModel, setAiModel] = useState(() => {
     return sessionStorage.getItem('ai_model') || "gpt-4o-mini";
   });
+  
+  const [aiProvider, setAiProvider] = useState<AIProvider>(() => {
+    const savedModel = sessionStorage.getItem('ai_model') || "gpt-4o-mini";
+    return savedModel.startsWith("claude") ? "anthropic" : "openai";
+  });
 
   // Save to sessionStorage when values change
   const storeApiKey = (key: string) => {
@@ -36,6 +44,12 @@ export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOp
   const storeAiModel = (model: string) => {
     if (model) sessionStorage.setItem('ai_model', model);
     setAiModel(model);
+    // Update provider based on model
+    if (model.startsWith("claude")) {
+      setAiProvider("anthropic");
+    } else {
+      setAiProvider("openai");
+    }
   };
   
   // Optimization state
@@ -131,6 +145,8 @@ export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOp
     setApiKey: storeApiKey,
     aiModel,
     setAiModel: storeAiModel,
+    aiProvider,
+    setAiProvider,
     
     // Optimization state & actions
     isOptimizing,

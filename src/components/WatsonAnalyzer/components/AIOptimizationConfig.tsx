@@ -13,26 +13,28 @@ import {
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Key } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { AIProvider } from '../hooks/useTextOptimization';
 
 interface AIOptimizationConfigProps {
   apiKey: string;
   setApiKey: (key: string) => void;
   aiModel: string;
   setAiModel: (model: string) => void;
+  aiProvider?: AIProvider;
+  setAiProvider?: (provider: AIProvider) => void;
 }
-
-// Define different AI providers
-export type AIProvider = "openai" | "anthropic";
 
 const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
   apiKey,
   setApiKey,
   aiModel,
-  setAiModel
+  setAiModel,
+  aiProvider = "openai",
+  setAiProvider
 }) => {
   const [tempApiKey, setTempApiKey] = useState(apiKey);
   const [isOpen, setIsOpen] = useState(false);
-  const [activeProvider, setActiveProvider] = useState<AIProvider>(aiModel.startsWith("claude") ? "anthropic" : "openai");
+  const [activeProvider, setActiveProvider] = useState<AIProvider>(aiProvider);
 
   const handleSave = () => {
     setApiKey(tempApiKey);
@@ -41,6 +43,9 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
 
   const handleProviderChange = (provider: AIProvider) => {
     setActiveProvider(provider);
+    if (setAiProvider) {
+      setAiProvider(provider);
+    }
     // Set a default model for the selected provider
     if (provider === "openai" && aiModel.startsWith("claude")) {
       setAiModel("gpt-4o-mini");
