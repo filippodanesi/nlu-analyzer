@@ -123,7 +123,6 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
                     <SelectItem value="claude-3-sonnet-20240229">Claude 3 Sonnet</SelectItem>
                     <SelectItem value="claude-3-haiku-20240307">Claude 3 Haiku</SelectItem>
                     <SelectItem value="claude-3-opus-20240229">Claude 3 Opus</SelectItem>
-                    <SelectItem value="claude-3.7-sonnet-20240620">Claude 3.7 Sonnet</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

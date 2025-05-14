@@ -176,6 +176,17 @@ const CorsProxy: React.FC<CorsProxyProps> = ({ className }) => {
               </li>
               <li>
                 <a 
+                  href="https://cors.sh/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center hover:underline"
+                >
+                  cors.sh/
+                  <ExternalLink className="ml-1 h-3 w-3" />
+                </a>
+              </li>
+              <li>
+                <a 
                   href="https://api.allorigins.win/" 
                   target="_blank" 
                   rel="noopener noreferrer"

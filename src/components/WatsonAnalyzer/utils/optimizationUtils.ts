@@ -153,6 +153,7 @@ const getCorsProxyUrl = (): string => {
   
   // In development, use a default CORS proxy
   if (isDev) {
+    // Don't use cors-anywhere.herokuapp.com as it's often rate-limited
     return "https://corsproxy.io/?";
   }
   
@@ -229,12 +230,20 @@ const optimizeWithClaude = async (
   model: string
 ): Promise<string> => {
   try {
+    // Force use a supported model
+    const claudeModel = model.includes("claude-3-sonnet") ? "claude-3-sonnet-20240229" : 
+                        model.includes("claude-3-haiku") ? "claude-3-haiku-20240307" : 
+                        model.includes("claude-3-opus") ? "claude-3-opus-20240229" : 
+                        "claude-3-sonnet-20240229";
+                        
     // Get the CORS proxy URL
     const corsProxyUrl = getCorsProxyUrl();
     
     // Create the proxied URL
     const baseUrl = "https://api.anthropic.com/v1/messages";
     const proxiedUrl = makeProxiedUrl(baseUrl, corsProxyUrl);
+    
+    console.log(`Using Claude model: ${claudeModel}`);
     
     const response = await fetch(proxiedUrl, {
       method: "POST",
@@ -245,7 +254,7 @@ const optimizeWithClaude = async (
         "anthropic-dangerous-direct-browser-access": "true" // Add the required header
       },
       body: JSON.stringify({
-        model: model,
+        model: claudeModel,
         system: "You are an assistant specialized in SEO and keyword optimization. Your task is to optimize the exact text provided without adding any content that wasn't in the original. Never reference external tools or services not mentioned in the original text.",
         messages: [
           {
@@ -272,9 +281,9 @@ const optimizeWithClaude = async (
       }
       
       // Try fallback approach if the proxy fails
-      if (response.status === 403 || response.status === 0 || response.status === 401) {
+      if (response.status === 403 || response.status === 0 || response.status === 401 || response.status === 404) {
         console.log("Attempting fallback method for Claude API...");
-        return await fallbackNoCorsClaude(prompt, apiKey, model);
+        return await fallbackNoCorsClaude(prompt, apiKey, claudeModel);
       }
       
       throw new Error(errorDetails || "Error in Claude optimization API");
@@ -296,4 +305,3 @@ const optimizeWithClaude = async (
     throw error;
   }
 };
-
