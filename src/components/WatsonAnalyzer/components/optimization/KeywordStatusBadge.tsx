@@ -1,13 +1,11 @@
 
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
+import type { KeywordStatus } from '../../hooks/useTextOptimization';
 
 interface KeywordStatusBadgeProps {
   keyword: string;
-  status: {
-    exact: boolean;
-    partial: boolean;
-  };
+  status: KeywordStatus;
 }
 
 /**
@@ -18,14 +16,18 @@ const KeywordStatusBadge: React.FC<KeywordStatusBadgeProps> = ({ keyword, status
   let badgeClass = "";
   let indicator = "✗";
   
-  if (status.exact) {
+  if (status === "exact") {
     badgeVariant = "outline";
     badgeClass = "bg-green-100 text-green-800";
     indicator = "✓";
-  } else if (status.partial) {
+  } else if (status === "partial") {
     badgeVariant = "outline";
     badgeClass = "bg-amber-100 text-amber-800";
     indicator = "~";
+  } else if (status === "relevant") {
+    badgeVariant = "secondary";
+    badgeClass = "bg-blue-100 text-blue-800";
+    indicator = "•";
   } else {
     badgeClass = "bg-red-100 text-red-800";
   }

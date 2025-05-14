@@ -29,6 +29,8 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
     setApiKey,
     aiModel,
     setAiModel,
+    aiProvider,
+    setAiProvider,
     isOptimizing,
     optimizedText,
     keywordsToOptimize,
@@ -57,14 +59,16 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
           <div>
             <CardTitle className="text-lg font-semibold">AI Optimization</CardTitle>
             <CardDescription>
-              Optimize text for target keywords using OpenAI
+              Optimize text for target keywords using AI
             </CardDescription>
           </div>
           <AIOptimizationConfig 
             apiKey={apiKey} 
             setApiKey={setApiKey} 
             aiModel={aiModel} 
-            setAiModel={setAiModel} 
+            setAiModel={setAiModel}
+            aiProvider={aiProvider}
+            setAiProvider={setAiProvider}
           />
         </div>
       </CardHeader>
