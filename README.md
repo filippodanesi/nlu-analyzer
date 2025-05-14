@@ -28,24 +28,24 @@ The application is built using a modern React stack:
 
 ## API Configuration
 
-### IBM Watson Authentication Options
+### IBM Watson Authentication
 
-The application provides several options for authenticating with IBM Watson's NLU API:
+The application provides multiple ways to authenticate with IBM Watson's NLU API:
 
-1. **Environment Variables** - Use credentials from environment variables or `ibm-credentials.env` file
-2. **Direct API Key** - Enter your API key directly in the configuration panel
-3. **Region Selection** - Choose from predefined IBM Cloud regions or specify a custom URL
-4. **Instance ID** - Specify your service instance ID for the selected region
+1. **Direct Input** - Enter your API key, region, and instance ID directly in the configuration panel
+2. **Quick Input** - Paste JSON credentials or URL for quick configuration
+3. **Import .env File** - Upload an IBM credentials file
+4. **Session Storage** - Credentials are saved to your browser's session storage for convenience
 
 ### AI Optimization Configuration
 
-The application allows configuration of AI optimization features:
+Configure AI optimization features with:
 
 1. **AI Provider Selection** - Choose between OpenAI (GPT) or Anthropic (Claude)
 2. **Model Selection** - Select the specific AI model to use for optimization
-3. **Optimization Parameters** - Adjust the parameters for the optimization process, such as temperature
+3. **API Key Management** - Securely enter your API keys in the configuration panel
 
-### Available Regions
+### Available IBM Watson Regions
 
 - Dallas (us-south)
 - Washington DC (us-east)
@@ -82,122 +82,73 @@ Fine-tune analysis with configurable parameters:
 
 ### Prerequisites
 
-- Node.js (v16+)
-- npm or yarn package manager
+- Modern web browser (Chrome, Firefox, Safari, Edge)
 - IBM Watson Natural Language Understanding API credentials
 - OpenAI API key (for GPT optimization)
 - Anthropic API key (for Claude optimization)
 
-### Installation
+### Usage
 
-1. Clone the repository:
-
-```bash
-git clone <repository-url>
-cd watson-nlu-optimizer
-```
-
-2. Install dependencies:
-
-```bash
-npm install
-# or
-yarn install
-```
-
-3. Configure API credentials (choose one method):
-
-#### Method 1: Using ibm-credentials.env (Recommended for local development)
-
-Create a file named `ibm-credentials.env` in the project root:
-
-```env
-NATURAL_LANGUAGE_UNDERSTANDING_APIKEY=your-api-key-here
-NATURAL_LANGUAGE_UNDERSTANDING_URL=your-service-url-here
-NATURAL_LANGUAGE_UNDERSTANDING_AUTH_TYPE=iam
-OPENAI_API_KEY=your-openai-api-key-here
-```
-
-**Important**: This file is automatically ignored by git. Never commit it to the repository!
-
-#### Method 2: Using .env file
-
-Create a `.env` file in the project root:
-
-```env
-VITE_NATURAL_LANGUAGE_UNDERSTANDING_APIKEY=your-api-key-here
-VITE_NATURAL_LANGUAGE_UNDERSTANDING_URL=your-service-url-here
-VITE_NATURAL_LANGUAGE_UNDERSTANDING_AUTH_TYPE=iam
-VITE_OPENAI_API_KEY=your-openai-api-key-here
-```
-
-4. Start the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-```
-
-5. Open your browser to `http://localhost:8080`
+1. Access the application through your web browser
+2. Configure the IBM Watson API credentials in the configuration panel
+3. Enter text directly, upload a file, or scrape content from a URL
+4. (Optional) Add target keywords for highlighting
+5. Select the features you want to analyze
+6. Click "Analyze" to process your content
+7. View results in organized tabs based on feature categories
+8. Use the AI Optimization tab to get suggestions for improving your content
 
 ### Required API Credentials
 
 To use all features of this application, you'll need:
 
-1. An IBM Cloud account with Watson Natural Language Understanding service
-   - API key and URL from your service credentials
+1. IBM Watson Natural Language Understanding service credentials
+   - API key, region, and instance ID from your IBM Cloud account
 2. An OpenAI account (for GPT optimization features)
    - API key from your OpenAI account
 3. An Anthropic account (for Claude optimization features)
    - API key from your Anthropic account
 
-## Production Deployment
+## Security Best Practices
 
-### Vercel Deployment
-
-1. Deploy the repository to Vercel
-2. Add the following environment variables in your Vercel project settings:
-   - `NATURAL_LANGUAGE_UNDERSTANDING_APIKEY`
-   - `NATURAL_LANGUAGE_UNDERSTANDING_URL`
-   - `NATURAL_LANGUAGE_UNDERSTANDING_AUTH_TYPE`
-   - `OPENAI_API_KEY`
-
-The application automatically detects and uses these environment variables in production.
+- **Session Storage Only** - Credentials are only stored in your browser's session storage
+- **No Server Storage** - No credentials are stored on any server
+- **Browser Session** - Credentials are cleared when you close your browser
+- **Secure Input** - API key fields use password masking for security
+- **Client-Side Processing** - All API requests are made directly from your browser
 
 ## Usage Guide
 
-1. Configure the API credentials (automatic if using environment variables)
-2. Enter text directly or upload a text file
+1. Configure your IBM Watson API credentials:
+   - Enter your API key
+   - Select your IBM Cloud region
+   - Enter your instance ID
+2. Enter text directly, upload a file, or scrape a URL
 3. (Optional) Add target keywords for highlighting
 4. Click "Analyze" to process your content
 5. View results in organized tabs based on feature categories
 6. Use the AI Optimization tab to get suggestions for improving your content
 
-## Security Best Practices
+## Text Optimization
 
-- **Never commit credentials**: The `ibm-credentials.env` and `.env` files are gitignored
-- **Use environment variables**: Store credentials in your hosting platform's environment variables
-- **Rotate API keys**: Regularly update your API keys
-- **Limit access**: Restrict API key permissions to only what's needed
+The application offers AI-powered text optimization using:
 
-## Development
+1. **OpenAI's GPT Models**
+   - GPT-4o-mini and GPT-4o for efficient and powerful text generation
+2. **Anthropic's Claude Models**
+   - Claude 3.7 Sonnet for nuanced text optimization
+3. **Optimization Features**
+   - Keyword integration suggestions
+   - Content improvements based on NLU analysis
+   - SEO optimization recommendations
 
-### Building for Production
+## URL Scraping
 
-```bash
-npm run build
-# or
-yarn build
-```
+Extract content from websites using:
 
-### Running Tests
-
-```bash
-npm test
-# or
-yarn test
-```
+1. **Firecrawl Integration** - Clean content extraction from any URL
+2. **Markdown Conversion** - Scraped content is converted to clean, analyzable text
+3. **API Key Management** - Configure Firecrawl API key for web scraping
 
 ## Technical Implementation Details
 
@@ -226,28 +177,28 @@ Text analysis is performed by sending requests to:
 - IBM Watson NLU API for text analysis features
 - OpenAI API for GPT-powered text optimization
 - Anthropic API for Claude-powered text optimization
+- Firecrawl API for web content extraction
 
 ## Troubleshooting
 
-### Environment Variables Not Loading
+### Session Storage Issues
 
-If the application doesn't detect your environment variables:
+If saved credentials are not loading:
 
-1. Ensure the file names are correct (`ibm-credentials.env` or `.env`)
-2. Restart the development server after creating/modifying env files
-3. Check that variables are properly formatted
-4. For Vercel deployments, ensure variables are added to the project settings
+1. Ensure you're using the same browser session
+2. Check that you've saved credentials using the "Save to Session" button
+3. Try clearing browser data and re-entering credentials
 
 ### API Authentication Errors
 
 1. Verify your API keys are correct
-2. Check that the URLs match your service instances
-3. Ensure your services are active
-4. Confirm the auth types are set correctly
+2. Check that the region and instance ID match your service instances
+3. Ensure your service instances are active
+4. Confirm you have proper access to the APIs
 
 ## Contributors
 
-- Built with React, Typescript, and Tailwind CSS
+- Built with React, TypeScript, and Tailwind CSS
 - UI inspired by Vercel's minimalist design principles
 - NLP functionality powered by IBM Watson's NLU service
 - Text optimization powered by OpenAI GPT models and Anthropic Claude
