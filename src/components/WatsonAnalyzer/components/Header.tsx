@@ -21,7 +21,7 @@ const Header: React.FC<HeaderProps> = ({ credentialsFileExists }) => {
       <div className="container max-w-7xl mx-auto py-4 px-4 flex items-center justify-between">
         <div className="flex items-center">
           <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
-            IBM Watson NLU Analyzer
+            Watson NLU &amp; AI Text Optimizer
           </h1>
         </div>
 
