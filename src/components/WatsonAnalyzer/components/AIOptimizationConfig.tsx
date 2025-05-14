@@ -51,7 +51,7 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
     if (provider === "openai" && aiModel.startsWith("claude")) {
       setAiModel("gpt-4o-mini");
     } else if (provider === "anthropic" && !aiModel.startsWith("claude")) {
-      setAiModel("claude-3-sonnet-20240229");
+      setAiModel("claude-3-7-sonnet-20250219");
     }
   };
 
@@ -113,16 +113,14 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
               <div className="space-y-2">
                 <Label htmlFor="ai-model-claude">AI Model</Label>
                 <Select 
-                  value={aiModel.startsWith("claude") ? aiModel : "claude-3-sonnet-20240229"} 
+                  value={aiModel.startsWith("claude") ? aiModel : "claude-3-7-sonnet-20250219"} 
                   onValueChange={setAiModel}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select a model" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="claude-3-sonnet-20240229">Claude 3 Sonnet</SelectItem>
-                    <SelectItem value="claude-3-haiku-20240307">Claude 3 Haiku</SelectItem>
-                    <SelectItem value="claude-3-opus-20240229">Claude 3 Opus</SelectItem>
+                    <SelectItem value="claude-3-7-sonnet-20250219">Claude 3.7 Sonnet</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

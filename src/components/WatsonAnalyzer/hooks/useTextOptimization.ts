@@ -28,9 +28,9 @@ export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOp
   
   const [aiModel, setAiModel] = useState(() => {
     const savedModel = sessionStorage.getItem('ai_model') || "gpt-4o-mini";
-    // Ensure we don't use a deprecated Claude model
-    if (savedModel === "claude-3.7-sonnet-20240620") {
-      return "claude-3-sonnet-20240229";
+    // Ensure we use the preferred Claude model
+    if (savedModel.startsWith("claude-3-")) {
+      return "claude-3-7-sonnet-20250219";
     }
     return savedModel;
   });

@@ -196,7 +196,7 @@ const fallbackNoCorsClaude = async (
         "anthropic-dangerous-direct-browser-access": "true" // Add the required header
       },
       body: JSON.stringify({
-        model: model,
+        model: "claude-3-7-sonnet-20250219", // Always use the preferred model
         system: "Optimize text with keywords",
         messages: [{ role: "user", content: simplePrompt }],
         max_tokens: 1000
@@ -230,11 +230,8 @@ const optimizeWithClaude = async (
   model: string
 ): Promise<string> => {
   try {
-    // Force use a supported model
-    const claudeModel = model.includes("claude-3-sonnet") ? "claude-3-sonnet-20240229" : 
-                        model.includes("claude-3-haiku") ? "claude-3-haiku-20240307" : 
-                        model.includes("claude-3-opus") ? "claude-3-opus-20240229" : 
-                        "claude-3-sonnet-20240229";
+    // Always use the preferred Claude model
+    const claudeModel = "claude-3-7-sonnet-20250219";
                         
     // Get the CORS proxy URL
     const corsProxyUrl = getCorsProxyUrl();
