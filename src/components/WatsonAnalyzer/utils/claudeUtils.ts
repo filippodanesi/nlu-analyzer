@@ -2,7 +2,7 @@
 /**
  * Utility functions for Claude API integration
  */
-import { getCorsProxyUrl, makeProxiedUrl, getCorsProxyHeaders } from './corsProxyUtils';
+import { getCorsProxyUrl, makeProxiedUrl, getCorsProxyHeaders, fetchWithCorsProxy } from './corsProxyUtils';
 
 /**
  * Fallback to no-cors mode with simpler prompt
@@ -62,62 +62,44 @@ export const optimizeWithClaude = async (
     // Always use the preferred Claude model
     const claudeModel = "claude-3-7-sonnet-20250219";
                         
-    // Get the CORS proxy URL
-    const corsProxyUrl = getCorsProxyUrl();
-    
-    // Create the proxied URL
-    const baseUrl = "https://api.anthropic.com/v1/messages";
-    const proxiedUrl = makeProxiedUrl(baseUrl, corsProxyUrl);
-    
-    // Get the proxy headers
-    const proxyHeaders = getCorsProxyHeaders(corsProxyUrl);
-    
     console.log(`Using Claude model: ${claudeModel}`);
-    console.log(`Using CORS proxy: ${corsProxyUrl}`);
     
-    const response = await fetch(proxiedUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-        "anthropic-dangerous-direct-browser-access": "true", // Add the required header
-        ...proxyHeaders // Add any proxy-specific headers
-      },
-      body: JSON.stringify({
-        model: claudeModel,
-        system: "You are an assistant specialized in SEO and keyword optimization. Your task is to optimize the exact text provided without adding any content that wasn't in the original. Never reference external tools or services not mentioned in the original text.",
-        messages: [
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 2000
-      })
+    // Prepare request body
+    const requestBody = JSON.stringify({
+      model: claudeModel,
+      system: "You are an assistant specialized in SEO and keyword optimization. Your task is to optimize the exact text provided without adding any content that wasn't in the original. Never reference external tools or services not mentioned in the original text.",
+      messages: [
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      temperature: 0.7,
+      max_tokens: 2000
     });
+    
+    // Prepare headers
+    const headers = {
+      "Content-Type": "application/json",
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true" // Required header
+    };
+    
+    // Use our enhanced fetch function with CORS proxy support
+    const response = await fetchWithCorsProxy(
+      "https://api.anthropic.com/v1/messages",
+      {
+        method: "POST",
+        headers,
+        body: requestBody
+      }
+    );
 
-    if (!response.ok) {
-      console.error("Claude API error status:", response.status);
-      
-      // Try to get the error details
-      let errorDetails = "";
-      try {
-        const errorData = await response.json();
-        errorDetails = errorData.error?.message || JSON.stringify(errorData);
-        console.error("Claude API error:", errorDetails);
-      } catch (e) {
-        errorDetails = "Unknown error";
-      }
-      
-      // Try fallback approach if the proxy fails
-      if (response.status === 403 || response.status === 0 || response.status === 401 || response.status === 404) {
-        console.log("Attempting fallback method for Claude API...");
-        return await fallbackNoCorsClaude(prompt, apiKey);
-      }
-      
-      throw new Error(errorDetails || "Error in Claude optimization API");
+    // If we're using no-cors mode, we'll get an opaque response
+    if (response.type === 'opaque') {
+      console.log("Received opaque response, using fallback...");
+      return await fallbackNoCorsClaude(prompt, apiKey);
     }
 
     const data = await response.json();
@@ -128,7 +110,8 @@ export const optimizeWithClaude = async (
     // If we have a specific CORS error, try the fallback
     if (error.toString().includes("CORS") || 
         error.toString().includes("Failed to fetch") ||
-        error.toString().includes("dangerous-direct-browser")) {
+        error.toString().includes("dangerous-direct-browser") ||
+        error.toString().includes("NetworkError")) {
       console.log("CORS error detected, trying fallback method...");
       return await fallbackNoCorsClaude(prompt, apiKey);
     }
