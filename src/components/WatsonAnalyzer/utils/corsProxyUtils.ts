@@ -13,8 +13,7 @@ export const getCorsProxyUrl = (): string => {
     return storedProxyUrl;
   }
   
-  // For all environments, use cors.sh as default with temp API key
-  // The key is valid for 3 days and needs to be replaced with a permanent one
+  // For all environments, use cors.sh as default with permanent API key
   return "https://proxy.cors.sh/";
 };
 
@@ -37,7 +36,7 @@ export const getCorsProxyHeaders = (corsProxyUrl: string): Record<string, string
   // Check if we're using cors.sh
   if (corsProxyUrl.includes("cors.sh")) {
     return {
-      "x-cors-api-key": "temp_3a4e8e881b300eba61b37720fbccf3d0" // Temporary key valid for 3 days
+      "x-cors-api-key": "live_0df03e15b7f1bdf27d12ee406841eed5866d880e2dec98dd37db703033e23734" // Permanent production API key
     };
   }
   

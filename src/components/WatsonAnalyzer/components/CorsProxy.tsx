@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -152,8 +151,8 @@ const CorsProxy: React.FC<CorsProxyProps> = ({ className }) => {
           <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-md p-3 mt-2">
             <h4 className="font-medium text-blue-800 dark:text-blue-300 text-sm">Default CORS Proxy</h4>
             <p className="text-xs text-blue-700 dark:text-blue-400 mt-1">
-              We're using <code>cors.sh</code> with a temporary API key (<code>temp_3a4e8e881b300eba61b37720fbccf3d0</code>)
-              that is valid for 3 days. For continued use, please sign up for a free account at{" "}
+              We're using <code>cors.sh</code> with a permanent production API key. You can use this proxy without any additional configuration.
+              For more information, visit{" "}
               <a 
                 href="https://cors.sh"
                 target="_blank"
@@ -161,8 +160,7 @@ const CorsProxy: React.FC<CorsProxyProps> = ({ className }) => {
                 className="underline"
               >
                 cors.sh
-              </a>
-              {" "}to get a permanent API key.
+              </a>.
             </p>
           </div>
           
