@@ -14,11 +14,17 @@ import { QuickCredentialsInput } from './config/QuickCredentialsInput';
 // Update the import path
 import CorsProxy from './CorsProxy';
 
+// Import the hook to get credential state setters
+import { useCredentialsConfig } from '../hooks/useCredentialsConfig';
+
 interface HeaderProps {
   credentialsFileExists: boolean;
 }
 
 const Header: React.FC<HeaderProps> = ({ credentialsFileExists }) => {
+  // Get the credential state setters from the hook
+  const { setApiKey, setUrl, setRegion, setInstanceId, setCredentialsFileExists } = useCredentialsConfig();
+
   return (
     <header className="bg-white dark:bg-gray-900 shadow">
       <div className="container max-w-7xl mx-auto py-4 px-4 flex items-center justify-between">
@@ -30,7 +36,14 @@ const Header: React.FC<HeaderProps> = ({ credentialsFileExists }) => {
         </div>
 
         <div className="flex items-center space-x-4">
-          <QuickCredentialsInput />
+          <QuickCredentialsInput 
+            setApiKey={setApiKey}
+            setUrl={setUrl}
+            setRegion={setRegion}
+            setInstanceId={setInstanceId}
+            credentialsFileExists={credentialsFileExists}
+            setCredentialsFileExists={setCredentialsFileExists}
+          />
           <CorsProxy className="mr-2" />
           <TooltipProvider>
             <Tooltip>
