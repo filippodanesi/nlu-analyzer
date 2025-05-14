@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/tooltip"
 
 // Fix import path to include correct components folder
-import QuickCredentialsInput from './config/QuickCredentialsInput';
+import { QuickCredentialsInput } from './config/QuickCredentialsInput';
 
 // Update the import path
 import CorsProxy from './CorsProxy';
