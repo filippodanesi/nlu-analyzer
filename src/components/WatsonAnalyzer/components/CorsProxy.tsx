@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Shield, ExternalLink } from "lucide-react";
+import { Shield, ExternalLink, Info } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface CorsProxyProps {
@@ -130,8 +130,8 @@ const CorsProxy: React.FC<CorsProxyProps> = ({ className }) => {
             
             <div className="mt-2 p-3 bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 rounded-md">
               <p className="text-amber-800 dark:text-amber-300 text-xs">
-                <strong>Note:</strong> For production use, it's recommended to set up a proper backend 
-                service or serverless function to handle API calls securely.
+                <strong>Important:</strong> Anthropic now requires the <code>anthropic-dangerous-direct-browser-access</code> header
+                for browser-based API calls. This application adds this header automatically.
               </p>
             </div>
           </div>

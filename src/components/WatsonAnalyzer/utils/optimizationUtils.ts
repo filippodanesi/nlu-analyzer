@@ -191,7 +191,8 @@ const fallbackNoCorsClaude = async (
       headers: {
         "Content-Type": "application/json",
         "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01"
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true" // Add the required header
       },
       body: JSON.stringify({
         model: model,
@@ -240,7 +241,8 @@ const optimizeWithClaude = async (
       headers: {
         "Content-Type": "application/json",
         "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01"
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true" // Add the required header
       },
       body: JSON.stringify({
         model: model,
@@ -258,14 +260,24 @@ const optimizeWithClaude = async (
 
     if (!response.ok) {
       console.error("Claude API error status:", response.status);
+      
+      // Try to get the error details
+      let errorDetails = "";
+      try {
+        const errorData = await response.json();
+        errorDetails = errorData.error?.message || JSON.stringify(errorData);
+        console.error("Claude API error:", errorDetails);
+      } catch (e) {
+        errorDetails = "Unknown error";
+      }
+      
       // Try fallback approach if the proxy fails
-      if (response.status === 403 || response.status === 0) {
+      if (response.status === 403 || response.status === 0 || response.status === 401) {
         console.log("Attempting fallback method for Claude API...");
         return await fallbackNoCorsClaude(prompt, apiKey, model);
       }
       
-      const error = await response.json().catch(() => ({ error: { message: "Error processing response" }}));
-      throw new Error(error.error?.message || "Error in Claude optimization API");
+      throw new Error(errorDetails || "Error in Claude optimization API");
     }
 
     const data = await response.json();
@@ -274,7 +286,9 @@ const optimizeWithClaude = async (
     console.error("Claude API error:", error);
     
     // If we have a specific CORS error, try the fallback
-    if (error.toString().includes("CORS") || error.toString().includes("Failed to fetch")) {
+    if (error.toString().includes("CORS") || 
+        error.toString().includes("Failed to fetch") ||
+        error.toString().includes("dangerous-direct-browser")) {
       console.log("CORS error detected, trying fallback method...");
       return await fallbackNoCorsClaude(prompt, apiKey, model);
     }
@@ -282,3 +296,4 @@ const optimizeWithClaude = async (
     throw error;
   }
 };
+
