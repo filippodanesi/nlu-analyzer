@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
 import { Key } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { AIProvider } from '../hooks/useTextOptimization';
@@ -66,6 +66,9 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>AI Optimization Configuration</DialogTitle>
+          <DialogDescription>
+            Configure API keys and models for AI-powered text optimization
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4 py-4">
