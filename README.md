@@ -14,6 +14,7 @@ Powerful tool for analyzing and optimizing text content using IBM Watson's Natur
 - **Text Stats** - View word count, sentence count, and character statistics
 - **Multiple Input Methods** - Enter text directly or upload text files
 - **Responsive Design** - Works on both desktop and mobile devices
+- **Export Results** - Download your analysis results in JSON or CSV format
 
 ## Technical Architecture
 
@@ -34,8 +35,7 @@ The application provides multiple ways to authenticate with IBM Watson's NLU API
 
 1. **Direct Input** - Enter your API key, region, and instance ID directly in the configuration panel
 2. **Quick Input** - Paste JSON credentials or URL for quick configuration
-3. **Import .env File** - Upload an IBM credentials file
-4. **Session Storage** - Credentials are saved to your browser's session storage for convenience
+3. **Session Storage** - Credentials are saved to your browser's session storage for convenience
 
 ### AI Optimization Configuration
 
@@ -78,6 +78,43 @@ Fine-tune analysis with configurable parameters:
 - **Feature Limits** - Set maximum number of results for each feature
 - **Language Selection** - Specify content language or use auto-detection
 
+## Exporting Your Analysis
+
+After analyzing your text content, you have multiple options to export and save your results:
+
+### Export Formats
+
+1. **JSON Export** - Download a complete structured JSON file containing all analysis data
+   - Click the "Export JSON" button in the results panel
+   - Includes all detected features (keywords, entities, concepts, etc.)
+   - Perfect for programmatic use or further processing
+
+2. **CSV Export** - Download results in CSV format for easy spreadsheet import
+   - Click the "Export CSV" button in the results panel
+   - Organized with clear section headers for each feature type
+   - Compatible with Excel, Google Sheets, and other spreadsheet applications
+
+### What's Included in Exports
+
+Your exports will contain:
+
+- **Metadata** - Language, timestamp, and version information
+- **Analyzed Text** - The original text that was analyzed
+- **Feature Results** - All detected features from your analysis:
+  - Keywords with relevance and sentiment
+  - Entities with type, relevance, and sentiment
+  - Concepts with relevance and DBpedia resources
+  - Categories with scores and explanations
+  - Classifications/tone analysis (when available)
+
+### Export File Naming
+
+Exported files follow the naming convention:
+- `nlu-analysis-YYYY-MM-DD.json` for JSON exports
+- `nlu-analysis-YYYY-MM-DD.csv` for CSV exports
+
+The date stamp ensures you can track when each analysis was performed.
+
 ## Getting Started
 
 ### Prerequisites
@@ -97,6 +134,7 @@ Fine-tune analysis with configurable parameters:
 6. Click "Analyze" to process your content
 7. View results in organized tabs based on feature categories
 8. Use the AI Optimization tab to get suggestions for improving your content
+9. Export your results using the JSON or CSV export buttons
 
 ### Required API Credentials
 
@@ -117,17 +155,13 @@ To use all features of this application, you'll need:
 - **Secure Input** - API key fields use password masking for security
 - **Client-Side Processing** - All API requests are made directly from your browser
 
-## Usage Guide
+## URL Scraping
 
-1. Configure your IBM Watson API credentials:
-   - Enter your API key
-   - Select your IBM Cloud region
-   - Enter your instance ID
-2. Enter text directly, upload a file, or scrape a URL
-3. (Optional) Add target keywords for highlighting
-4. Click "Analyze" to process your content
-5. View results in organized tabs based on feature categories
-6. Use the AI Optimization tab to get suggestions for improving your content
+Extract content from websites using:
+
+1. **Firecrawl Integration** - Clean content extraction from any URL
+2. **Markdown Conversion** - Scraped content is converted to clean, analyzable text
+3. **API Key Management** - Configure Firecrawl API key for web scraping
 
 ## Text Optimization
 
@@ -141,60 +175,6 @@ The application offers AI-powered text optimization using:
    - Keyword integration suggestions
    - Content improvements based on NLU analysis
    - SEO optimization recommendations
-
-## URL Scraping
-
-Extract content from websites using:
-
-1. **Firecrawl Integration** - Clean content extraction from any URL
-2. **Markdown Conversion** - Scraped content is converted to clean, analyzable text
-3. **API Key Management** - Configure Firecrawl API key for web scraping
-
-## Technical Implementation Details
-
-### Component Structure
-
-- **ThemeProvider** - Context provider for light/dark mode theming
-- **ApiConfigPanel** - Panel for configuring Watson NLU API settings
-- **InputPanel** - Text input with file upload and target keyword options
-- **ResultsPanel** - Organizes analysis results into feature-based tabs
-- **TextOptimizationPanel** - Panel for AI-powered text optimization
-
-### State Management
-
-The application uses React's useState hook to manage:
-
-- API configuration state
-- Feature selection state
-- Input and analysis state
-- Results display state
-- AI optimization state
-
-### API Integration
-
-Text analysis is performed by sending requests to:
-
-- IBM Watson NLU API for text analysis features
-- OpenAI API for GPT-powered text optimization
-- Anthropic API for Claude-powered text optimization
-- Firecrawl API for web content extraction
-
-## Troubleshooting
-
-### Session Storage Issues
-
-If saved credentials are not loading:
-
-1. Ensure you're using the same browser session
-2. Check that you've saved credentials using the "Save to Session" button
-3. Try clearing browser data and re-entering credentials
-
-### API Authentication Errors
-
-1. Verify your API keys are correct
-2. Check that the region and instance ID match your service instances
-3. Ensure your service instances are active
-4. Confirm you have proper access to the APIs
 
 ## Contributors
 
