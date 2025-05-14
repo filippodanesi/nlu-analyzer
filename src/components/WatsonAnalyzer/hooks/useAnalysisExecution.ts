@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from "@/components/ui/use-toast";
 import { TextStats } from './useInputManagement';
 import { WatsonFeatures, WatsonLimits, TONE_SUPPORTED_LANGUAGES } from './useAnalysisFeatures';
@@ -30,6 +30,22 @@ export const useAnalysisExecution = ({
   // Analysis state
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [results, setResults] = useState<any>(null);
+  const [lastAnalyzedFeatures, setLastAnalyzedFeatures] = useState<WatsonFeatures | null>(null);
+
+  // Reset results when features change significantly from last analyzed features
+  useEffect(() => {
+    // Only check if we have previous results and features
+    if (results && lastAnalyzedFeatures) {
+      // Check if tone analysis was toggled
+      const toneWasToggled = 
+        features.classifications !== lastAnalyzedFeatures.classifications;
+      
+      // If tone analysis was toggled, we should mark that a new analysis is needed
+      if (toneWasToggled) {
+        console.log("Tone analysis feature was toggled, new analysis will be needed");
+      }
+    }
+  }, [features, lastAnalyzedFeatures, results]);
 
   const handleAnalyze = async () => {
     if (!text) {
@@ -138,6 +154,9 @@ export const useAnalysisExecution = ({
 
       const data = await response.json();
       setResults(data);
+      
+      // Save the features used for this analysis to track changes
+      setLastAnalyzedFeatures({...features});
       
       toast({
         title: "Analysis completed",

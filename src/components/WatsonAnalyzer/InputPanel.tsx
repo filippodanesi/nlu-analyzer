@@ -1,5 +1,5 @@
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { 
   Card, 
   CardContent, 
@@ -24,6 +24,13 @@ interface InputPanelProps {
   setTargetKeywords: (keywords: string) => void;
   onAnalyze: () => void;
   isAnalyzing: boolean;
+  features?: {
+    keywords: boolean;
+    entities: boolean;
+    concepts: boolean;
+    categories: boolean;
+    classifications: boolean;
+  };
 }
 
 const InputPanel: React.FC<InputPanelProps> = ({
@@ -34,9 +41,34 @@ const InputPanel: React.FC<InputPanelProps> = ({
   targetKeywords,
   setTargetKeywords,
   onAnalyze,
-  isAnalyzing
+  isAnalyzing,
+  features
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [enableReanalyze, setEnableReanalyze] = React.useState(false);
+  const featuresRef = React.useRef(features);
+
+  // Effect to detect feature changes and enable reanalysis
+  useEffect(() => {
+    // Skip on first render
+    if (featuresRef.current !== features && features) {
+      // Check if features changed
+      const hasChanges = featuresRef.current && (
+        featuresRef.current.keywords !== features.keywords ||
+        featuresRef.current.entities !== features.entities ||
+        featuresRef.current.concepts !== features.concepts ||
+        featuresRef.current.categories !== features.categories ||
+        featuresRef.current.classifications !== features.classifications
+      );
+      
+      if (hasChanges) {
+        setEnableReanalyze(true);
+      }
+      
+      // Update reference
+      featuresRef.current = features;
+    }
+  }, [features]);
 
   const handleUploadClick = () => {
     if (fileInputRef.current) {
@@ -76,8 +108,11 @@ const InputPanel: React.FC<InputPanelProps> = ({
 
       <CardFooter>
         <Button 
-          onClick={onAnalyze}
-          disabled={!text || isAnalyzing}
+          onClick={() => {
+            onAnalyze();
+            setEnableReanalyze(false);
+          }}
+          disabled={(!text || isAnalyzing) && !enableReanalyze}
           className="w-full bg-vercel text-white hover:bg-vercel/90"
         >
           {isAnalyzing ? "Analyzing..." : "Analyze"}

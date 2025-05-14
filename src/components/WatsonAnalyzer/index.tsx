@@ -118,6 +118,7 @@ const WatsonAnalyzer: React.FC = () => {
               setTargetKeywords={setTargetKeywords}
               onAnalyze={handleAnalyze}
               isAnalyzing={isAnalyzing}
+              features={features}
             />
 
             {results && (
