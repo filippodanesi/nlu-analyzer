@@ -14,6 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Key } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { AIProvider } from '../hooks/useTextOptimization';
+import CorsProxy from './CorsProxy';
 
 interface AIOptimizationConfigProps {
   apiKey: string;
@@ -122,7 +123,7 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
                     <SelectItem value="claude-3-sonnet-20240229">Claude 3 Sonnet</SelectItem>
                     <SelectItem value="claude-3-haiku-20240307">Claude 3 Haiku</SelectItem>
                     <SelectItem value="claude-3-opus-20240229">Claude 3 Opus</SelectItem>
-                    <SelectItem value="claude-3-7-sonnet-20240620">Claude 3.7 Sonnet</SelectItem>
+                    <SelectItem value="claude-3.7-sonnet-20240620">Claude 3.7 Sonnet</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -137,6 +138,17 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
                   onChange={(e) => setTempApiKey(e.target.value)}
                   className="font-mono"
                 />
+              </div>
+              
+              <div className="pt-2">
+                <CorsProxy className="w-full" />
+              </div>
+              
+              <div className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950 p-3 rounded-md border border-amber-200 dark:border-amber-800">
+                <p>
+                  <strong>Note:</strong> Anthropic's Claude API may have CORS restrictions when called directly from a browser.
+                  Use the CORS Proxy option to resolve this issue during development.
+                </p>
               </div>
             </TabsContent>
           </Tabs>

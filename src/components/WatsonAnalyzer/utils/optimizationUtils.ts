@@ -139,6 +139,22 @@ const optimizeWithOpenAI = async (
 };
 
 /**
+ * Get CORS proxy URL based on environment
+ */
+const getCorsProxyUrl = (): string => {
+  // Check if we're in development mode
+  const isDev = import.meta.env.DEV;
+  
+  // In development, use a CORS proxy
+  if (isDev) {
+    return "https://cors-anywhere.herokuapp.com/";
+  }
+  
+  // In production, expect proper CORS handling via backend/proxy
+  return "";
+};
+
+/**
  * Optimizes text using Anthropic Claude API
  */
 const optimizeWithClaude = async (
@@ -146,7 +162,10 @@ const optimizeWithClaude = async (
   apiKey: string, 
   model: string
 ): Promise<string> => {
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
+  // Get appropriate URL with CORS proxy if needed
+  const baseUrl = getCorsProxyUrl() + "https://api.anthropic.com/v1/messages";
+  
+  const response = await fetch(baseUrl, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -168,7 +187,7 @@ const optimizeWithClaude = async (
   });
 
   if (!response.ok) {
-    const error = await response.json();
+    const error = await response.json().catch(() => ({ error: { message: "Error processing response" }}));
     throw new Error(error.error?.message || "Error in Claude optimization API");
   }
 

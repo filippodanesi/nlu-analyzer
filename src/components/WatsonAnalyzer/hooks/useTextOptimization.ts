@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from "@/hooks/use-toast";
 import { 
   isKeywordInTopPositions, 
@@ -34,6 +34,22 @@ export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOp
     const savedModel = sessionStorage.getItem('ai_model') || "gpt-4o-mini";
     return savedModel.startsWith("claude") ? "anthropic" : "openai";
   });
+
+  // CORS proxy configuration
+  const [corsProxyUrl, setCorsProxyUrl] = useState(() => {
+    return sessionStorage.getItem('cors_proxy_url') || "";
+  });
+
+  // Update corsProxyUrl when it changes in sessionStorage
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const newProxyUrl = sessionStorage.getItem('cors_proxy_url') || "";
+      setCorsProxyUrl(newProxyUrl);
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   // Save to sessionStorage when values change
   const storeApiKey = (key: string) => {
@@ -147,6 +163,8 @@ export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOp
     setAiModel: storeAiModel,
     aiProvider,
     setAiProvider,
+    corsProxyUrl,
+    setCorsProxyUrl,
     
     // Optimization state & actions
     isOptimizing,
