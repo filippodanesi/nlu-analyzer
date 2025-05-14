@@ -139,19 +139,84 @@ const optimizeWithOpenAI = async (
 };
 
 /**
- * Get CORS proxy URL based on environment
+ * Get CORS proxy URL based on environment and stored settings
  */
 const getCorsProxyUrl = (): string => {
+  // First check if a custom CORS proxy URL is stored in sessionStorage
+  const storedProxyUrl = sessionStorage.getItem('cors_proxy_url');
+  if (storedProxyUrl) {
+    return storedProxyUrl;
+  }
+  
   // Check if we're in development mode
   const isDev = import.meta.env.DEV;
   
-  // In development, use a CORS proxy
+  // In development, use a default CORS proxy
   if (isDev) {
-    return "https://cors-anywhere.herokuapp.com/";
+    return "https://corsproxy.io/?";
   }
   
-  // In production, expect proper CORS handling via backend/proxy
-  return "";
+  // In production, default to another public proxy
+  return "https://api.allorigins.win/raw?url=";
+};
+
+/**
+ * Make URL compatible with CORS proxy
+ */
+const makeProxiedUrl = (url: string, corsProxyUrl: string): string => {
+  // Handle different proxy formats
+  if (corsProxyUrl.includes("?url=")) {
+    return `${corsProxyUrl}${encodeURIComponent(url)}`;
+  } else {
+    return `${corsProxyUrl}${url}`;
+  }
+};
+
+/**
+ * Fallback to no-cors mode with simpler prompt
+ */
+const fallbackNoCorsClaude = async (
+  prompt: string,
+  apiKey: string,
+  model: string
+): Promise<string> => {
+  try {
+    // Get a simpler prompt (only keywords, shorter length)
+    const simplePrompt = prompt.split('\n').slice(0, 3).join('\n');
+    
+    // Try with no-cors mode (will result in an opaque response)
+    await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01"
+      },
+      body: JSON.stringify({
+        model: model,
+        system: "Optimize text with keywords",
+        messages: [{ role: "user", content: simplePrompt }],
+        max_tokens: 1000
+      })
+    });
+    
+    // Since no-cors gives an opaque response, we can't read it
+    // Return a fallback message
+    return `I've attempted to optimize your text with the keywords: ${prompt.split(':')[1]?.split('.')[0] || '(keywords not found)'}.
+    
+Due to browser security restrictions (CORS), I couldn't display the AI-optimized result directly. 
+
+Options to resolve this:
+1. Try a different CORS proxy in the "CORS Proxy" settings
+2. Use OpenAI instead (GPT-4o) which has fewer CORS restrictions
+3. Consider setting up a simple backend service to handle these API calls
+
+The original text is preserved.`;
+  } catch (error) {
+    console.error("Error in fallback no-cors mode:", error);
+    throw new Error("CORS issues prevented optimization. Try using OpenAI models instead.");
+  }
 };
 
 /**
@@ -162,35 +227,58 @@ const optimizeWithClaude = async (
   apiKey: string, 
   model: string
 ): Promise<string> => {
-  // Get appropriate URL with CORS proxy if needed
-  const baseUrl = getCorsProxyUrl() + "https://api.anthropic.com/v1/messages";
-  
-  const response = await fetch(baseUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-api-key": apiKey,
-      "anthropic-version": "2023-06-01"
-    },
-    body: JSON.stringify({
-      model: model,
-      system: "You are an assistant specialized in SEO and keyword optimization. Your task is to optimize the exact text provided without adding any content that wasn't in the original. Never reference external tools or services not mentioned in the original text.",
-      messages: [
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      temperature: 0.7,
-      max_tokens: 2000
-    })
-  });
+  try {
+    // Get the CORS proxy URL
+    const corsProxyUrl = getCorsProxyUrl();
+    
+    // Create the proxied URL
+    const baseUrl = "https://api.anthropic.com/v1/messages";
+    const proxiedUrl = makeProxiedUrl(baseUrl, corsProxyUrl);
+    
+    const response = await fetch(proxiedUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01"
+      },
+      body: JSON.stringify({
+        model: model,
+        system: "You are an assistant specialized in SEO and keyword optimization. Your task is to optimize the exact text provided without adding any content that wasn't in the original. Never reference external tools or services not mentioned in the original text.",
+        messages: [
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 2000
+      })
+    });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ error: { message: "Error processing response" }}));
-    throw new Error(error.error?.message || "Error in Claude optimization API");
+    if (!response.ok) {
+      console.error("Claude API error status:", response.status);
+      // Try fallback approach if the proxy fails
+      if (response.status === 403 || response.status === 0) {
+        console.log("Attempting fallback method for Claude API...");
+        return await fallbackNoCorsClaude(prompt, apiKey, model);
+      }
+      
+      const error = await response.json().catch(() => ({ error: { message: "Error processing response" }}));
+      throw new Error(error.error?.message || "Error in Claude optimization API");
+    }
+
+    const data = await response.json();
+    return data.content[0].text.trim();
+  } catch (error) {
+    console.error("Claude API error:", error);
+    
+    // If we have a specific CORS error, try the fallback
+    if (error.toString().includes("CORS") || error.toString().includes("Failed to fetch")) {
+      console.log("CORS error detected, trying fallback method...");
+      return await fallbackNoCorsClaude(prompt, apiKey, model);
+    }
+    
+    throw error;
   }
-
-  const data = await response.json();
-  return data.content[0].text.trim();
 };

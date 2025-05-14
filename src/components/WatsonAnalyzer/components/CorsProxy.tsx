@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,33 +14,83 @@ interface CorsProxyProps {
 const CorsProxy: React.FC<CorsProxyProps> = ({ className }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [proxyUrl, setProxyUrl] = useState(() => {
-    return sessionStorage.getItem('cors_proxy_url') || "https://cors-anywhere.herokuapp.com/";
+    return sessionStorage.getItem('cors_proxy_url') || "";
   });
+  const [proxyStatus, setProxyStatus] = useState<'unknown' | 'working' | 'error'>('unknown');
+
+  // Check if proxy is set when component mounts
+  useEffect(() => {
+    const storedProxy = sessionStorage.getItem('cors_proxy_url');
+    if (storedProxy) {
+      setProxyUrl(storedProxy);
+      setProxyStatus('unknown');
+    }
+  }, []);
 
   const handleSave = () => {
-    sessionStorage.setItem('cors_proxy_url', proxyUrl);
+    // Ensure the URL ends with a trailing slash or question mark for proper concatenation
+    let formattedUrl = proxyUrl.trim();
+    
+    // Don't save empty URL (will use defaults based on environment)
+    if (formattedUrl === "") {
+      sessionStorage.removeItem('cors_proxy_url');
+      toast({
+        title: "CORS proxy settings cleared",
+        description: "Default proxy settings will be used.",
+      });
+      setIsOpen(false);
+      return;
+    }
+    
+    // Format the URL properly depending on the proxy type
+    if (formattedUrl.includes("?url=")) {
+      // Format for proxies that use ?url= parameter
+      if (!formattedUrl.endsWith("=")) {
+        formattedUrl = formattedUrl + "=";
+      }
+    } else if (!formattedUrl.endsWith("?") && !formattedUrl.endsWith("/")) {
+      // For other proxies ensure we have a separator
+      formattedUrl = formattedUrl + "/";
+    }
+    
+    sessionStorage.setItem('cors_proxy_url', formattedUrl);
     toast({
       title: "CORS proxy settings saved",
       description: "Your CORS proxy settings have been updated.",
     });
     setIsOpen(false);
+    
+    // Dispatch storage event to notify other components
+    window.dispatchEvent(new Event('storage'));
   };
 
   const handleTestProxy = async () => {
     try {
+      setProxyStatus('unknown');
       toast({
         title: "Testing CORS proxy",
         description: "Sending a test request...",
       });
       
+      // Format the URL as we would in the actual API call
+      let testUrl;
+      
+      if (proxyUrl.includes("?url=")) {
+        testUrl = `${proxyUrl}${encodeURIComponent("https://httpbin.org/get")}`;
+      } else {
+        testUrl = `${proxyUrl}https://httpbin.org/get`;
+      }
+      
       // Try a simple request through the proxy
-      const response = await fetch(`${proxyUrl}https://httpbin.org/get`);
+      const response = await fetch(testUrl);
       if (response.ok) {
+        setProxyStatus('working');
         toast({
           title: "CORS proxy test successful",
           description: "The proxy appears to be working correctly.",
         });
       } else {
+        setProxyStatus('error');
         toast({
           title: "CORS proxy test failed",
           description: "The proxy returned an error. Check the console for details.",
@@ -49,6 +99,7 @@ const CorsProxy: React.FC<CorsProxyProps> = ({ className }) => {
       }
     } catch (error) {
       console.error("CORS proxy test error:", error);
+      setProxyStatus('error');
       toast({
         title: "CORS proxy test failed",
         description: "Could not connect to the proxy. Check the console for details.",
@@ -89,12 +140,12 @@ const CorsProxy: React.FC<CorsProxyProps> = ({ className }) => {
             <Label htmlFor="proxy-url">CORS Proxy URL</Label>
             <Input
               id="proxy-url"
-              placeholder="https://cors-anywhere.herokuapp.com/"
+              placeholder="https://corsproxy.io/?"
               value={proxyUrl}
               onChange={(e) => setProxyUrl(e.target.value)}
             />
             <p className="text-xs text-muted-foreground">
-              Enter the URL of a CORS proxy service (including the trailing slash).
+              Enter the URL of a CORS proxy service. Leave empty to use default proxies.
             </p>
           </div>
           
@@ -109,17 +160,28 @@ const CorsProxy: React.FC<CorsProxyProps> = ({ className }) => {
           
           <div className="text-xs text-muted-foreground mt-4">
             <p>
-              Popular CORS proxy services:
+              Recommended CORS proxy services:
             </p>
             <ul className="list-disc list-inside mt-1 space-y-1">
               <li>
                 <a 
-                  href="https://cors-anywhere.herokuapp.com/" 
+                  href="https://corsproxy.io/" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="flex items-center hover:underline"
                 >
-                  CORS Anywhere
+                  corsproxy.io/?
+                  <ExternalLink className="ml-1 h-3 w-3" />
+                </a>
+              </li>
+              <li>
+                <a 
+                  href="https://api.allorigins.win/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="flex items-center hover:underline"
+                >
+                  api.allorigins.win/raw?url=
                   <ExternalLink className="ml-1 h-3 w-3" />
                 </a>
               </li>
