@@ -8,23 +8,14 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-// Import corretto con path relativo alla posizione attuale
-import { QuickCredentialsInput } from './config/QuickCredentialsInput';
-
-// Import corretto per CorsProxy
+// Import for CorsProxy
 import CorsProxy from './CorsProxy';
-
-// Import dell'hook per ottenere i setter dello stato delle credenziali
-import { useCredentialsConfig } from '../hooks/useCredentialsConfig';
 
 interface HeaderProps {
   credentialsFileExists: boolean;
 }
 
 const Header: React.FC<HeaderProps> = ({ credentialsFileExists }) => {
-  // Ottenere i setter dello stato delle credenziali dall'hook
-  const { setApiKey, setUrl, setRegion, setInstanceId, setCredentialsFileExists } = useCredentialsConfig();
-
   return (
     <header className="bg-white dark:bg-gray-900 shadow">
       <div className="container max-w-7xl mx-auto py-4 px-4 flex items-center justify-between">
@@ -36,14 +27,6 @@ const Header: React.FC<HeaderProps> = ({ credentialsFileExists }) => {
         </div>
 
         <div className="flex items-center space-x-4">
-          <QuickCredentialsInput 
-            setApiKey={setApiKey}
-            setUrl={setUrl}
-            setRegion={setRegion}
-            setInstanceId={setInstanceId}
-            credentialsFileExists={credentialsFileExists}
-            setCredentialsFileExists={setCredentialsFileExists}
-          />
           <CorsProxy className="mr-2" />
           <TooltipProvider>
             <Tooltip>
