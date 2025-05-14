@@ -43,6 +43,7 @@ interface ApiConfigPanelProps {
   toneModel: string;
   setToneModel: (model: string) => void;
   credentialsFileExists?: boolean;
+  setCredentialsFileExists?: (exists: boolean) => void;
 }
 
 const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
@@ -63,6 +64,7 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
   toneModel,
   setToneModel,
   credentialsFileExists = false,
+  setCredentialsFileExists
 }) => {
   const handleFeatureChange = (feature: string, value: boolean) => {
     setFeatures({ ...features, [feature]: value });
@@ -86,6 +88,7 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
           setRegion={setRegion}
           setInstanceId={setInstanceId}
           credentialsFileExists={credentialsFileExists}
+          setCredentialsFileExists={setCredentialsFileExists}
         />
 
         <Separator />

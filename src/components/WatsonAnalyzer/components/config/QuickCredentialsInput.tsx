@@ -12,6 +12,7 @@ interface QuickCredentialsInputProps {
   setRegion: (region: string) => void;
   setInstanceId: (id: string) => void;
   credentialsFileExists?: boolean;
+  setCredentialsFileExists?: (exists: boolean) => void;
 }
 
 export const QuickCredentialsInput: React.FC<QuickCredentialsInputProps> = ({
@@ -19,7 +20,8 @@ export const QuickCredentialsInput: React.FC<QuickCredentialsInputProps> = ({
   setUrl,
   setRegion,
   setInstanceId,
-  credentialsFileExists = false
+  credentialsFileExists = false,
+  setCredentialsFileExists
 }) => {
   const [quickInput, setQuickInput] = useState("");
 
@@ -81,6 +83,12 @@ export const QuickCredentialsInput: React.FC<QuickCredentialsInputProps> = ({
         setRegion(region);
         setUrl(url);
         setInstanceId(url.split('/').pop() || '');
+        
+        // Aggiorna lo stato per indicare che un file di credenziali è stato caricato con successo
+        if (setCredentialsFileExists) {
+          setCredentialsFileExists(true);
+        }
+        
         toast.success("Credentials imported successfully");
       } else {
         toast.error("Invalid .env file format");
@@ -97,7 +105,7 @@ export const QuickCredentialsInput: React.FC<QuickCredentialsInputProps> = ({
           {credentialsFileExists && (
             <div className="flex items-center text-green-500">
               <CheckCircle className="h-4 w-4 mr-1" />
-              <span className="text-xs">ibm-credentials.env found</span>
+              <span className="text-xs">Credentials loaded</span>
             </div>
           )}
           <div className="relative">

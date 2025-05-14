@@ -14,7 +14,7 @@ const Header: React.FC<HeaderProps> = ({ credentialsFileExists }) => {
         {credentialsFileExists && (
           <div className="flex items-center text-green-500">
             <CheckCircle className="h-4 w-4 mr-1" />
-            <span className="text-sm">ibm-credentials.env found</span>
+            <span className="text-sm">Credentials loaded successfully</span>
           </div>
         )}
       </div>

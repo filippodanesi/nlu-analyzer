@@ -21,7 +21,7 @@ export const SECRETS = {
   authType: "iam",
   region: "eu-de",
   instanceId: "",
-  credentialsFileExists: false // Default to false, we'll check in useEffect
+  credentialsFileExists: false // Default to false, we'll set this when a file is uploaded
 };
 
 // Storage keys
@@ -50,7 +50,7 @@ export const useCredentialsConfig = () => {
     return sessionStorage.getItem(SESSION_STORAGE_KEYS.INSTANCE_ID) || "";
   });
   
-  // Credentials file state
+  // Credentials file state - only used for UI indication after file upload
   const [credentialsFileExists, setCredentialsFileExists] = useState(false);
 
   // Save to sessionStorage when values change
@@ -69,36 +69,6 @@ export const useCredentialsConfig = () => {
   useEffect(() => {
     if (instanceId) sessionStorage.setItem(SESSION_STORAGE_KEYS.INSTANCE_ID, instanceId);
   }, [instanceId]);
-
-  // Check if ibm-credentials.env file exists - only in development or when the file might exist
-  useEffect(() => {
-    const checkCredentialsFile = async () => {
-      try {
-        // Use a simple approach to detect if we're likely in development mode
-        const isDevelopment = window.location.hostname === 'localhost' || 
-                             window.location.hostname === '127.0.0.1' ||
-                             window.location.port === '8080' ||
-                             window.location.port === '5173';
-        
-        // Only try to fetch the credentials file if we're likely in development
-        // or in an environment where the file might exist (not on Vercel or other cloud hosts)
-        if (isDevelopment || !window.location.hostname.includes('.vercel.app')) {
-          const response = await fetch('/ibm-credentials.env', { method: 'HEAD' });
-          if (response.ok) {
-            setCredentialsFileExists(true);
-            toast({
-              title: "IBM credentials file found",
-              description: "The ibm-credentials.env file was detected and will be used for authentication.",
-            });
-          }
-        }
-      } catch (error) {
-        console.log('IBM credentials file not found or unavailable');
-      }
-    };
-    
-    checkCredentialsFile();
-  }, []);
   
   // Return values that will be used by the component
   return {
@@ -112,6 +82,7 @@ export const useCredentialsConfig = () => {
     instanceId,
     setInstanceId,
     credentialsFileExists,
+    setCredentialsFileExists, // Esportiamo questo setter per permettere l'aggiornamento da QuickCredentialsInput
     
     // Utility functions
     getCurrentApiKey: () => apiKey,

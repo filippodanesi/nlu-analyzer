@@ -25,6 +25,7 @@ const WatsonAnalyzer: React.FC = () => {
     instanceId,
     setInstanceId,
     credentialsFileExists,
+    setCredentialsFileExists,
     
     // Features and limits
     features,
@@ -103,6 +104,7 @@ const WatsonAnalyzer: React.FC = () => {
               toneModel={toneModel}
               setToneModel={setToneModel}
               credentialsFileExists={credentialsFileExists}
+              setCredentialsFileExists={setCredentialsFileExists}
             />
           </div>
 
