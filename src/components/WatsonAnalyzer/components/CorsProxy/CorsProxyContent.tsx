@@ -28,11 +28,7 @@ export const CorsProxyContent: React.FC<CorsProxyContentProps> = ({
   return (
     <div className="space-y-4 py-4">
       <div className="text-sm text-muted-foreground">
-        <p>
-          Configure a CORS proxy to enable direct API calls to Anthropic's Claude API from your browser.
-          This is typically needed during development or for client-side applications.
-        </p>
-        
+        {/* Removed duplicate description since it's now in DialogDescription */}
         <ProxyInfoBoxes currentProxyUrl={currentProxyUrl} />
       </div>
       

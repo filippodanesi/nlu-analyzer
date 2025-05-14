@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { CorsProxyContent } from './CorsProxyContent';
 
 interface CorsProxyDialogProps {
@@ -32,6 +32,9 @@ export const CorsProxyDialog: React.FC<CorsProxyDialogProps> = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>CORS Proxy Configuration</DialogTitle>
+          <DialogDescription>
+            Configure a CORS proxy to enable API requests from your browser
+          </DialogDescription>
         </DialogHeader>
         
         <CorsProxyContent 
