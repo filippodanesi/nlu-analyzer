@@ -8,13 +8,13 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-// Fix import path to include correct components folder
+// Import corretto con path relativo alla posizione attuale
 import { QuickCredentialsInput } from './config/QuickCredentialsInput';
 
-// Update the import path
+// Import corretto per CorsProxy
 import CorsProxy from './CorsProxy';
 
-// Import the hook to get credential state setters
+// Import dell'hook per ottenere i setter dello stato delle credenziali
 import { useCredentialsConfig } from '../hooks/useCredentialsConfig';
 
 interface HeaderProps {
@@ -22,7 +22,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ credentialsFileExists }) => {
-  // Get the credential state setters from the hook
+  // Ottenere i setter dello stato delle credenziali dall'hook
   const { setApiKey, setUrl, setRegion, setInstanceId, setCredentialsFileExists } = useCredentialsConfig();
 
   return (
