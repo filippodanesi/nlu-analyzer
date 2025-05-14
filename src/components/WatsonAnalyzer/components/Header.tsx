@@ -20,9 +20,9 @@ const Header: React.FC<HeaderProps> = ({ credentialsFileExists }) => {
     <header className="bg-white dark:bg-gray-900 shadow">
       <div className="container max-w-7xl mx-auto py-4 px-4 flex items-center justify-between">
         <div className="flex items-center">
-          <Wand2 className="h-6 w-6 mr-2 text-blue-500" />
+          <Wand2 className="h-6 w-6 mr-2 text-gray-800" />
           <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
-            Watson Analyzer
+            IBM Watson NLU Analyzer
           </h1>
         </div>
 
