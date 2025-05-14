@@ -12,6 +12,7 @@ interface CorsProxyDialogProps {
   currentProxyUrl: string;
   handleSave: () => void;
   handleTestProxy: () => void;
+  children?: React.ReactNode; // Added children prop
 }
 
 export const CorsProxyDialog: React.FC<CorsProxyDialogProps> = ({
@@ -22,10 +23,12 @@ export const CorsProxyDialog: React.FC<CorsProxyDialogProps> = ({
   proxyStatus,
   currentProxyUrl,
   handleSave,
-  handleTestProxy
+  handleTestProxy,
+  children // Added children prop
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      {children} {/* Render the trigger button */}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>CORS Proxy Configuration</DialogTitle>

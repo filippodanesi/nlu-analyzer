@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Github, Wand2 } from 'lucide-react';
 import {
@@ -6,7 +7,9 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import QuickCredentialsInput from './QuickCredentialsInput';
+
+// Fix import path to include correct components folder
+import QuickCredentialsInput from './config/QuickCredentialsInput';
 
 // Update the import path
 import CorsProxy from './CorsProxy';
