@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 // Define types for our environment variables
 interface WatsonEnvVars {

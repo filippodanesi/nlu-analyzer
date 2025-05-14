@@ -145,7 +145,24 @@ const CorsProxy: React.FC<CorsProxyProps> = ({ className }) => {
               onChange={(e) => setProxyUrl(e.target.value)}
             />
             <p className="text-xs text-muted-foreground">
-              Enter the URL of a CORS proxy service. Leave empty to use default proxies.
+              Enter the URL of a CORS proxy service. Leave empty to use the default CORS.sh proxy.
+            </p>
+          </div>
+          
+          <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-md p-3 mt-2">
+            <h4 className="font-medium text-blue-800 dark:text-blue-300 text-sm">Default CORS Proxy</h4>
+            <p className="text-xs text-blue-700 dark:text-blue-400 mt-1">
+              We're using <code>cors.sh</code> with a temporary API key (<code>temp_3a4e8e881b300eba61b37720fbccf3d0</code>)
+              that is valid for 3 days. For continued use, please sign up for a free account at{" "}
+              <a 
+                href="https://cors.sh"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                cors.sh
+              </a>
+              {" "}to get a permanent API key.
             </p>
           </div>
           
@@ -165,23 +182,23 @@ const CorsProxy: React.FC<CorsProxyProps> = ({ className }) => {
             <ul className="list-disc list-inside mt-1 space-y-1">
               <li>
                 <a 
-                  href="https://corsproxy.io/" 
+                  href="https://cors.sh/" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="flex items-center hover:underline"
+                  className="flex items-center hover:underline font-medium"
                 >
-                  corsproxy.io/?
+                  cors.sh (Recommended)
                   <ExternalLink className="ml-1 h-3 w-3" />
                 </a>
               </li>
               <li>
                 <a 
-                  href="https://cors.sh/" 
+                  href="https://corsproxy.io/" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="flex items-center hover:underline"
                 >
-                  cors.sh/
+                  corsproxy.io
                   <ExternalLink className="ml-1 h-3 w-3" />
                 </a>
               </li>
@@ -192,7 +209,7 @@ const CorsProxy: React.FC<CorsProxyProps> = ({ className }) => {
                   rel="noopener noreferrer"
                   className="flex items-center hover:underline"
                 >
-                  api.allorigins.win/raw?url=
+                  api.allorigins.win
                   <ExternalLink className="ml-1 h-3 w-3" />
                 </a>
               </li>

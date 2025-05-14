@@ -1,4 +1,3 @@
-
 // Utility functions for AI-based text optimization
 
 /**
@@ -148,17 +147,9 @@ const getCorsProxyUrl = (): string => {
     return storedProxyUrl;
   }
   
-  // Check if we're in development mode
-  const isDev = import.meta.env.DEV;
-  
-  // In development, use a default CORS proxy
-  if (isDev) {
-    // Don't use cors-anywhere.herokuapp.com as it's often rate-limited
-    return "https://corsproxy.io/?";
-  }
-  
-  // In production, default to another public proxy
-  return "https://api.allorigins.win/raw?url=";
+  // For all environments, use cors.sh as default with temp API key
+  // The key is valid for 3 days and needs to be replaced with a permanent one
+  return "https://proxy.cors.sh/";
 };
 
 /**
@@ -171,6 +162,21 @@ const makeProxiedUrl = (url: string, corsProxyUrl: string): string => {
   } else {
     return `${corsProxyUrl}${url}`;
   }
+};
+
+/**
+ * Get CORS proxy headers needed for the request
+ */
+const getCorsProxyHeaders = (corsProxyUrl: string): Record<string, string> => {
+  // Check if we're using cors.sh
+  if (corsProxyUrl.includes("cors.sh")) {
+    return {
+      "x-cors-api-key": "temp_3a4e8e881b300eba61b37720fbccf3d0" // Temporary key valid for 3 days
+    };
+  }
+  
+  // No special headers for other proxies
+  return {};
 };
 
 /**
@@ -240,7 +246,11 @@ const optimizeWithClaude = async (
     const baseUrl = "https://api.anthropic.com/v1/messages";
     const proxiedUrl = makeProxiedUrl(baseUrl, corsProxyUrl);
     
+    // Get the proxy headers
+    const proxyHeaders = getCorsProxyHeaders(corsProxyUrl);
+    
     console.log(`Using Claude model: ${claudeModel}`);
+    console.log(`Using CORS proxy: ${corsProxyUrl}`);
     
     const response = await fetch(proxiedUrl, {
       method: "POST",
@@ -248,7 +258,8 @@ const optimizeWithClaude = async (
         "Content-Type": "application/json",
         "x-api-key": apiKey,
         "anthropic-version": "2023-06-01",
-        "anthropic-dangerous-direct-browser-access": "true" // Add the required header
+        "anthropic-dangerous-direct-browser-access": "true", // Add the required header
+        ...proxyHeaders // Add any proxy-specific headers
       },
       body: JSON.stringify({
         model: claudeModel,
