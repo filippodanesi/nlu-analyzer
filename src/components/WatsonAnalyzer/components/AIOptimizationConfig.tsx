@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
-import { Key, AlertCircle } from "lucide-react";
+import { Key, AlertCircle, Info } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { AIProvider } from '../hooks/useTextOptimization';
@@ -135,6 +135,13 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
             </TabsContent>
             
             <TabsContent value="anthropic" className="space-y-4">
+              <Alert variant="default" className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+                <Info className="h-4 w-4" />
+                <AlertDescription>
+                  Using official Anthropic SDK for secure and reliable API access
+                </AlertDescription>
+              </Alert>
+
               <div className="space-y-2">
                 <Label htmlFor="ai-model-claude">AI Model</Label>
                 <Select 
@@ -173,17 +180,6 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
                   </AlertDescription>
                 </Alert>
               )}
-              
-              <div className="pt-2">
-                <CorsProxy className="w-full" />
-              </div>
-              
-              <div className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950 p-3 rounded-md border border-amber-200 dark:border-amber-800">
-                <p>
-                  <strong>Note:</strong> Anthropic's Claude API may have CORS restrictions when called directly from a browser.
-                  Use the CORS Proxy option to resolve this issue during development.
-                </p>
-              </div>
             </TabsContent>
           </Tabs>
 

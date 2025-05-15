@@ -1,61 +1,15 @@
 
 /**
- * Utility functions for Claude API integration
+ * Utility functions for Claude API integration using the official Anthropic SDK
  */
-import { getCorsProxyUrl, makeProxiedUrl, getCorsProxyHeaders, fetchWithCorsProxy } from './corsProxyUtils';
+import Anthropic from '@anthropic-ai/sdk';
 import { toast } from "@/hooks/use-toast";
 
 /**
- * Fallback to no-cors mode with simpler prompt
+ * Fallback message for when the Anthropic SDK encounters an error
  */
-const fallbackNoCorsClaude = async (
-  prompt: string,
-  apiKey: string,
-  error?: Error
-): Promise<string> => {
+const getFallbackMessage = (prompt: string, error?: Error): string => {
   try {
-    // Show a toast notification about the fallback
-    toast({
-      title: "API Error Detected",
-      description: error?.message?.includes("401") ? 
-        "Invalid API key for Claude. Please check your API key in the AI Configuration." :
-        "Attempting alternative method to reach the Claude API...",
-      variant: error?.message?.includes("401") ? "destructive" : "default"
-    });
-    
-    // If we have an authentication error, return a clear message
-    if (error?.message?.includes("401") || error?.toString().includes("invalid x-api-key")) {
-      return `Authentication Failed: Your Claude API key appears to be invalid.
-
-Please check the following:
-1. Make sure your API key is correctly entered in the AI Configuration settings
-2. Verify that your Claude API key is active and has not expired
-3. Ensure your account has access to the Claude API
-
-The original text has been preserved.`;
-    }
-    
-    // Get a simpler prompt (only keywords, shorter length)
-    const simplePrompt = prompt.split('\n').slice(0, 3).join('\n');
-    
-    // Try with no-cors mode (will result in an opaque response)
-    await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      mode: "no-cors",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-        "anthropic-dangerous-direct-browser-access": "true" // Add the required header
-      },
-      body: JSON.stringify({
-        model: "claude-3-7-sonnet-20250219", // Always use the preferred model
-        system: "Optimize text with keywords",
-        messages: [{ role: "user", content: simplePrompt }],
-        max_tokens: 1000
-      })
-    });
-    
     // Extract keywords for the fallback message
     let keywordsList = "unknown";
     try {
@@ -67,26 +21,39 @@ The original text has been preserved.`;
       console.warn("Could not extract keywords from prompt:", err);
     }
     
-    // Since no-cors gives an opaque response, we can't read it
-    // Return a fallback message
+    // If we have an authentication error, return a clear message
+    if (error?.message?.includes("401") || 
+        error?.message?.includes("auth") || 
+        error?.toString().includes("invalid x-api-key")) {
+      return `Authentication Failed: Your Claude API key appears to be invalid.
+
+Please check the following:
+1. Make sure your API key is correctly entered in the AI Configuration settings
+2. Verify that your Claude API key is active and has not expired
+3. Ensure your account has access to the Claude API
+
+The original text has been preserved.`;
+    }
+    
+    // Return a general fallback message
     return `I've attempted to optimize your text with the keywords: ${keywordsList}
     
-Due to browser security restrictions (CORS), I couldn't display the AI-optimized result directly. 
+Due to API connection issues, I couldn't display the AI-optimized result directly. 
 
 Options to resolve this:
-1. Try a different CORS proxy in the "CORS Proxy" settings
-2. Use OpenAI instead (GPT-4o) which has fewer CORS restrictions
-3. Consider setting up a simple backend service to handle these API calls
+1. Check that your Claude API key is valid
+2. Use OpenAI instead (GPT-4o) which may have fewer connection restrictions
+3. Try again in a few moments
 
 The original text is preserved.`;
-  } catch (error) {
-    console.error("Error in fallback no-cors mode:", error);
-    throw new Error("CORS issues prevented optimization. Try using OpenAI models instead.");
+  } catch (fallbackError) {
+    console.error("Error creating fallback message:", fallbackError);
+    return "Could not optimize the text due to API connection issues. Please try again later.";
   }
 };
 
 /**
- * Optimizes text using Anthropic Claude API
+ * Optimizes text using Anthropic Claude API via the official SDK
  */
 export const optimizeWithClaude = async (
   prompt: string, 
@@ -109,13 +76,12 @@ export const optimizeWithClaude = async (
       toast({
         title: "Invalid API Key Format",
         description: "Claude API keys typically start with 'sk-ant-'. Please check your key.",
-        variant: "destructive",
+        variant: "warning",
       });
     }
     
     // Always use the preferred Claude model
     const claudeModel = "claude-3-7-sonnet-20250219";
-                        
     console.log(`Using Claude model: ${claudeModel}`);
     
     // Enhanced unified system prompt for better entity handling
@@ -129,160 +95,58 @@ Core rules:
 • Preserve meaning, tone, paragraph count, and authentic voice.  
 • Insert target keywords verbatim in high-impact positions while keeping the text natural.  
 • After internal reasoning, output **only** the optimized text with correct spacing and punctuation – no JSON, no explanations, no markup.`;
-    
-    // First attempt: Try direct API call with the new dangerous-direct-browser-access header
+
+    // Create Anthropic client
+    const client = new Anthropic({
+      apiKey: apiKey,
+    });
+
+    toast({
+      title: "Optimizing with Claude",
+      description: "Using the Anthropic SDK for secure API access...",
+    });
+
     try {
-      console.log("Attempting direct Claude API call with CORS header");
-      
-      toast({
-        title: "Making direct Claude API call",
-        description: "Using new anthropic-dangerous-direct-browser-access header...",
-      });
-      
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-api-key": apiKey,
-          "anthropic-version": "2023-06-01",
-          "anthropic-dangerous-direct-browser-access": "true" // New header to enable CORS
-        },
-        body: JSON.stringify({
-          model: claudeModel,
-          system: systemPrompt,
-          messages: [
-            {
-              role: "user",
-              content: prompt
-            }
-          ],
-          max_tokens: 2000
-        })
-      });
-      
-      if (response.ok) {
-        const data = await response.json();
-        return data.content[0].text.trim();
-      } else {
-        const responseText = await response.text();
-        console.error("Direct Claude API call failed:", responseText);
-        
-        // Check for authentication errors specifically
-        if (response.status === 401) {
-          toast({
-            title: "Authentication Failed",
-            description: "Invalid Claude API key. Please check your API key in the AI Configuration.",
-            variant: "destructive",
-          });
-          throw new Error(`Claude API authentication error: ${response.status}`);
-        } else {
-          throw new Error(`Claude API error: ${response.status}`);
-        }
-      }
-    } catch (directCallError) {
-      // Log the error from direct call
-      console.error("Direct Claude API call error:", directCallError);
-      console.log("Falling back to CORS proxy...");
-      
-      // Check if we have an auth error
-      if (directCallError.message?.includes("401") || 
-          directCallError.toString().includes("invalid x-api-key")) {
-        return await fallbackNoCorsClaude(prompt, apiKey, directCallError);
-      }
-      
-      toast({
-        title: "Direct API call failed",
-        description: "Trying with CORS proxy instead...",
-      });
-      
-      // Second attempt: Try with CORS proxy
-      try {
-        // Prepare request body
-        const requestBody = JSON.stringify({
-          model: claudeModel,
-          system: systemPrompt,
-          messages: [
-            {
-              role: "user",
-              content: prompt
-            }
-          ],
-          max_tokens: 2000
-        });
-        
-        // Prepare headers
-        const headers = {
-          "Content-Type": "application/json",
-          "x-api-key": apiKey,
-          "anthropic-version": "2023-06-01",
-          "anthropic-dangerous-direct-browser-access": "true" // Include this header even with proxy
-        };
-        
-        // Get the current CORS proxy URL
-        const corsProxyUrl = getCorsProxyUrl();
-        console.log(`Falling back to CORS proxy: ${corsProxyUrl}`);
-        
-        // Use our enhanced fetch function with CORS proxy support
-        const response = await fetchWithCorsProxy(
-          "https://api.anthropic.com/v1/messages",
+      // Make the API request using the SDK
+      const response = await client.messages.create({
+        model: claudeModel,
+        system: systemPrompt,
+        messages: [
           {
-            method: "POST",
-            headers,
-            body: requestBody
+            role: 'user',
+            content: prompt
           }
-        );
+        ],
+        max_tokens: 2000
+      });
 
-        // If we're using no-cors mode, we'll get an opaque response
-        if (response.type === 'opaque') {
-          console.log("Received opaque response, using fallback...");
-          return await fallbackNoCorsClaude(prompt, apiKey, directCallError);
-        }
-
-        // Try to parse the response as JSON
-        try {
-          const data = await response.json();
-          return data.content[0].text.trim();
-        } catch (parseError) {
-          console.error("Failed to parse Claude API response:", parseError);
-          return await fallbackNoCorsClaude(prompt, apiKey, directCallError);
-        }
-      } catch (proxyError) {
-        console.error("CORS proxy attempt error:", proxyError);
-        return await fallbackNoCorsClaude(prompt, apiKey, proxyError);
+      // Return the generated text
+      return response.content[0].text.trim();
+    } catch (sdkError) {
+      console.error("Anthropic SDK error:", sdkError);
+      
+      // Show a specific toast for authentication errors
+      if (sdkError instanceof Anthropic.AuthenticationError) {
+        toast({
+          title: "Authentication Failed",
+          description: "Invalid Claude API key. Please check your API key in the AI Configuration.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Claude API Error",
+          description: sdkError instanceof Error ? sdkError.message : "An error occurred during API call",
+          variant: "destructive",
+        });
       }
+      
+      // Return fallback message
+      return getFallbackMessage(prompt, sdkError instanceof Error ? sdkError : new Error(String(sdkError)));
     }
   } catch (error) {
     console.error("Claude API error:", error);
     
-    // Detailed logging for debugging
-    if (error.response) {
-      console.error("Claude API error response:", {
-        status: error.response.status,
-        headers: error.response.headers,
-        data: error.response.data
-      });
-    }
-    
-    // If we have a specific CORS error or other known errors, try the fallback
-    if (error.toString().includes("CORS") || 
-        error.toString().includes("Failed to fetch") ||
-        error.toString().includes("dangerous-direct-browser") ||
-        error.toString().includes("NetworkError") ||
-        error.toString().includes("fetch") ||
-        error.toString().includes("TypeError") ||
-        error.toString().includes("401")) {
-      console.log("Connection error detected, trying fallback method...");
-      
-      // Show a toast notification about the fallback
-      toast({
-        title: "Connection issue detected",
-        description: "Falling back to alternative method...",
-        variant: "destructive",
-      });
-      
-      return await fallbackNoCorsClaude(prompt, apiKey, error instanceof Error ? error : new Error(String(error)));
-    }
-    
-    throw error;
+    // Return fallback message
+    return getFallbackMessage(prompt, error instanceof Error ? error : new Error(String(error)));
   }
 };
