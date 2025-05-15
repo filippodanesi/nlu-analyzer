@@ -23,8 +23,30 @@ Core rules:
 • Insert target keywords verbatim in high-impact positions while keeping the text natural.  
 • After internal reasoning, output **only** the optimized text with correct spacing and punctuation – no JSON, no explanations, no markup.`;
 
-  // Determine if using o4 models which require different parameter names
+  // Determine if using o4 models which require different parameter names and restrictions
   const isO4Model = model.startsWith('o4-');
+
+  // Configure API request body based on model type
+  const requestBody = {
+    model: model,
+    messages: [
+      {
+        role: "system",
+        content: systemPrompt
+      },
+      {
+        role: "user",
+        content: prompt
+      }
+    ],
+    // o4 models only support default temperature (1.0) and use max_completion_tokens instead of max_tokens
+    ...(isO4Model ? { 
+      max_completion_tokens: 2000 
+    } : { 
+      temperature: 0.7,
+      max_tokens: 2000 
+    })
+  };
 
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
@@ -32,21 +54,7 @@ Core rules:
       "Content-Type": "application/json",
       "Authorization": `Bearer ${apiKey}`
     },
-    body: JSON.stringify({
-      model: model,
-      messages: [
-        {
-          role: "system",
-          content: systemPrompt
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      temperature: 0.7,
-      ...(isO4Model ? { max_completion_tokens: 2000 } : { max_tokens: 2000 })
-    })
+    body: JSON.stringify(requestBody)
   });
 
   if (!response.ok) {
