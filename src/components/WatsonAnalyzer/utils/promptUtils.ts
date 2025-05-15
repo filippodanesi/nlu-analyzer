@@ -13,23 +13,38 @@ export const generateOptimizationPrompt = (
 ): string => {
   const keywordsString = targetKeywords.join(', ');
   
-  return `Optimize this exact text for the following target keywords: ${keywordsString}.
+  // Extract entities from analysis results if available
+  const entities = analysisResults && analysisResults.entities ? 
+    analysisResults.entities.map((entity: any) => `${entity.text} (${entity.type})`).join(', ') : 
+    'None detected';
+  
+  // Extract top keywords from analysis results if available
+  const topKeywords = analysisResults && analysisResults.keywords ? 
+    analysisResults.keywords.slice(0, 5).map((kw: any) => kw.text).join(', ') : 
+    'None detected';
+  
+  return `Optimize this text for SEO while preserving its meaning and intent.
 
 Original text:
 ${originalText}
 
-Instructions:
-1. Only optimize the EXACT text provided above.
-2. Preserve the original structure exactly as provided.
-3. IMPORTANT: Only include headings/titles if they already exist in the original text (marked with H1:, H2:, etc.). DO NOT add new headings if none exist in the original text.
-4. Do not add any content that isn't directly related to the original text.
-5. Do not reference any external APIs, libraries, or services that aren't mentioned in the original text.
-6. Include the target keywords in strategic positions (beginning of paragraphs, existing headings).
-7. Slightly increase the density of target keywords while maintaining natural flow.
-8. Use synonyms and semantic variations of the target keywords where appropriate.
-9. Keep the text natural and readable.
-10. Preserve the original meaning, scope, and intent.
-11. If headings are present (marked with H1:, H2:, etc.), optimize them while maintaining their format.
+Target keywords to optimize for: ${keywordsString}
 
-Provide only the optimized version of the exact text, without any additional content, explanations, or references.`;
+Watson NLU detected entities: ${entities}
+Watson NLU detected keywords: ${topKeywords}
+
+Instructions:
+1. Identify proper nouns, brands, and product names in the text - preserve them exactly as they appear.
+2. Make sure brand names like "Triumph" are correctly identified as separate entities, not combined with other words.
+3. If "Experience" is the first word of a sentence, make sure it's not erroneously combined with a brand name.
+4. Strategically place the target keywords in important positions (beginning of paragraphs, headings if applicable).
+5. Increase the density of target keywords while keeping the text natural and readable.
+6. Use semantic variations of the target keywords where appropriate.
+7. Ensure the text flows naturally and doesn't seem keyword-stuffed.
+8. Preserve the original structure, meaning, and intent of the content.
+9. Only include headings if they already exist in the original text.
+10. Do not add any content that isn't directly related to the original text.
+11. Make sure entity names are properly separated (e.g., "Experience" and "Triumph" should be separate if appropriate).
+
+Provide only the optimized version of the text, without any additional content, explanations, or references.`;
 };
