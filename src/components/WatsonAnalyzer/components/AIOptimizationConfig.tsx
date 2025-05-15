@@ -11,8 +11,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from "@/components/ui/dialog";
-import { Key } from "lucide-react";
+import { Key, AlertCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { AIProvider } from '../hooks/useTextOptimization';
 import CorsProxy from './CorsProxy';
 
@@ -54,6 +55,23 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
       setAiModel("claude-3-7-sonnet-20250219");
     }
   };
+
+  // Validate API key format for better user feedback
+  const validateApiKey = (key: string, provider: AIProvider): string | null => {
+    if (!key || key.trim() === "") return null;
+    
+    if (provider === "anthropic" && !key.startsWith("sk-ant-") && !key.startsWith("sk-")) {
+      return "Claude API keys typically start with 'sk-ant-'";
+    }
+    
+    if (provider === "openai" && !key.startsWith("sk-")) {
+      return "OpenAI API keys typically start with 'sk-'";
+    }
+    
+    return null;
+  };
+
+  const apiKeyWarning = validateApiKey(tempApiKey, activeProvider);
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -105,11 +123,14 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
                 <Input
                   id="api-key-openai"
                   type="password"
-                  placeholder="Enter your OpenAI API key"
+                  placeholder="Enter your OpenAI API key (starts with sk-)"
                   value={activeProvider === "openai" ? tempApiKey : ""}
                   onChange={(e) => setTempApiKey(e.target.value)}
                   className="font-mono"
                 />
+                {activeProvider === "openai" && apiKeyWarning && (
+                  <p className="text-xs text-amber-600 mt-1">{apiKeyWarning}</p>
+                )}
               </div>
             </TabsContent>
             
@@ -134,12 +155,24 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
                 <Input
                   id="api-key-claude"
                   type="password"
-                  placeholder="Enter your Anthropic API key"
+                  placeholder="Enter your Anthropic API key (starts with sk-ant-)"
                   value={activeProvider === "anthropic" ? tempApiKey : ""}
                   onChange={(e) => setTempApiKey(e.target.value)}
                   className="font-mono"
                 />
+                {activeProvider === "anthropic" && apiKeyWarning && (
+                  <p className="text-xs text-amber-600 mt-1">{apiKeyWarning}</p>
+                )}
               </div>
+              
+              {activeProvider === "anthropic" && (
+                <Alert variant="warning" className="bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    Claude API keys typically start with <code className="bg-amber-100 dark:bg-amber-900 px-1 py-0.5 rounded">sk-ant-</code>
+                  </AlertDescription>
+                </Alert>
+              )}
               
               <div className="pt-2">
                 <CorsProxy className="w-full" />

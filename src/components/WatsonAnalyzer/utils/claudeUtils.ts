@@ -10,14 +10,30 @@ import { toast } from "@/hooks/use-toast";
  */
 const fallbackNoCorsClaude = async (
   prompt: string,
-  apiKey: string
+  apiKey: string,
+  error?: Error
 ): Promise<string> => {
   try {
     // Show a toast notification about the fallback
     toast({
-      title: "CORS issue detected",
-      description: "Attempting alternative method to reach the Claude API...",
+      title: "API Error Detected",
+      description: error?.message?.includes("401") ? 
+        "Invalid API key for Claude. Please check your API key in the AI Configuration." :
+        "Attempting alternative method to reach the Claude API...",
+      variant: error?.message?.includes("401") ? "destructive" : "default"
     });
+    
+    // If we have an authentication error, return a clear message
+    if (error?.message?.includes("401") || error?.toString().includes("invalid x-api-key")) {
+      return `Authentication Failed: Your Claude API key appears to be invalid.
+
+Please check the following:
+1. Make sure your API key is correctly entered in the AI Configuration settings
+2. Verify that your Claude API key is active and has not expired
+3. Ensure your account has access to the Claude API
+
+The original text has been preserved.`;
+    }
     
     // Get a simpler prompt (only keywords, shorter length)
     const simplePrompt = prompt.split('\n').slice(0, 3).join('\n');
@@ -77,6 +93,26 @@ export const optimizeWithClaude = async (
   apiKey: string
 ): Promise<string> => {
   try {
+    // Validate API key first
+    if (!apiKey || apiKey.trim() === "") {
+      toast({
+        title: "Missing API Key",
+        description: "Please provide a valid Claude API key in the AI Configuration.",
+        variant: "destructive",
+      });
+      throw new Error("Claude API key is missing");
+    }
+
+    // Check for likely invalid API key format
+    if (!apiKey.startsWith("sk-ant-") && !apiKey.startsWith("sk-")) {
+      console.warn("Claude API key appears to have invalid format. Should start with 'sk-ant-'");
+      toast({
+        title: "Invalid API Key Format",
+        description: "Claude API keys typically start with 'sk-ant-'. Please check your key.",
+        variant: "destructive",
+      });
+    }
+    
     // Always use the preferred Claude model
     const claudeModel = "claude-3-7-sonnet-20250219";
                         
@@ -128,13 +164,31 @@ Core rules:
         const data = await response.json();
         return data.content[0].text.trim();
       } else {
-        console.error("Direct Claude API call failed:", await response.text());
-        throw new Error(`Claude API error: ${response.status}`);
+        const responseText = await response.text();
+        console.error("Direct Claude API call failed:", responseText);
+        
+        // Check for authentication errors specifically
+        if (response.status === 401) {
+          toast({
+            title: "Authentication Failed",
+            description: "Invalid Claude API key. Please check your API key in the AI Configuration.",
+            variant: "destructive",
+          });
+          throw new Error(`Claude API authentication error: ${response.status}`);
+        } else {
+          throw new Error(`Claude API error: ${response.status}`);
+        }
       }
     } catch (directCallError) {
       // Log the error from direct call
       console.error("Direct Claude API call error:", directCallError);
       console.log("Falling back to CORS proxy...");
+      
+      // Check if we have an auth error
+      if (directCallError.message?.includes("401") || 
+          directCallError.toString().includes("invalid x-api-key")) {
+        return await fallbackNoCorsClaude(prompt, apiKey, directCallError);
+      }
       
       toast({
         title: "Direct API call failed",
@@ -181,7 +235,7 @@ Core rules:
         // If we're using no-cors mode, we'll get an opaque response
         if (response.type === 'opaque') {
           console.log("Received opaque response, using fallback...");
-          return await fallbackNoCorsClaude(prompt, apiKey);
+          return await fallbackNoCorsClaude(prompt, apiKey, directCallError);
         }
 
         // Try to parse the response as JSON
@@ -190,11 +244,11 @@ Core rules:
           return data.content[0].text.trim();
         } catch (parseError) {
           console.error("Failed to parse Claude API response:", parseError);
-          return await fallbackNoCorsClaude(prompt, apiKey);
+          return await fallbackNoCorsClaude(prompt, apiKey, directCallError);
         }
       } catch (proxyError) {
         console.error("CORS proxy attempt error:", proxyError);
-        return await fallbackNoCorsClaude(prompt, apiKey);
+        return await fallbackNoCorsClaude(prompt, apiKey, proxyError);
       }
     }
   } catch (error) {
@@ -215,7 +269,8 @@ Core rules:
         error.toString().includes("dangerous-direct-browser") ||
         error.toString().includes("NetworkError") ||
         error.toString().includes("fetch") ||
-        error.toString().includes("TypeError")) {
+        error.toString().includes("TypeError") ||
+        error.toString().includes("401")) {
       console.log("Connection error detected, trying fallback method...");
       
       // Show a toast notification about the fallback
@@ -225,7 +280,7 @@ Core rules:
         variant: "destructive",
       });
       
-      return await fallbackNoCorsClaude(prompt, apiKey);
+      return await fallbackNoCorsClaude(prompt, apiKey, error instanceof Error ? error : new Error(String(error)));
     }
     
     throw error;

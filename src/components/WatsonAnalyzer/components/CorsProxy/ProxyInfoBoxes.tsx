@@ -24,6 +24,7 @@ export const ProxyInfoBoxes: React.FC<ProxyInfoBoxesProps> = ({ currentProxyUrl 
           <span>
             <strong>Important:</strong> If you experience issues with Claude optimization, try these alternatives:
             <ul className="list-disc pl-5 mt-1">
+              <li>Verify your Claude API key is correct (should start with <code>sk-ant-</code>)</li>
               <li>Use OpenAI models instead (GPT-4o works well)</li>
               <li>Try different CORS proxies like corsproxy.io or allorigins.win</li>
               <li>Set up a simple backend service for API calls</li>
