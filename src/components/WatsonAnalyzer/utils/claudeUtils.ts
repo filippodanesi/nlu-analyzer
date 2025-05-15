@@ -96,9 +96,10 @@ Core rules:
 • Insert target keywords verbatim in high-impact positions while keeping the text natural.  
 • After internal reasoning, output **only** the optimized text with correct spacing and punctuation – no JSON, no explanations, no markup.`;
 
-    // Create Anthropic client
+    // Create Anthropic client with browser support enabled
     const client = new Anthropic({
       apiKey: apiKey,
+      dangerouslyAllowBrowser: true, // Enable browser support
     });
 
     toast({
