@@ -23,6 +23,9 @@ Core rules:
 • Insert target keywords verbatim in high-impact positions while keeping the text natural.  
 • After internal reasoning, output **only** the optimized text with correct spacing and punctuation – no JSON, no explanations, no markup.`;
 
+  // Determine if using o4 models which require different parameter names
+  const isO4Model = model.startsWith('o4-');
+
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -42,7 +45,7 @@ Core rules:
         }
       ],
       temperature: 0.7,
-      max_tokens: 2000
+      ...(isO4Model ? { max_completion_tokens: 2000 } : { max_tokens: 2000 })
     })
   });
 
