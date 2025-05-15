@@ -3,6 +3,7 @@
  * Utility functions for Claude API integration
  */
 import { getCorsProxyUrl, makeProxiedUrl, getCorsProxyHeaders, fetchWithCorsProxy } from './corsProxyUtils';
+import { toast } from "@/hooks/use-toast";
 
 /**
  * Fallback to no-cors mode with simpler prompt
@@ -12,6 +13,12 @@ const fallbackNoCorsClaude = async (
   apiKey: string
 ): Promise<string> => {
   try {
+    // Show a toast notification about the fallback
+    toast({
+      title: "CORS issue detected",
+      description: "Attempting alternative method to reach the Claude API...",
+    });
+    
     // Get a simpler prompt (only keywords, shorter length)
     const simplePrompt = prompt.split('\n').slice(0, 3).join('\n');
     
@@ -33,9 +40,20 @@ const fallbackNoCorsClaude = async (
       })
     });
     
+    // Extract keywords for the fallback message
+    let keywordsList = "unknown";
+    try {
+      const keywordMatch = prompt.match(/Target Keywords:\s*([^\n]+)/i);
+      if (keywordMatch && keywordMatch[1]) {
+        keywordsList = keywordMatch[1].trim();
+      }
+    } catch (err) {
+      console.warn("Could not extract keywords from prompt:", err);
+    }
+    
     // Since no-cors gives an opaque response, we can't read it
     // Return a fallback message
-    return `I've attempted to optimize your text with the keywords: ${prompt.split(':')[1]?.split('.')[0] || '(keywords not found)'}.
+    return `I've attempted to optimize your text with the keywords: ${keywordsList}
     
 Due to browser security restrictions (CORS), I couldn't display the AI-optimized result directly. 
 
@@ -98,33 +116,75 @@ Core rules:
       "anthropic-dangerous-direct-browser-access": "true" // Required header
     };
     
-    // Use our enhanced fetch function with CORS proxy support
-    const response = await fetchWithCorsProxy(
-      "https://api.anthropic.com/v1/messages",
-      {
-        method: "POST",
-        headers,
-        body: requestBody
+    // First attempt: Try direct API call with CORS bypass
+    try {
+      // Get the current CORS proxy URL
+      const corsProxyUrl = getCorsProxyUrl();
+      console.log(`Attempting Claude optimization with CORS proxy: ${corsProxyUrl}`);
+      
+      // Show toast notification
+      toast({
+        title: "Processing with Claude API",
+        description: `Using CORS proxy: ${corsProxyUrl || "Default (cors.sh)"}`,
+      });
+      
+      // Use our enhanced fetch function with CORS proxy support
+      const response = await fetchWithCorsProxy(
+        "https://api.anthropic.com/v1/messages",
+        {
+          method: "POST",
+          headers,
+          body: requestBody
+        }
+      );
+
+      // If we're using no-cors mode, we'll get an opaque response
+      if (response.type === 'opaque') {
+        console.log("Received opaque response, using fallback...");
+        return await fallbackNoCorsClaude(prompt, apiKey);
       }
-    );
 
-    // If we're using no-cors mode, we'll get an opaque response
-    if (response.type === 'opaque') {
-      console.log("Received opaque response, using fallback...");
-      return await fallbackNoCorsClaude(prompt, apiKey);
+      // Try to parse the response as JSON
+      try {
+        const data = await response.json();
+        return data.content[0].text.trim();
+      } catch (parseError) {
+        console.error("Failed to parse Claude API response:", parseError);
+        return await fallbackNoCorsClaude(prompt, apiKey);
+      }
+    } catch (firstAttemptError) {
+      // Log the first attempt error
+      console.error("First attempt Claude API error:", firstAttemptError);
+      throw firstAttemptError; // Throw to try the fallbacks below
     }
-
-    const data = await response.json();
-    return data.content[0].text.trim();
   } catch (error) {
     console.error("Claude API error:", error);
     
-    // If we have a specific CORS error, try the fallback
+    // Detailed logging for debugging
+    if (error.response) {
+      console.error("Claude API error response:", {
+        status: error.response.status,
+        headers: error.response.headers,
+        data: error.response.data
+      });
+    }
+    
+    // If we have a specific CORS error or other known errors, try the fallback
     if (error.toString().includes("CORS") || 
         error.toString().includes("Failed to fetch") ||
         error.toString().includes("dangerous-direct-browser") ||
-        error.toString().includes("NetworkError")) {
-      console.log("CORS error detected, trying fallback method...");
+        error.toString().includes("NetworkError") ||
+        error.toString().includes("fetch") ||
+        error.toString().includes("TypeError")) {
+      console.log("Connection error detected, trying fallback method...");
+      
+      // Show a toast notification about the fallback
+      toast({
+        title: "Connection issue detected",
+        description: "Falling back to alternative method...",
+        variant: "destructive",
+      });
+      
       return await fallbackNoCorsClaude(prompt, apiKey);
     }
     

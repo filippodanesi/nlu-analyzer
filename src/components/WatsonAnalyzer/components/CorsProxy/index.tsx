@@ -27,9 +27,14 @@ const CorsProxy: React.FC<CorsProxyProps> = ({ className }) => {
     // Get and display the current active proxy
     setCurrentProxyUrl(getCorsProxyUrl());
     
+    // Test the current proxy automatically when component mounts
+    handleTestProxy();
+    
     // Add event listener for storage changes
     const handleStorageChange = () => {
       setCurrentProxyUrl(getCorsProxyUrl());
+      // Re-test the proxy when it changes
+      handleTestProxy();
     };
     
     window.addEventListener('storage', handleStorageChange);
@@ -51,6 +56,9 @@ const CorsProxy: React.FC<CorsProxyProps> = ({ className }) => {
       });
       setCurrentProxyUrl(getCorsProxyUrl());
       setIsOpen(false);
+      
+      // Test the default proxy
+      setTimeout(() => handleTestProxy(), 500);
       return;
     }
     
@@ -73,6 +81,9 @@ const CorsProxy: React.FC<CorsProxyProps> = ({ className }) => {
     setCurrentProxyUrl(formattedUrl);
     setIsOpen(false);
     
+    // Test the new proxy after saving
+    setTimeout(() => handleTestProxy(), 500);
+    
     // Dispatch storage event to notify other components
     window.dispatchEvent(new Event('storage'));
   };
@@ -80,10 +91,6 @@ const CorsProxy: React.FC<CorsProxyProps> = ({ className }) => {
   const handleTestProxy = async () => {
     try {
       setProxyStatus('unknown');
-      toast({
-        title: "Testing CORS proxy",
-        description: "Sending a test request...",
-      });
       
       // Format the URL as we would in the actual API call
       let testUrl;
@@ -102,18 +109,28 @@ const CorsProxy: React.FC<CorsProxyProps> = ({ className }) => {
       }
       
       // Try a simple request through the proxy
+      const startTime = Date.now();
       const response = await fetch(testUrl, { headers });
+      
       if (response.ok) {
+        const endTime = Date.now();
+        const responseTime = endTime - startTime;
         setProxyStatus('working');
-        toast({
-          title: "CORS proxy test successful",
-          description: "The proxy appears to be working correctly.",
-        });
+        console.log(`CORS proxy test successful in ${responseTime}ms`);
+        
+        // Only show toast if dialog is open (avoid spam during auto-tests)
+        if (isOpen) {
+          toast({
+            title: "CORS proxy test successful",
+            description: `The proxy appears to be working correctly (${responseTime}ms).`,
+          });
+        }
       } else {
         setProxyStatus('error');
+        console.error(`CORS proxy test failed with status: ${response.status}`);
         toast({
           title: "CORS proxy test failed",
-          description: "The proxy returned an error. Check the console for details.",
+          description: `The proxy returned an error: ${response.status} ${response.statusText}`,
           variant: "destructive",
         });
       }
