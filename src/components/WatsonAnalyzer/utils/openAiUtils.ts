@@ -4,12 +4,12 @@
  */
 
 /**
- * Optimizes text using OpenAI API
+ * Optimizes text using OpenAI GPT API
  */
 export const optimizeWithOpenAI = async (
   prompt: string, 
-  apiKey: string, 
-  model: string
+  apiKey: string,
+  model: string = "gpt-4o-mini"
 ): Promise<string> => {
   // Enhanced unified system prompt for better entity handling
   const systemPrompt = `You are an expert SEO content optimizer with deep expertise in NER.
@@ -39,7 +39,7 @@ Core rules:
         content: prompt
       }
     ],
-    // o4 models only support default temperature (1.0) and use max_completion_tokens instead of max_tokens
+    // o4 models only support default temperature and use max_completion_tokens instead of max_tokens
     ...(isO4Model ? { 
       max_completion_tokens: 2000 
     } : { 
@@ -58,10 +58,13 @@ Core rules:
   });
 
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error?.message || "Error in OpenAI optimization API");
+    const errorData = await response.json().catch(() => null);
+    console.error("OpenAI API error:", errorData || response.statusText);
+    throw new Error(
+      errorData?.error?.message || `OpenAI API error: ${response.status} ${response.statusText}`
+    );
   }
 
   const data = await response.json();
-  return data.choices[0].message.content.trim();
+  return data.choices[0].message.content;
 };
