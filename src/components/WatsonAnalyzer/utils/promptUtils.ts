@@ -23,6 +23,11 @@ export const generateOptimizationPrompt = (
     analysisResults.keywords.slice(0, 5).map((kw: any) => kw.text).join(', ') : 
     'None detected';
   
+  // Extract categories for better context
+  const categories = analysisResults && analysisResults.categories ?
+    analysisResults.categories.slice(0, 2).map((cat: any) => cat.label).join(', ') :
+    'None detected';
+  
   return `Optimize this text for SEO while preserving its meaning and intent.
 
 Original text:
@@ -32,19 +37,24 @@ Target keywords to optimize for: ${keywordsString}
 
 Watson NLU detected entities: ${entities}
 Watson NLU detected keywords: ${topKeywords}
+Watson NLU detected categories: ${categories}
 
 Instructions:
-1. Identify proper nouns, brands, and product names in the text - preserve them exactly as they appear.
-2. Make sure brand names like "Triumph" are correctly identified as separate entities, not combined with other words.
-3. If "Experience" is the first word of a sentence, make sure it's not erroneously combined with a brand name.
-4. Strategically place the target keywords in important positions (beginning of paragraphs, headings if applicable).
-5. Increase the density of target keywords while keeping the text natural and readable.
-6. Use semantic variations of the target keywords where appropriate.
-7. Ensure the text flows naturally and doesn't seem keyword-stuffed.
-8. Preserve the original structure, meaning, and intent of the content.
-9. Only include headings if they already exist in the original text.
-10. Do not add any content that isn't directly related to the original text.
-11. Make sure entity names are properly separated (e.g., "Experience" and "Triumph" should be separate if appropriate).
+1. Carefully identify distinct entities in the text, especially brand names, product names, and proper nouns.
+2. Treat the first word of sentences separately from any brand or entity names that follow it.
+3. For example, in "Experience Triumph's products", recognize that "Triumph" is the brand name, not "Experience Triumph".
+4. Similarly, in other contexts like "Buy Samsung phones", recognize "Samsung" as the entity, not "Buy Samsung".
+5. Strategically place the target keywords in high-impact positions (beginning of paragraphs, headings, and near the start and end of the content).
+6. Increase the density of target keywords while maintaining natural readability.
+7. Use target keywords verbatim when possible rather than just semantic variations.
+8. For partial matches in the original Watson analysis, convert them to exact matches where natural.
+9. Maintain paragraph structure and overall flow similar to the original.
+10. Don't artificially introduce new sections, headers, or formatting that wasn't in the original.
+11. Ensure the text sounds natural to human readers while incorporating the target keywords.
+12. Pay special attention to proper spacing between sentences and proper punctuation.
+13. If entity disambiguation is available in the analysis results, use this information to properly identify entities.
+
+Remember: The goal is to improve SEO performance while maintaining the authentic voice and intent of the original content.
 
 Provide only the optimized version of the text, without any additional content, explanations, or references.`;
 };
