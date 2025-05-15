@@ -9,6 +9,7 @@ import KeywordStatusBadge from "./optimization/KeywordStatusBadge";
 import KeywordStatusLegend from "./optimization/KeywordStatusLegend";
 import OptimizationAlerts from "./optimization/OptimizationAlerts";
 import OptimizedTextDisplay from "./optimization/OptimizedTextDisplay";
+import CostSummary from "./optimization/CostSummary";
 import { useTextOptimization } from "../hooks/useTextOptimization";
 
 interface TextOptimizationPanelProps {
@@ -25,12 +26,19 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
   onOptimizedTextSelect
 }) => {
   const {
+    // Cost tracking
+    costTracker,
+    lastCostRecord,
+    
+    // API configuration
     apiKey,
     setApiKey,
     aiModel,
     setAiModel,
     aiProvider,
     setAiProvider,
+    
+    // Optimization states
     isOptimizing,
     optimizedText,
     keywordsToOptimize,
@@ -74,6 +82,13 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
       </CardHeader>
 
       <CardContent className="space-y-4">
+        {/* Cost Summary Card */}
+        <CostSummary 
+          costTracker={costTracker} 
+          activeProvider={aiProvider}
+          lastCostRecord={lastCostRecord}
+        />
+        
         {targetKeywords.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {targetKeywords.map((keyword, index) => (

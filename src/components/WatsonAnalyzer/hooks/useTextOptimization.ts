@@ -7,6 +7,7 @@ import {
   isPartialKeywordMatch,
   optimizeTextWithAI
 } from '../utils/optimizationUtils';
+import { useCostTracker } from './useCostTracker';
 
 // Define the keyword status type
 export type KeywordStatus = "missing" | "exact" | "partial" | "relevant";
@@ -21,6 +22,12 @@ interface UseTextOptimizationProps {
 }
 
 export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOptimizationProps) => {
+  // Cost tracker
+  const costTracker = useCostTracker();
+  
+  // Last optimization cost record
+  const [lastCostRecord, setLastCostRecord] = useState<any>(null);
+  
   // AI configuration
   const [apiKey, setApiKey] = useState(() => {
     return sessionStorage.getItem('ai_api_key') || "";
@@ -144,9 +151,16 @@ export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOp
       );
       
       setOptimizedText(optimizedContent);
+      
+      // Track the cost of this optimization
+      const costRecord = costTracker.trackOperation(aiModel, text, optimizedContent);
+      setLastCostRecord(costRecord);
+      
+      const remainingBudget = costTracker.remainingBudget[aiProvider];
+      
       toast({
         title: "Text optimized",
-        description: "The text has been optimized for your target keywords.",
+        description: `The text has been optimized for your target keywords. Cost: $${costRecord?.estimatedCost.toFixed(5) || '0.00'}, Remaining budget: $${remainingBudget.toFixed(2)}`,
       });
     } catch (error) {
       console.error("Error optimizing text:", error);
@@ -161,6 +175,10 @@ export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOp
   };
   
   return {
+    // Cost tracking
+    costTracker,
+    lastCostRecord,
+    
     // AI configuration
     apiKey,
     setApiKey: storeApiKey,
