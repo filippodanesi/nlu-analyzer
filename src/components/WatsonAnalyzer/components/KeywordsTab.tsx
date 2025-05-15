@@ -44,25 +44,47 @@ const KeywordsTab: React.FC<KeywordsTabProps> = ({
     );
   }
 
+  // Log the keywords and target keywords for debugging
+  console.log("Keywords from API:", keywords);
+  console.log("Target keywords:", targetKeywords);
+
   // Check the type of match with target keywords
   const checkKeywordMatch = (text: string) => {
     if (!targetKeywords.length) return "none";
     
+    // Convert text to lowercase for comparison
+    const lowerText = text.toLowerCase().trim();
+    console.log(`Checking keyword match for: "${lowerText}"`);
+    
     // Check for exact matches
     for (const keyword of targetKeywords) {
-      if (isExactKeywordMatch(text, keyword)) {
+      const lowerKeyword = keyword.toLowerCase().trim();
+      if (isExactKeywordMatch && isExactKeywordMatch(lowerText, lowerKeyword)) {
+        console.log(`✓ Exact match found for "${lowerText}" with "${lowerKeyword}"`);
         return "exact";
       }
     }
     
     // Check for partial matches
     for (const keyword of targetKeywords) {
-      if (isPartialKeywordMatch(text, keyword)) {
+      const lowerKeyword = keyword.toLowerCase().trim();
+      if (isPartialKeywordMatch && isPartialKeywordMatch(lowerText, lowerKeyword)) {
+        console.log(`~ Partial match found for "${lowerText}" with "${lowerKeyword}"`);
         return "partial";
       }
     }
     
-    // No match
+    // Double-check if there's any match using direct string includes
+    for (const keyword of targetKeywords) {
+      const lowerKeyword = keyword.toLowerCase().trim();
+      if (lowerText.includes(lowerKeyword)) {
+        console.log(`• Direct includes match for "${lowerText}" with "${lowerKeyword}"`);
+        // If we got here, one of our matcher functions might be failing
+        return "partial";
+      }
+    }
+    
+    console.log(`✗ No match for "${lowerText}"`);
     return "none";
   };
   

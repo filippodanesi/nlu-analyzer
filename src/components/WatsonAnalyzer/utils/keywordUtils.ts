@@ -16,7 +16,7 @@ export const isKeywordInTopPositions = (
   // Check if the keyword is among the top N positions
   const topKeywords = keywords.slice(0, topN);
   return topKeywords.some(kw => 
-    kw.text.toLowerCase().includes(targetKeyword.toLowerCase())
+    kw.text.toLowerCase().trim().includes(targetKeyword.toLowerCase().trim())
   );
 };
 
@@ -32,7 +32,11 @@ export const isExactKeywordMatch = (
   
   // Convert both to lowercase for case-insensitive comparison
   // and trim whitespace for more accurate matching
-  return text.toLowerCase().trim() === targetKeyword.toLowerCase().trim();
+  const lowerText = text.toLowerCase().trim();
+  const lowerKeyword = targetKeyword.toLowerCase().trim();
+  
+  console.log(`Exact match check: "${lowerText}" === "${lowerKeyword}" -> ${lowerText === lowerKeyword}`);
+  return lowerText === lowerKeyword;
 };
 
 /**
@@ -46,9 +50,11 @@ export const isPartialKeywordMatch = (
   if (!text || !targetKeyword) return false;
   
   // Convert both to lowercase for case-insensitive comparison
-  const textLower = text.toLowerCase().trim();
-  const keywordLower = targetKeyword.toLowerCase().trim();
+  const lowerText = text.toLowerCase().trim();
+  const lowerKeyword = targetKeyword.toLowerCase().trim();
   
   // Return true if the text includes the keyword but is not an exact match
-  return textLower.includes(keywordLower) && textLower !== keywordLower;
+  const isPartial = lowerText.includes(lowerKeyword) && lowerText !== lowerKeyword;
+  console.log(`Partial match check: "${lowerText}" includes "${lowerKeyword}" -> ${isPartial}`);
+  return isPartial;
 };
