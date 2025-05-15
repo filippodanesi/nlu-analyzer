@@ -13,7 +13,7 @@ import RelationsTab from './RelationsTab';
 import { 
   isExactKeywordMatch, 
   isPartialKeywordMatch 
-} from "../utils/optimizationUtils";
+} from "../utils/keywordUtils";
 
 interface ExtractionTabProps {
   results: any;

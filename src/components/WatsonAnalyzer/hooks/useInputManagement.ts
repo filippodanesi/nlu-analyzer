@@ -28,7 +28,7 @@ export const useInputManagement = () => {
     return stats;
   };
   
-  // Process target keywords into an array
+  // Process target keywords into an array with proper trimming
   const getTargetKeywordsList = () => {
     return targetKeywords
       .split(',')

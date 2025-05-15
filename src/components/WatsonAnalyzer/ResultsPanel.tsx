@@ -51,11 +51,16 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
 
   if (!results) return null;
 
-  // Function to check if a string contains any target keywords
+  // Enhanced function to check if a string contains any target keywords
   const containsTargetKeyword = (text: string) => {
-    if (!text || !targetKeywords.length) return false;
-    const lowerText = text.toLowerCase();
-    return targetKeywords.some(keyword => lowerText.includes(keyword.toLowerCase()));
+    if (!text || !targetKeywords || targetKeywords.length === 0) return false;
+    
+    const lowerText = text.toLowerCase().trim();
+    // Check if any of the target keywords are included in the text
+    return targetKeywords.some(keyword => {
+      const lowerKeyword = keyword.toLowerCase().trim();
+      return lowerText.includes(lowerKeyword);
+    });
   };
 
   // Check if classifications are available and language is supported

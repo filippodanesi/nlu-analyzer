@@ -22,6 +22,7 @@ export const isKeywordInTopPositions = (
 
 /**
  * Checks if there's an exact keyword match
+ * Fixed to properly handle case insensitivity
  */
 export const isExactKeywordMatch = (
   text: string,
@@ -29,12 +30,14 @@ export const isExactKeywordMatch = (
 ): boolean => {
   if (!text || !targetKeyword) return false;
   
-  // Convert both to lowercase and check for exact match
-  return text.toLowerCase() === targetKeyword.toLowerCase();
+  // Convert both to lowercase for case-insensitive comparison
+  // and trim whitespace for more accurate matching
+  return text.toLowerCase().trim() === targetKeyword.toLowerCase().trim();
 };
 
 /**
  * Checks if there's a partial keyword match
+ * Fixed to properly handle partial matching
  */
 export const isPartialKeywordMatch = (
   text: string,
@@ -42,7 +45,10 @@ export const isPartialKeywordMatch = (
 ): boolean => {
   if (!text || !targetKeyword) return false;
   
-  // Convert both to lowercase and check if the text includes the keyword
-  return text.toLowerCase().includes(targetKeyword.toLowerCase()) && 
-         text.toLowerCase() !== targetKeyword.toLowerCase();
+  // Convert both to lowercase for case-insensitive comparison
+  const textLower = text.toLowerCase().trim();
+  const keywordLower = targetKeyword.toLowerCase().trim();
+  
+  // Return true if the text includes the keyword but is not an exact match
+  return textLower.includes(keywordLower) && textLower !== keywordLower;
 };

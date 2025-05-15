@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { AlertCircle, Info } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Table,
@@ -30,8 +30,8 @@ const KeywordsTab: React.FC<KeywordsTabProps> = ({
   keywords, 
   containsTargetKeyword, 
   targetKeywords,
-  isExactKeywordMatch = (text, keyword) => text.toLowerCase() === keyword.toLowerCase(),
-  isPartialKeywordMatch = (text, keyword) => text.toLowerCase().includes(keyword.toLowerCase()) && text.toLowerCase() !== keyword.toLowerCase()
+  isExactKeywordMatch,
+  isPartialKeywordMatch
 }) => {
   if (!keywords || keywords.length === 0) {
     return (
@@ -46,6 +46,8 @@ const KeywordsTab: React.FC<KeywordsTabProps> = ({
 
   // Check the type of match with target keywords
   const checkKeywordMatch = (text: string) => {
+    if (!targetKeywords.length) return "none";
+    
     // Check for exact matches
     for (const keyword of targetKeywords) {
       if (isExactKeywordMatch(text, keyword)) {
