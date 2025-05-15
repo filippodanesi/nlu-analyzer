@@ -28,33 +28,47 @@ export const generateOptimizationPrompt = (
     analysisResults.categories.slice(0, 2).map((cat: any) => cat.label).join(', ') :
     'None detected';
   
-  return `Optimize this text for SEO while preserving its meaning and intent.
+  return `### TASK
+Optimize this text for SEO while preserving its meaning, intent, and paragraph structure.
 
-Original text:
+### ORIGINAL
 ${originalText}
 
-Target keywords to optimize for: ${keywordsString}
+### TARGET KEYWORDS
+${keywordsString}
 
-Watson NLU detected entities: ${entities}
-Watson NLU detected keywords: ${topKeywords}
-Watson NLU detected categories: ${categories}
+### WATSON CONTEXT
+- Entities: ${entities}
+- Top keywords: ${topKeywords}
+- Categories: ${categories}
 
-Instructions:
-1. Carefully identify distinct entities in the text, especially brand names, product names, and proper nouns.
-2. Treat the first word of sentences separately from any brand or entity names that follow it.
-3. For example, in "Experience Triumph's products", recognize that "Triumph" is the brand name, not "Experience Triumph".
-4. Similarly, in other contexts like "Buy Samsung phones", recognize "Samsung" as the entity, not "Buy Samsung".
-5. Strategically place the target keywords in high-impact positions (beginning of paragraphs, headings, and near the start and end of the content).
-6. Increase the density of target keywords while maintaining natural readability.
-7. Use target keywords verbatim when possible rather than just semantic variations.
-8. For partial matches in the original Watson analysis, convert them to exact matches where natural.
-9. Maintain paragraph structure and overall flow similar to the original.
-10. Don't artificially introduce new sections, headers, or formatting that wasn't in the original.
-11. Ensure the text sounds natural to human readers while incorporating the target keywords.
-12. Pay special attention to proper spacing between sentences and proper punctuation.
-13. If entity disambiguation is available in the analysis results, use this information to properly identify entities.
+### ENTITY TAXONOMY (closed set)
+Brand, ProductType, Material, Feature, Benefit
 
-Remember: The goal is to improve SEO performance while maintaining the authentic voice and intent of the original content.
+### KNOWLEDGE SNIPPETS
+Triumph = global lingerie brand (est. 1886) – NOT the Canadian band  
+"Experience <Brand>" → <Brand> is the entity, "Experience" is a verb/slogan.
 
-Provide only the optimized version of the text, without any additional content, explanations, or references.`;
+### FEW-SHOT EXAMPLES
+1. **Positive**  
+   Text: "Discover Calvin Klein bralettes in cotton."  
+   → Entities: Calvin Klein (Brand), bralettes (ProductType), cotton (Material)
+
+2. **Positive**  
+   Text: "Soft lace bralette by Intimissimi offers gentle support."  
+   → Entities: Intimissimi (Brand), lace bralette (ProductType+Material), gentle support (Benefit)
+
+3. **Negative**  
+   Text: "Wire your payment before Friday."  
+   → No Product-related entities
+
+### INSTRUCTIONS
+1. Identify entities using the taxonomy; ignore sentence-initial verbs.
+2. Favour multi-word keyphrases (2-5 tokens); exclude generics ('styles').
+3. Replace partial Watson matches with exact target keywords where natural.
+4. Place target keywords at paragraph starts/ends without adding new sections.
+5. Output **only** the optimized text – no JSON, no explanations.
+
+### REMEMBER
+Think step-by-step internally but do **not** reveal that reasoning.`;
 };
