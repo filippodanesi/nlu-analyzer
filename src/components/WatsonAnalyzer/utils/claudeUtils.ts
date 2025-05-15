@@ -130,6 +130,7 @@ Core rules:
         
         // Return the text if found, otherwise handle appropriately
         if (textContent && 'text' in textContent) {
+          console.log("Claude optimization successful, received text response:", textContent.text.substring(0, 100) + "...");
           return textContent.text.trim();
         } else {
           console.warn("No text content found in Claude response:", response);
@@ -166,3 +167,4 @@ Core rules:
     return getFallbackMessage(prompt, error instanceof Error ? error : new Error(String(error)));
   }
 };
+

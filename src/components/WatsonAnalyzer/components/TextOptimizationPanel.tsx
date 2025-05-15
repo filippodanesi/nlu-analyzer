@@ -41,12 +41,16 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
     // Optimization states
     isOptimizing,
     optimizedText,
+    optimizedResults,
     keywordsToOptimize,
     keywordsWithPartialMatch,
     needsOptimization,
     handleOptimize,
     checkKeywordStatus
   } = useTextOptimization({ text, results, targetKeywords });
+  
+  // Use optimizedResults if available, otherwise use original results
+  const resultsForKeywords = optimizedResults || results;
   
   const handleUseOptimized = () => {
     onOptimizedTextSelect(optimizedText);
@@ -95,7 +99,7 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
               <KeywordStatusBadge 
                 key={index} 
                 keyword={keyword} 
-                status={checkKeywordStatus(keyword)} 
+                status={checkKeywordStatus(keyword, resultsForKeywords)} 
               />
             ))}
           </div>
@@ -146,3 +150,4 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
 };
 
 export default TextOptimizationPanel;
+

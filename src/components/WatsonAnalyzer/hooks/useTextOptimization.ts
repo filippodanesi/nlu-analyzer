@@ -83,28 +83,49 @@ export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOp
   // Optimization state
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [optimizedText, setOptimizedText] = useState("");
+  // Add a state to store optimized results for keyword checking
+  const [optimizedResults, setOptimizedResults] = useState<any>(null);
   
   // Keywords statuses
-  const checkKeywordStatus = (keyword: string): KeywordStatus => {
-    if (!results || !results.keywords || !keyword) return "missing";
+  const checkKeywordStatus = (keyword: string, resultsToUse = results): KeywordStatus => {
+    if (!resultsToUse || !resultsToUse.keywords || !keyword) return "missing";
+    
+    // Log the results we're using to check keywords
+    console.log("Checking keyword status for:", keyword);
+    console.log("Using results:", resultsToUse.keywords ? 
+      `${resultsToUse.keywords.length} keywords found` : "No keywords in results");
     
     // Look for exact match
-    if (results.keywords.some((k: any) => isExactKeywordMatch(k.text, keyword))) {
+    if (resultsToUse.keywords.some((k: any) => isExactKeywordMatch(k.text, keyword))) {
       // Found an exact match in the keywords
+      console.log(`Found exact match for keyword "${keyword}"`);
       return "exact";
     }
     
     // Look for partial match
-    if (results.keywords.some((k: any) => isPartialKeywordMatch(k.text, keyword))) {
+    if (resultsToUse.keywords.some((k: any) => isPartialKeywordMatch(k.text, keyword))) {
       // Found a partial match in the keywords
+      console.log(`Found partial match for keyword "${keyword}"`);
+      return "partial";
+    }
+    
+    // Additional check - just look for the keyword as a substring (case insensitive)
+    const lowerKeyword = keyword.toLowerCase().trim();
+    if (resultsToUse.keywords.some((k: any) => 
+      k.text.toLowerCase().trim().includes(lowerKeyword) || 
+      lowerKeyword.includes(k.text.toLowerCase().trim())
+    )) {
+      console.log(`Found substring match for keyword "${keyword}"`);
       return "partial";
     }
     
     // Check if keyword is in relevant top positions
-    if (isKeywordInTopPositions(keyword, results.keywords, 10)) {
+    if (isKeywordInTopPositions(keyword, resultsToUse.keywords, 10)) {
+      console.log(`Found relevant match for keyword "${keyword}"`);
       return "relevant";
     }
     
+    console.log(`No match found for keyword "${keyword}"`);
     return "missing";
   };
   
@@ -119,6 +140,59 @@ export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOp
   
   // Check if we need optimization
   const needsOptimization = keywordsToOptimize.length > 0;
+  
+  // Mock analysis for optimized text to check keywords
+  const mockAnalysisForKeywords = (optimizedContent: string) => {
+    // Create a simple mock result with keywords from the text
+    // This helps us visually show the keywords in the optimized text
+    const mockResults = { ...results };
+    
+    // Extract all phrases from the optimized content
+    const words = optimizedContent.split(/\s+/);
+    const mockKeywords = [];
+
+    // Add target keywords that are exactly present in the optimized text
+    for (const keyword of targetKeywords) {
+      const lowerKeyword = keyword.toLowerCase().trim();
+      const lowerContent = optimizedContent.toLowerCase();
+      
+      if (lowerContent.includes(lowerKeyword)) {
+        mockKeywords.push({
+          text: keyword,
+          relevance: 0.95,
+          count: 1
+        });
+      }
+    }
+    
+    // Now add other potential keywords from the text
+    for (let i = 0; i < words.length; i++) {
+      // Create 1-3 word phrases
+      for (let j = 1; j <= 3; j++) {
+        if (i + j <= words.length) {
+          const phrase = words.slice(i, i + j).join(" ");
+          
+          // Skip very short phrases and those we already added
+          if (phrase.length < 3 || mockKeywords.some(k => k.text.toLowerCase() === phrase.toLowerCase())) {
+            continue;
+          }
+          
+          mockKeywords.push({
+            text: phrase,
+            relevance: 0.7 - (0.1 * j), // Longer phrases get slightly lower relevance
+            count: 1
+          });
+        }
+      }
+    }
+    
+    // Sort by relevance and take top 15
+    mockResults.keywords = mockKeywords
+      .sort((a, b) => b.relevance - a.relevance)
+      .slice(0, 15);
+    
+    return mockResults;
+  };
   
   // Handle optimize button click
   const handleOptimize = async () => {
@@ -166,6 +240,11 @@ export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOp
       );
       
       setOptimizedText(optimizedContent);
+      
+      // Create analysis results for the optimized text to check keywords
+      const mockResults = mockAnalysisForKeywords(optimizedContent);
+      setOptimizedResults(mockResults);
+      console.log("Created mock results for optimized text:", mockResults);
       
       // Track the cost of this optimization
       const costRecord = costTracker.trackOperation(aiModel, text, optimizedContent);
@@ -218,6 +297,7 @@ export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOp
     // Optimization state & actions
     isOptimizing,
     optimizedText,
+    optimizedResults,
     handleOptimize,
     
     // Keywords data
@@ -227,3 +307,4 @@ export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOp
     checkKeywordStatus
   };
 };
+
