@@ -120,8 +120,23 @@ Core rules:
         max_tokens: 2000
       });
 
-      // Return the generated text
-      return response.content[0].text.trim();
+      // Check if there's content in the response and handle different content types properly
+      if (response.content && response.content.length > 0) {
+        // Find the first text block in the content array
+        const textContent = response.content.find(block => 
+          'type' in block && block.type === 'text' && 'text' in block
+        );
+        
+        // Return the text if found, otherwise handle appropriately
+        if (textContent && 'text' in textContent) {
+          return textContent.text.trim();
+        } else {
+          console.warn("No text content found in Claude response:", response);
+          return "Claude responded with an unexpected format. Please try again.";
+        }
+      } else {
+        return "Claude returned an empty response. Please try again.";
+      }
     } catch (sdkError) {
       console.error("Anthropic SDK error:", sdkError);
       
