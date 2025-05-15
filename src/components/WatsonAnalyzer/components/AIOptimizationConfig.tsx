@@ -86,7 +86,7 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
               <div className="space-y-2">
                 <Label htmlFor="ai-model-openai">AI Model</Label>
                 <Select 
-                  value={aiModel.startsWith("gpt") ? aiModel : "gpt-4o-mini"} 
+                  value={aiModel.startsWith("gpt") || aiModel.startsWith("o4") ? aiModel : "gpt-4o-mini"} 
                   onValueChange={setAiModel}
                 >
                   <SelectTrigger>
@@ -95,6 +95,7 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
                   <SelectContent>
                     <SelectItem value="gpt-4o-mini">OpenAI GPT-4o-mini</SelectItem>
                     <SelectItem value="gpt-4o">OpenAI GPT-4o</SelectItem>
+                    <SelectItem value="o4-mini-2025-04-16">OpenAI o4-mini</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
