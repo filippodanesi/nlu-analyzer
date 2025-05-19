@@ -1,4 +1,3 @@
-
 /**
  * Utility functions for OpenAI API integration
  */
@@ -13,7 +12,6 @@ export const optimizeWithOpenAI = async (
 ): Promise<string> => {
   // Enhanced unified system prompt for better entity handling
   const systemPrompt = `You are an expert SEO content optimizer with deep expertise in NER.
-
 Core rules:
 • Use the ENTITY TAXONOMY provided in the user prompt (Brand, ProductType, Material, Feature, Benefit).  
 • Never merge a sentence-initial verb with a brand name.  
@@ -25,12 +23,12 @@ Core rules:
 
   // Log the model being used to debug o4-mini issues
   console.log(`Using OpenAI model: ${model}`);
-
-  // Determine if using o4 models which require different parameter names
-  const isO4Model = model.includes('o4-mini');
-
+  
+  // Determine if using newer models that require max_completion_tokens
+  const isNewModel = model.includes('o1') || model.includes('o4');
+  
   // Configure API request body based on model type
-  const requestBody = isO4Model ? {
+  const requestBody = {
     model: model,
     messages: [
       {
@@ -42,21 +40,13 @@ Core rules:
         content: prompt
       }
     ],
-    max_completion_tokens: 4000 // Use max_completion_tokens for o4-mini model
-  } : {
-    model: model,
-    messages: [
-      {
-        role: "system",
-        content: systemPrompt
-      },
-      {
-        role: "user",
-        content: prompt
-      }
-    ],
-    temperature: 0.7,
-    max_tokens: 4000 // Use max_tokens for other models
+    // Newer models (o1/o4) use max_completion_tokens and don't support temperature
+    ...(isNewModel ? { 
+      max_completion_tokens: 4000
+    } : { 
+      temperature: 0.7,
+      max_tokens: 4000 
+    })
   };
 
   console.log("OpenAI API request body:", JSON.stringify(requestBody, null, 2));
