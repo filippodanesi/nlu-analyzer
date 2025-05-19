@@ -26,11 +26,11 @@ Core rules:
   // Log the model being used to debug o4-mini issues
   console.log(`Using OpenAI model: ${model}`);
 
-  // Determine if using o4 models which require different parameter names and restrictions
-  const isO4Model = model.includes('o4');
+  // Determine if using o4 models which require different parameter names
+  const isO4Model = model.includes('o4-mini');
 
   // Configure API request body based on model type
-  const requestBody = {
+  const requestBody = isO4Model ? {
     model: model,
     messages: [
       {
@@ -42,13 +42,21 @@ Core rules:
         content: prompt
       }
     ],
-    // o4 models only support default temperature and use max_completion_tokens instead of max_tokens
-    ...(isO4Model ? { 
-      max_tokens: 4000 // Use max_tokens for all models for simplicity and reliability
-    } : { 
-      temperature: 0.7,
-      max_tokens: 4000 
-    })
+    max_completion_tokens: 4000 // Use max_completion_tokens for o4-mini model
+  } : {
+    model: model,
+    messages: [
+      {
+        role: "system",
+        content: systemPrompt
+      },
+      {
+        role: "user",
+        content: prompt
+      }
+    ],
+    temperature: 0.7,
+    max_tokens: 4000 // Use max_tokens for other models
   };
 
   console.log("OpenAI API request body:", JSON.stringify(requestBody, null, 2));

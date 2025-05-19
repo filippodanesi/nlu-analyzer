@@ -106,8 +106,8 @@ export const useOptimizationProcess = ({ text, results, targetKeywords, apiKey, 
         errorMessage = "Authentication failed. Please check your API key in the AI Configuration.";
       } else if (errorMessage.includes("CORS")) {
         errorMessage = "CORS error detected. Try using a different CORS proxy in settings or switch to OpenAI.";
-      } else if (errorMessage.includes("o4")) {
-        errorMessage = "Error with o4 model. Try switching to a different model like gpt-3.5-turbo.";
+      } else if (errorMessage.includes("o4") || errorMessage.includes("max_tokens") || errorMessage.includes("max_completion_tokens")) {
+        errorMessage = "Error with o4 model. This may be due to parameter incompatibilities. Try switching to a different model like gpt-4o.";
       }
       
       toast({
