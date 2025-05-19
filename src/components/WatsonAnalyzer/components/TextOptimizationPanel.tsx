@@ -105,7 +105,7 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
               <KeywordStatusBadge 
                 key={index} 
                 keyword={keyword} 
-                status={checkKeywordStatus(keyword, resultsForKeywords)} 
+                status={checkKeywordStatus(keyword)} 
               />
             ))}
           </div>
