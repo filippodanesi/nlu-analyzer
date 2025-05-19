@@ -2,6 +2,8 @@
 import React from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { InfoIcon } from "lucide-react";
 
 interface OptimizedTextDisplayProps {
   originalText: string;
@@ -12,10 +14,11 @@ interface OptimizedTextDisplayProps {
  * Displays the original and optimized text in a tabbed interface
  */
 const OptimizedTextDisplay: React.FC<OptimizedTextDisplayProps> = ({ originalText, optimizedText }) => {
-  if (!optimizedText) return null;
+  // Return null only if both texts are empty or undefined
+  if (!originalText && !optimizedText) return null;
   
   return (
-    <Tabs defaultValue="original">
+    <Tabs defaultValue={optimizedText ? "optimized" : "original"}>
       <TabsList className="grid grid-cols-2 mb-2">
         <TabsTrigger value="original">Original Text</TabsTrigger>
         <TabsTrigger value="optimized">Optimized Text</TabsTrigger>
@@ -23,16 +26,25 @@ const OptimizedTextDisplay: React.FC<OptimizedTextDisplayProps> = ({ originalTex
       <TabsContent value="original">
         <Textarea 
           readOnly
-          value={originalText}
+          value={originalText || ""}
           className="min-h-[200px] font-mono text-sm"
         />
       </TabsContent>
       <TabsContent value="optimized">
-        <Textarea 
-          readOnly
-          value={optimizedText}
-          className="min-h-[200px] font-mono text-sm"
-        />
+        {optimizedText ? (
+          <Textarea 
+            readOnly
+            value={optimizedText}
+            className="min-h-[200px] font-mono text-sm"
+          />
+        ) : (
+          <Alert>
+            <InfoIcon className="h-4 w-4" />
+            <AlertDescription>
+              No optimized text available yet. Click the "Optimize Text" button to generate optimized content.
+            </AlertDescription>
+          </Alert>
+        )}
       </TabsContent>
     </Tabs>
   );

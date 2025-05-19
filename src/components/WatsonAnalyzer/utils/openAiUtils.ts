@@ -27,7 +27,7 @@ Core rules:
   console.log(`Using OpenAI model: ${model}`);
 
   // Determine if using o4 models which require different parameter names and restrictions
-  const isO4Model = model.includes('o4-');
+  const isO4Model = model.includes('o4');
 
   // Configure API request body based on model type
   const requestBody = {
@@ -44,33 +44,45 @@ Core rules:
     ],
     // o4 models only support default temperature and use max_completion_tokens instead of max_tokens
     ...(isO4Model ? { 
-      max_completion_tokens: 2000 
+      max_tokens: 4000 // Use max_tokens for all models for simplicity and reliability
     } : { 
       temperature: 0.7,
-      max_tokens: 2000 
+      max_tokens: 4000 
     })
   };
 
   console.log("OpenAI API request body:", JSON.stringify(requestBody, null, 2));
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${apiKey}`
-    },
-    body: JSON.stringify(requestBody)
-  });
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+      },
+      body: JSON.stringify(requestBody)
+    });
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => null);
-    console.error("OpenAI API error:", errorData || response.statusText);
-    throw new Error(
-      errorData?.error?.message || `OpenAI API error: ${response.status} ${response.statusText}`
-    );
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      console.error("OpenAI API error:", errorData || response.statusText);
+      throw new Error(
+        errorData?.error?.message || `OpenAI API error: ${response.status} ${response.statusText}`
+      );
+    }
+
+    const data = await response.json();
+    console.log("OpenAI API response:", JSON.stringify(data, null, 2));
+    
+    // Safely extract the content from the response
+    if (!data.choices || !data.choices[0] || !data.choices[0].message || !data.choices[0].message.content) {
+      console.error("Unexpected API response format:", data);
+      throw new Error("Invalid response format from OpenAI API");
+    }
+    
+    return data.choices[0].message.content;
+  } catch (error) {
+    console.error("OpenAI API call failed:", error);
+    throw error;
   }
-
-  const data = await response.json();
-  console.log("OpenAI API response:", JSON.stringify(data, null, 2));
-  return data.choices[0].message.content;
 };

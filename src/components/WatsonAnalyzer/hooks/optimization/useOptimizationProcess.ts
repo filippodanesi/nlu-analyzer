@@ -62,6 +62,7 @@ export const useOptimizationProcess = ({ text, results, targetKeywords, apiKey, 
     
     setIsOptimizing(true);
     try {
+      console.log(`Starting optimization with ${aiProvider} model: ${aiModel}`);
       const optimizedContent = await optimizeTextWithAI(
         text,
         targetKeywords,
@@ -69,6 +70,13 @@ export const useOptimizationProcess = ({ text, results, targetKeywords, apiKey, 
         apiKey,
         aiModel
       );
+      
+      console.log("Optimization successful, result length:", optimizedContent?.length || 0);
+      
+      // Verify we have content before setting state
+      if (!optimizedContent || optimizedContent.trim() === "") {
+        throw new Error("The AI returned an empty response. Please try again or try a different model.");
+      }
       
       setOptimizedText(optimizedContent);
       
@@ -98,6 +106,8 @@ export const useOptimizationProcess = ({ text, results, targetKeywords, apiKey, 
         errorMessage = "Authentication failed. Please check your API key in the AI Configuration.";
       } else if (errorMessage.includes("CORS")) {
         errorMessage = "CORS error detected. Try using a different CORS proxy in settings or switch to OpenAI.";
+      } else if (errorMessage.includes("o4")) {
+        errorMessage = "Error with o4 model. Try switching to a different model like gpt-3.5-turbo.";
       }
       
       toast({
@@ -105,6 +115,10 @@ export const useOptimizationProcess = ({ text, results, targetKeywords, apiKey, 
         description: errorMessage,
         variant: "destructive",
       });
+      
+      // Clear optimization state on error
+      setOptimizedText("");
+      setOptimizedResults(null);
     } finally {
       setIsOptimizing(false);
     }
