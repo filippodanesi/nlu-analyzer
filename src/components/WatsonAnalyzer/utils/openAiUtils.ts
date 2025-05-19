@@ -23,8 +23,11 @@ Core rules:
 • Insert target keywords verbatim in high-impact positions while keeping the text natural.  
 • After internal reasoning, output **only** the optimized text with correct spacing and punctuation – no JSON, no explanations, no markup.`;
 
+  // Log the model being used to debug o4-mini issues
+  console.log(`Using OpenAI model: ${model}`);
+
   // Determine if using o4 models which require different parameter names and restrictions
-  const isO4Model = model.startsWith('o4-');
+  const isO4Model = model.includes('o4-');
 
   // Configure API request body based on model type
   const requestBody = {
@@ -48,6 +51,8 @@ Core rules:
     })
   };
 
+  console.log("OpenAI API request body:", JSON.stringify(requestBody, null, 2));
+
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -66,5 +71,6 @@ Core rules:
   }
 
   const data = await response.json();
+  console.log("OpenAI API response:", JSON.stringify(data, null, 2));
   return data.choices[0].message.content;
 };

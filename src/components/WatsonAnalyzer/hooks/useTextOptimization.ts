@@ -33,6 +33,14 @@ export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOp
     return sessionStorage.getItem('ai_api_key') || "";
   });
   
+  const [openAIKey, setOpenAIKey] = useState(() => {
+    return sessionStorage.getItem('openai_api_key') || "";
+  });
+  
+  const [anthropicKey, setAnthropicKey] = useState(() => {
+    return sessionStorage.getItem('anthropic_api_key') || "";
+  });
+  
   const [aiModel, setAiModel] = useState(() => {
     const savedModel = sessionStorage.getItem('ai_model') || "gpt-4o-mini";
     // Ensure we use the preferred Claude model
@@ -46,6 +54,15 @@ export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOp
     const savedModel = sessionStorage.getItem('ai_model') || "gpt-4o-mini";
     return savedModel.startsWith("claude") ? "anthropic" : "openai";
   });
+
+  // Effect to manage provider-specific API keys
+  useEffect(() => {
+    if (aiProvider === "openai") {
+      setApiKey(openAIKey);
+    } else {
+      setApiKey(anthropicKey);
+    }
+  }, [aiProvider, openAIKey, anthropicKey]);
 
   // CORS proxy configuration
   const [corsProxyUrl, setCorsProxyUrl] = useState(() => {
@@ -65,7 +82,16 @@ export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOp
 
   // Save to sessionStorage when values change
   const storeApiKey = (key: string) => {
-    if (key) sessionStorage.setItem('ai_api_key', key);
+    if (key) {
+      if (aiProvider === "openai") {
+        sessionStorage.setItem('openai_api_key', key);
+        setOpenAIKey(key);
+      } else {
+        sessionStorage.setItem('anthropic_api_key', key);
+        setAnthropicKey(key);
+      }
+      sessionStorage.setItem('ai_api_key', key);
+    }
     setApiKey(key);
   };
 
@@ -73,10 +99,14 @@ export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOp
     if (model) sessionStorage.setItem('ai_model', model);
     setAiModel(model);
     // Update provider based on model
-    if (model.startsWith("claude")) {
-      setAiProvider("anthropic");
+    const newProvider = model.startsWith("claude") ? "anthropic" : "openai";
+    setAiProvider(newProvider);
+    
+    // Switch to the appropriate API key for the selected provider
+    if (newProvider === "openai") {
+      setApiKey(openAIKey);
     } else {
-      setAiProvider("openai");
+      setApiKey(anthropicKey);
     }
   };
   
@@ -151,17 +181,35 @@ export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOp
     const words = optimizedContent.split(/\s+/);
     const mockKeywords = [];
 
-    // Add target keywords that are exactly present in the optimized text
+    // Process target keywords first to ensure they're included with high relevance
     for (const keyword of targetKeywords) {
       const lowerKeyword = keyword.toLowerCase().trim();
       const lowerContent = optimizedContent.toLowerCase();
       
-      if (lowerContent.includes(lowerKeyword)) {
+      // Check for exact matches
+      let exactMatch = false;
+      // This regex checks for word boundaries or start/end of string
+      const exactRegex = new RegExp(`(^|\\s|[,.;!?])${lowerKeyword}($|\\s|[,.;!?])`, 'i');
+      exactMatch = exactRegex.test(lowerContent);
+      
+      if (exactMatch) {
+        // Found an exact match
         mockKeywords.push({
           text: keyword,
           relevance: 0.95,
           count: 1
         });
+        console.log(`Mock analysis: Exact match for "${keyword}"`);
+      } else if (lowerContent.includes(lowerKeyword)) {
+        // Found a partial match
+        mockKeywords.push({
+          text: keyword + " (partial)",  // Mark as partial
+          relevance: 0.8,
+          count: 1
+        });
+        console.log(`Mock analysis: Partial match for "${keyword}"`);
+      } else {
+        console.log(`Mock analysis: No match for "${keyword}"`);
       }
     }
     
@@ -294,6 +342,10 @@ export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOp
     corsProxyUrl,
     setCorsProxyUrl,
     
+    // Provider-specific keys
+    openAIKey,
+    anthropicKey,
+    
     // Optimization state & actions
     isOptimizing,
     optimizedText,
@@ -307,4 +359,3 @@ export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOp
     checkKeywordStatus
   };
 };
-

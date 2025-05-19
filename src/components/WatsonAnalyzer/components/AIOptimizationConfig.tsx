@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,6 +24,8 @@ interface AIOptimizationConfigProps {
   setAiModel: (model: string) => void;
   aiProvider?: AIProvider;
   setAiProvider?: (provider: AIProvider) => void;
+  openAIKey?: string;
+  anthropicKey?: string;
 }
 
 const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
@@ -32,14 +34,30 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
   aiModel,
   setAiModel,
   aiProvider = "openai",
-  setAiProvider
+  setAiProvider,
+  openAIKey = "",
+  anthropicKey = ""
 }) => {
-  const [tempApiKey, setTempApiKey] = useState(apiKey);
   const [isOpen, setIsOpen] = useState(false);
   const [activeProvider, setActiveProvider] = useState<AIProvider>(aiProvider);
+  
+  // Initialize with provider-specific keys when available
+  const [tempOpenAIKey, setTempOpenAIKey] = useState(openAIKey || (aiProvider === "openai" ? apiKey : ""));
+  const [tempAnthropicKey, setTempAnthropicKey] = useState(anthropicKey || (aiProvider === "anthropic" ? apiKey : ""));
+
+  // Update temp keys when the props change
+  useEffect(() => {
+    if (openAIKey) setTempOpenAIKey(openAIKey);
+    if (anthropicKey) setTempAnthropicKey(anthropicKey);
+  }, [openAIKey, anthropicKey]);
 
   const handleSave = () => {
-    setApiKey(tempApiKey);
+    // Save the current provider's API key
+    if (activeProvider === "openai") {
+      setApiKey(tempOpenAIKey);
+    } else {
+      setApiKey(tempAnthropicKey);
+    }
     setIsOpen(false);
   };
 
@@ -71,7 +89,8 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
     return null;
   };
 
-  const apiKeyWarning = validateApiKey(tempApiKey, activeProvider);
+  const openAIKeyWarning = validateApiKey(tempOpenAIKey, "openai");
+  const anthropicKeyWarning = validateApiKey(tempAnthropicKey, "anthropic");
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -124,12 +143,12 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
                   id="api-key-openai"
                   type="password"
                   placeholder="Enter your OpenAI API key (starts with sk-)"
-                  value={activeProvider === "openai" ? tempApiKey : ""}
-                  onChange={(e) => setTempApiKey(e.target.value)}
+                  value={tempOpenAIKey}
+                  onChange={(e) => setTempOpenAIKey(e.target.value)}
                   className="font-mono"
                 />
-                {activeProvider === "openai" && apiKeyWarning && (
-                  <p className="text-xs text-amber-600 mt-1">{apiKeyWarning}</p>
+                {openAIKeyWarning && (
+                  <p className="text-xs text-amber-600 mt-1">{openAIKeyWarning}</p>
                 )}
               </div>
             </TabsContent>
@@ -163,23 +182,21 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
                   id="api-key-claude"
                   type="password"
                   placeholder="Enter your Anthropic API key (starts with sk-ant-)"
-                  value={activeProvider === "anthropic" ? tempApiKey : ""}
-                  onChange={(e) => setTempApiKey(e.target.value)}
+                  value={tempAnthropicKey}
+                  onChange={(e) => setTempAnthropicKey(e.target.value)}
                   className="font-mono"
                 />
-                {activeProvider === "anthropic" && apiKeyWarning && (
-                  <p className="text-xs text-amber-600 mt-1">{apiKeyWarning}</p>
+                {anthropicKeyWarning && (
+                  <p className="text-xs text-amber-600 mt-1">{anthropicKeyWarning}</p>
                 )}
               </div>
               
-              {activeProvider === "anthropic" && (
-                <Alert variant="warning" className="bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>
-                    Claude API keys typically start with <code className="bg-amber-100 dark:bg-amber-900 px-1 py-0.5 rounded">sk-ant-</code>
-                  </AlertDescription>
-                </Alert>
-              )}
+              <Alert variant="warning" className="bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  Claude API keys typically start with <code className="bg-amber-100 dark:bg-amber-900 px-1 py-0.5 rounded">sk-ant-</code>
+                </AlertDescription>
+              </Alert>
             </TabsContent>
           </Tabs>
 

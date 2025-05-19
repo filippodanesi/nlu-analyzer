@@ -38,6 +38,10 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
     aiProvider,
     setAiProvider,
     
+    // Provider-specific API keys
+    openAIKey,
+    anthropicKey,
+    
     // Optimization states
     isOptimizing,
     optimizedText,
@@ -81,6 +85,8 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
             setAiModel={setAiModel}
             aiProvider={aiProvider}
             setAiProvider={setAiProvider}
+            openAIKey={openAIKey}
+            anthropicKey={anthropicKey}
           />
         </div>
       </CardHeader>
@@ -150,4 +156,3 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
 };
 
 export default TextOptimizationPanel;
-
