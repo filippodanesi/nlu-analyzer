@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { toast } from "@/components/ui/use-toast";
 import { TextStats } from './useInputManagement';
 import { WatsonFeatures, WatsonLimits, TONE_SUPPORTED_LANGUAGES } from './useAnalysisFeatures';
+import { analyzeTextWithGoogleNLP, mapWatsonToGoogleFeatures } from '../utils/googleNlpUtils';
+import type { AnalysisProvider } from './useAnalysisProvider';
 
 interface AnalysisExecutionProps {
   text: string;
@@ -14,6 +16,10 @@ interface AnalysisExecutionProps {
   getCurrentUrl: () => string;
   getAuthType: () => string;
   updateTextStats: (text: string) => TextStats;
+  // New prop for provider
+  provider: AnalysisProvider;
+  // Google specific props
+  getGoogleApiKey?: () => string;
 }
 
 export const useAnalysisExecution = ({
@@ -25,7 +31,9 @@ export const useAnalysisExecution = ({
   getCurrentApiKey,
   getCurrentUrl,
   getAuthType,
-  updateTextStats
+  updateTextStats,
+  provider,
+  getGoogleApiKey
 }: AnalysisExecutionProps) => {
   // Analysis state
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -47,43 +55,29 @@ export const useAnalysisExecution = ({
     }
   }, [features, lastAnalyzedFeatures, results]);
 
-  const handleAnalyze = async () => {
-    if (!text) {
-      toast({
-        title: "No text provided",
-        description: "Please enter text to analyze.",
-        variant: "destructive",
-      });
-      return;
-    }
-
+  // Function to analyze text with Watson NLU API
+  const analyzeWithWatson = async () => {
     // Get current credentials
     const currentApiKey = getCurrentApiKey();
     const currentUrl = getCurrentUrl();
 
     if (!currentApiKey) {
       toast({
-        title: "API Key required",
-        description: "Please enter your IBM Watson NLU API key or enable secrets.",
+        title: "API Key richiesta",
+        description: "Inserisci la tua IBM Watson NLU API key o abilita i secrets.",
         variant: "destructive",
       });
-      return;
+      return null;
     }
 
     if (!currentUrl) {
       toast({
-        title: "URL required",
-        description: "Please provide a valid URL for the IBM Watson NLU service.",
+        title: "URL richiesto",
+        description: "Fornisci un URL valido per il servizio IBM Watson NLU.",
         variant: "destructive",
       });
-      return;
+      return null;
     }
-
-    // Start analysis
-    setIsAnalyzing(true);
-
-    // Calculate text statistics
-    const stats = updateTextStats(text);
 
     // Prepare parameters for API request
     const featuresParams: any = {};
@@ -152,21 +146,93 @@ export const useAnalysisExecution = ({
         throw new Error(errorData.error || 'API request failed');
       }
 
-      const data = await response.json();
+      return await response.json();
+    } catch (error) {
+      console.error('Error analyzing text with Watson:', error);
+      throw error;
+    }
+  };
+
+  // Function to analyze text with Google NLP API
+  const analyzeWithGoogle = async () => {
+    if (!getGoogleApiKey) {
+      toast({
+        title: "Configurazione mancante",
+        description: "La funzione getGoogleApiKey non è stata fornita.",
+        variant: "destructive",
+      });
+      return null;
+    }
+
+    const googleApiKey = getGoogleApiKey();
+    
+    if (!googleApiKey) {
+      toast({
+        title: "API Key richiesta",
+        description: "Inserisci la tua Google Cloud NLP API key.",
+        variant: "destructive",
+      });
+      return null;
+    }
+
+    try {
+      // Map Watson features to Google NLP features
+      const googleFeatures = mapWatsonToGoogleFeatures(features);
+      
+      // Call Google NLP API
+      return await analyzeTextWithGoogleNLP(text, googleApiKey, googleFeatures);
+    } catch (error) {
+      console.error('Error analyzing text with Google NLP:', error);
+      throw error;
+    }
+  };
+
+  const handleAnalyze = async () => {
+    if (!text) {
+      toast({
+        title: "Nessun testo fornito",
+        description: "Inserisci il testo da analizzare.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Start analysis
+    setIsAnalyzing(true);
+
+    // Calculate text statistics
+    const stats = updateTextStats(text);
+
+    try {
+      let data;
+      
+      // Choose the appropriate analysis method based on the provider
+      if (provider === "watson") {
+        data = await analyzeWithWatson();
+      } else if (provider === "google") {
+        data = await analyzeWithGoogle();
+      } else {
+        throw new Error(`Provider non supportato: ${provider}`);
+      }
+
+      if (!data) {
+        throw new Error("Nessun dato ricevuto dall'API");
+      }
+
       setResults(data);
       
       // Save the features used for this analysis to track changes
       setLastAnalyzedFeatures({...features});
       
       toast({
-        title: "Analysis completed",
-        description: "The text was successfully analyzed.",
+        title: "Analisi completata",
+        description: "Il testo è stato analizzato con successo.",
       });
     } catch (error) {
       console.error('Error analyzing text:', error);
       toast({
-        title: "Analysis failed",
-        description: error instanceof Error ? error.message : "An error occurred during analysis.",
+        title: "Analisi fallita",
+        description: error instanceof Error ? error.message : "Si è verificato un errore durante l'analisi.",
         variant: "destructive",
       });
     } finally {

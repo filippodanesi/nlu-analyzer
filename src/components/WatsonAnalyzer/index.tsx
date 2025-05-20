@@ -55,6 +55,14 @@ const WatsonAnalyzer: React.FC = () => {
     results,
     textStats,
     
+    // Provider
+    provider,
+    setProvider,
+    
+    // Google NLP
+    googleApiKey,
+    setGoogleApiKey,
+    
     // Actions
     handleAnalyze,
     getTargetKeywordsList,
@@ -90,7 +98,7 @@ const WatsonAnalyzer: React.FC = () => {
             to="/changelog" 
             className="text-sm text-primary hover:text-primary/80 underline underline-offset-4"
           >
-            Changelog v1.1.6
+            Changelog v1.1.7
           </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -114,6 +122,10 @@ const WatsonAnalyzer: React.FC = () => {
               setToneModel={setToneModel}
               credentialsFileExists={credentialsFileExists}
               setCredentialsFileExists={setCredentialsFileExists}
+              provider={provider}
+              setProvider={setProvider}
+              googleApiKey={googleApiKey}
+              setGoogleApiKey={setGoogleApiKey}
             />
           </div>
 
@@ -136,6 +148,7 @@ const WatsonAnalyzer: React.FC = () => {
                   results={results} 
                   targetKeywords={targetKeywordsList}
                   textStats={textStats}
+                  provider={provider}
                 />
 
                 <TextOptimizationPanel

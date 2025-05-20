@@ -1,18 +1,33 @@
-
 import React from 'react';
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { Button } from "@/components/ui/button";
+import { ChevronDown } from "lucide-react";
+
+// Import custom components
 import { ApiKeySection } from './components/config/ApiKeySection';
-import { AnalysisFeaturesSection } from './components/config/AnalysisFeaturesSection';
-import { LanguageSection } from './components/config/LanguageSection';
+import { FeaturesSection } from './components/config/FeaturesSection';
 import { LimitsSection } from './components/config/LimitsSection';
+import { LanguageSection } from './components/config/LanguageSection';
+import { ToneModelSection } from './components/config/ToneModelSection';
 import { QuickCredentialsInput } from './components/config/QuickCredentialsInput';
-import { SessionStorageControls } from './components/config/SessionStorageControls';
+
+import ProviderSelector from "./components/config/ProviderSelector";
+import GoogleNlpConfig from "./components/config/GoogleNlpConfig";
+import { useAnalysisProvider } from "./hooks/useAnalysisProvider";
+import { useGoogleNlpConfig } from "./hooks/useGoogleNlpConfig";
 
 interface ApiConfigPanelProps {
   apiKey: string;
@@ -23,30 +38,23 @@ interface ApiConfigPanelProps {
   setRegion: (region: string) => void;
   instanceId: string;
   setInstanceId: (id: string) => void;
-  features: {
-    keywords: boolean;
-    entities: boolean;
-    concepts: boolean;
-    categories: boolean;
-    classifications: boolean;
-  };
+  features: any;
   setFeatures: (features: any) => void;
-  limits: {
-    keywords: number;
-    entities: number;
-    concepts: number;
-    categories: number;
-  };
+  limits: any;
   setLimits: (limits: any) => void;
   language: string;
-  setLanguage: (lang: string) => void;
+  setLanguage: (language: string) => void;
   toneModel: string;
-  setToneModel: (model: string) => void;
-  credentialsFileExists?: boolean;
-  setCredentialsFileExists?: (exists: boolean) => void;
+  setToneModel: (toneModel: string) => void;
+  credentialsFileExists: boolean;
+  setCredentialsFileExists: (exists: boolean) => void;
+  provider: any;
+  setProvider: (provider: any) => void;
+  googleApiKey: string;
+  setGoogleApiKey: (key: string) => void;
 }
 
-const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
+const ApiConfigPanel = ({
   apiKey,
   setApiKey,
   url,
@@ -63,74 +71,192 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
   setLanguage,
   toneModel,
   setToneModel,
-  credentialsFileExists = false,
-  setCredentialsFileExists
+  credentialsFileExists,
+  setCredentialsFileExists,
+  provider,
+  setProvider,
+  googleApiKey,
+  setGoogleApiKey
 }) => {
-  const handleFeatureChange = (feature: string, value: boolean) => {
-    setFeatures({ ...features, [feature]: value });
-  };
-  
-  const handleLimitChange = (feature: string, value: number) => {
-    setLimits({ ...limits, [feature]: value });
-  };
+  const {
+    isWatson,
+    isGoogle
+  } = useAnalysisProvider();
+
+  // Google NLP configuration
+  const googleConfig = useGoogleNlpConfig();
 
   return (
-    <Card className="w-full bg-background border-border">
+    <Card className="bg-background border-border">
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-medium">
-          API Configuration
-        </CardTitle>
+        <CardTitle className="text-lg font-semibold">Configurazione API</CardTitle>
+        <CardDescription>
+          Configura le API per l'analisi del linguaggio naturale
+        </CardDescription>
       </CardHeader>
+
       <CardContent className="space-y-4">
-        <QuickCredentialsInput
-          setApiKey={setApiKey}
-          setUrl={setUrl}
-          setRegion={setRegion}
-          setInstanceId={setInstanceId}
-          credentialsFileExists={credentialsFileExists}
-          setCredentialsFileExists={setCredentialsFileExists}
+        {/* Provider selector */}
+        <ProviderSelector 
+          provider={provider}
+          setProvider={setProvider}
         />
-
+        
         <Separator />
+        
+        {/* IBM Watson configuration */}
+        {isWatson && (
+          <Collapsible defaultOpen>
+            <CollapsibleTrigger asChild>
+              <div className="flex justify-between items-center py-2 cursor-pointer">
+                <h3 className="text-sm font-medium">IBM Watson NLU</h3>
+                <Button variant="ghost" size="sm" className="p-0 h-7 w-7">
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="pt-2 pb-4">
+                <ApiKeySection
+                  apiKey={apiKey}
+                  setApiKey={setApiKey}
+                  region={region}
+                  setRegion={setRegion}
+                  url={url}
+                  setUrl={setUrl}
+                  instanceId={instanceId}
+                  setInstanceId={setInstanceId}
+                />
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        )}
 
-        <ApiKeySection 
-          apiKey={apiKey}
-          setApiKey={setApiKey}
-          region={region}
-          setRegion={setRegion}
-          url={url}
-          setUrl={setUrl}
-          instanceId={instanceId}
-          setInstanceId={setInstanceId}
-        />
+        {/* Google NLP configuration */}
+        {isGoogle && (
+          <Collapsible defaultOpen>
+            <CollapsibleTrigger asChild>
+              <div className="flex justify-between items-center py-2 cursor-pointer">
+                <h3 className="text-sm font-medium">Google Cloud NLP</h3>
+                <Button variant="ghost" size="sm" className="p-0 h-7 w-7">
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="pt-2 pb-4">
+                <GoogleNlpConfig
+                  apiKey={googleConfig.apiKey}
+                  setApiKey={googleConfig.setApiKey}
+                />
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        )}
 
-        <SessionStorageControls
-          apiKey={apiKey}
-          url={url}
-          region={region}
-          instanceId={instanceId}
-        />
+        {/* Analysis Features Section */}
+        <Collapsible defaultOpen>
+          <CollapsibleTrigger asChild>
+            <div className="flex justify-between items-center py-2 cursor-pointer">
+              <h3 className="text-sm font-medium">Funzionalità di Analisi</h3>
+              <Button variant="ghost" size="sm" className="p-0 h-7 w-7">
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="pt-2 pb-4">
+              <FeaturesSection
+                features={features}
+                setFeatures={setFeatures}
+              />
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
 
-        <Separator />
+        {/* Limits Section */}
+        <Collapsible defaultOpen>
+          <CollapsibleTrigger asChild>
+            <div className="flex justify-between items-center py-2 cursor-pointer">
+              <h3 className="text-sm font-medium">Limiti</h3>
+              <Button variant="ghost" size="sm" className="p-0 h-7 w-7">
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="pt-2 pb-4">
+              <LimitsSection
+                limits={limits}
+                setLimits={setLimits}
+              />
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
 
-        <AnalysisFeaturesSection 
-          features={features}
-          handleFeatureChange={handleFeatureChange}
-        />
+        {/* Language Section */}
+        <Collapsible defaultOpen>
+          <CollapsibleTrigger asChild>
+            <div className="flex justify-between items-center py-2 cursor-pointer">
+              <h3 className="text-sm font-medium">Lingua</h3>
+              <Button variant="ghost" size="sm" className="p-0 h-7 w-7">
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="pt-2 pb-4">
+              <LanguageSection
+                language={language}
+                setLanguage={setLanguage}
+              />
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
 
-        <Separator />
+        {/* Tone Model Section */}
+        <Collapsible defaultOpen>
+          <CollapsibleTrigger asChild>
+            <div className="flex justify-between items-center py-2 cursor-pointer">
+              <h3 className="text-sm font-medium">Modello di Tono</h3>
+              <Button variant="ghost" size="sm" className="p-0 h-7 w-7">
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="pt-2 pb-4">
+              <ToneModelSection
+                toneModel={toneModel}
+                setToneModel={setToneModel}
+              />
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
 
-        <LanguageSection 
-          language={language}
-          setLanguage={setLanguage}
-        />
-
-        <Separator />
-
-        <LimitsSection 
-          limits={limits}
-          handleLimitChange={handleLimitChange}
-        />
+        {/* Quick Credentials Input */}
+        <Collapsible defaultOpen>
+          <CollapsibleTrigger asChild>
+            <div className="flex justify-between items-center py-2 cursor-pointer">
+              <h3 className="text-sm font-medium">Carica Credenziali</h3>
+              <Button variant="ghost" size="sm" className="p-0 h-7 w-7">
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <div className="pt-2 pb-4">
+              <QuickCredentialsInput
+                setApiKey={setApiKey}
+                setUrl={setUrl}
+                setRegion={setRegion}
+                setInstanceId={setInstanceId}
+                setCredentialsFileExists={setCredentialsFileExists}
+              />
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+        
       </CardContent>
     </Card>
   );

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Card, 
@@ -31,6 +30,7 @@ import JsonResponseDisplay from './components/JsonResponseDisplay';
 import ToneTab from './components/ToneTab';
 import ExportResults from './components/ExportResults';
 import { TONE_SUPPORTED_LANGUAGES } from './hooks/useAnalysisFeatures';
+import type { AnalysisProvider } from './hooks/useAnalysisProvider';
 
 interface ResultsPanelProps {
   results: any;
@@ -40,12 +40,14 @@ interface ResultsPanelProps {
     sentenceCount: number;
     charCount: number;
   };
+  provider: AnalysisProvider;
 }
 
 const ResultsPanel: React.FC<ResultsPanelProps> = ({
   results,
   targetKeywords,
   textStats,
+  provider
 }) => {
   const [isJsonOpen, setIsJsonOpen] = React.useState(false);
 
@@ -68,14 +70,17 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
     results.classifications.length > 0 && 
     (TONE_SUPPORTED_LANGUAGES.includes(results.language) || results.language === 'en' || results.language === 'fr');
 
+  // Determine provider name for display
+  const providerName = provider === 'watson' ? 'IBM Watson NLU' : 'Google Cloud NLP';
+
   return (
     <Card className="w-full bg-background border-border">
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
           <div>
-            <CardTitle className="text-lg font-semibold">Analysis Results</CardTitle>
+            <CardTitle className="text-lg font-semibold">Risultati Analisi</CardTitle>
             <CardDescription>
-              Information extracted from the text
+              Informazioni estratte dal testo usando {providerName}
             </CardDescription>
           </div>
           <ExportResults results={results} isDisabled={!results} />
@@ -89,9 +94,9 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
         {/* Main Results Tabs */}
         <Tabs defaultValue="extraction" className="w-full">
           <TabsList className="w-full grid grid-cols-3">
-            <TabsTrigger value="extraction">Extraction</TabsTrigger>
-            <TabsTrigger value="classification">Classification</TabsTrigger>
-            <TabsTrigger value="tone">Tone Analysis</TabsTrigger>
+            <TabsTrigger value="extraction">Estrazione</TabsTrigger>
+            <TabsTrigger value="classification">Classificazione</TabsTrigger>
+            <TabsTrigger value="tone">Analisi del Tono</TabsTrigger>
           </TabsList>
 
           {/* Extraction Tab */}
@@ -117,8 +122,14 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
               <ToneTab classifications={results.classifications} />
             ) : (
               <PlaceholderTab 
-                message="Enable Tone Analysis in the features panel to activate this function." 
-                helpText="Tone analysis is only available for English and French languages, and detects seven emotional tones in the text."
+                message={provider === 'watson' 
+                  ? "Abilita l'analisi del tono nel pannello delle funzionalità per attivare questa funzione." 
+                  : "L'analisi del tono non è supportata da Google Cloud NLP in questa integrazione."
+                } 
+                helpText={provider === 'watson'
+                  ? "L'analisi del tono è disponibile solo per le lingue inglese e francese, e rileva sette toni emozionali nel testo."
+                  : "Usa il provider IBM Watson NLU per accedere all'analisi del tono."
+                }
               />
             )}
           </TabsContent>
@@ -127,7 +138,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
         {/* Raw JSON Response */}
         <Collapsible open={isJsonOpen} onOpenChange={setIsJsonOpen}>
           <div className="flex items-center justify-between py-2">
-            <h3 className="text-sm font-medium">API Response</h3>
+            <h3 className="text-sm font-medium">Risposta API</h3>
             <CollapsibleTrigger asChild>
               <Button variant="ghost" size="sm" className="p-0 h-7 w-7">
                 <ChevronDown className={`h-4 w-4 transition-transform ${isJsonOpen ? "transform rotate-180" : ""}`} />
@@ -143,9 +154,9 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
       <CardFooter className="flex justify-between pt-2 text-xs text-muted-foreground">
         <span className="flex items-center gap-1">
           <FileJson className="h-3.5 w-3.5" />
-          IBM Watson Natural Language Understanding Analyzer
+          {providerName} Analyzer
         </span>
-        <span>v1.1.6</span>
+        <span>v1.1.7</span>
       </CardFooter>
     </Card>
   );
