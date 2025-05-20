@@ -148,12 +148,6 @@ const Changelog: React.FC = () => {
                     <div className="flex-grow">
                       <div className="flex flex-wrap items-center gap-3 mb-3">
                         <h3 className="text-lg font-medium">Version {version.version}</h3>
-                        <Badge 
-                          variant="outline" 
-                          className="text-foreground/70 font-normal"
-                        >
-                          {version.type}
-                        </Badge>
                         <span className="text-sm text-muted-foreground">{version.date}</span>
                       </div>
                       
