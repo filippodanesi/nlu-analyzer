@@ -31,10 +31,10 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({
 
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-medium">Funzionalità di Analisi</h3>
+      <h3 className="text-sm font-medium">Analysis Features</h3>
       
       <div className="space-y-2">
-        <h4 className="text-xs font-medium text-muted-foreground">Estrazione</h4>
+        <h4 className="text-xs font-medium text-muted-foreground">Extraction</h4>
         <div className="grid grid-cols-2 gap-2">
           <div className="flex items-center space-x-2">
             <Switch
@@ -51,7 +51,7 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({
               checked={features.entities}
               onCheckedChange={(checked) => handleFeatureChange("entities", checked)}
             />
-            <Label htmlFor="entities">Entità</Label>
+            <Label htmlFor="entities">Entities</Label>
           </div>
           
           <div className="flex items-center space-x-2">
@@ -60,32 +60,32 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({
               checked={features.concepts}
               onCheckedChange={(checked) => handleFeatureChange("concepts", checked)}
             />
-            <Label htmlFor="concepts">Concetti</Label>
+            <Label htmlFor="concepts">Concepts</Label>
           </div>
         </div>
       </div>
       
       <div className="space-y-2">
-        <h4 className="text-xs font-medium text-muted-foreground">Classificazione</h4>
+        <h4 className="text-xs font-medium text-muted-foreground">Classification</h4>
         <div className="flex items-center space-x-2">
           <Switch
             id="categories"
             checked={features.categories}
             onCheckedChange={(checked) => handleFeatureChange("categories", checked)}
           />
-          <Label htmlFor="categories">Categorie</Label>
+          <Label htmlFor="categories">Categories</Label>
         </div>
       </div>
       
       <div className="space-y-2">
-        <h4 className="text-xs font-medium text-muted-foreground">Analisi del Tono</h4>
+        <h4 className="text-xs font-medium text-muted-foreground">Tone Analysis</h4>
         <div className="flex items-center space-x-2">
           <Switch
             id="classifications"
             checked={features.classifications}
             onCheckedChange={(checked) => handleFeatureChange("classifications", checked)}
           />
-          <Label htmlFor="classifications">Analisi del Tono</Label>
+          <Label htmlFor="classifications">Tone Analysis</Label>
         </div>
       </div>
     </div>

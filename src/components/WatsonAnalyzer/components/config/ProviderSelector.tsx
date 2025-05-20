@@ -17,7 +17,7 @@ const ProviderSelector: React.FC<ProviderSelectorProps> = ({
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h3 className="text-sm font-medium">Provider di Analisi</h3>
+        <h3 className="text-sm font-medium">Analysis Provider</h3>
       </div>
       
       <RadioGroup 

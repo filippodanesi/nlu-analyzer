@@ -23,26 +23,26 @@ export const ToneModelSection: React.FC<ToneModelSectionProps> = ({
   setToneModel, 
   provider = "watson" 
 }) => {
-  // Determina se il provider corrente è Google
+  // Determine if the current provider is Google
   const isGoogle = provider === "google";
   
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-medium">Modello di Tono</h3>
+      <h3 className="text-sm font-medium">Tone Model</h3>
       <div className="space-y-2">
         <Label htmlFor="tone-model">
-          {isGoogle ? "Modello NLP per l'analisi" : "Modello per l'analisi del tono"}
+          {isGoogle ? "NLP Model for Analysis" : "Model for Tone Analysis"}
         </Label>
         <Select value={toneModel} onValueChange={setToneModel}>
           <SelectTrigger id="tone-model">
-            <SelectValue placeholder="Seleziona un modello" />
+            <SelectValue placeholder="Select a model" />
           </SelectTrigger>
           <SelectContent>
             {isGoogle ? (
               <>
                 <SelectItem value="default">Google NLP Standard</SelectItem>
-                <SelectItem value="content-classification">Classificazione Contenuti</SelectItem>
-                <SelectItem value="entity-sentiment">Sentiment Entità</SelectItem>
+                <SelectItem value="content-classification">Content Classification</SelectItem>
+                <SelectItem value="entity-sentiment">Entity Sentiment</SelectItem>
               </>
             ) : (
               <>

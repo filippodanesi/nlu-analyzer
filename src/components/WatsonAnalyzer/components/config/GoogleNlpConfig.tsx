@@ -23,7 +23,7 @@ const GoogleNlpConfig: React.FC<GoogleNlpConfigProps> = ({
       <Alert variant="info" className="bg-secondary/30">
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          Per utilizzare Google Cloud NLP API, è necessario creare un progetto su Google Cloud Platform e abilitare l'API Natural Language.
+          To use Google Cloud NLP API, you need to create a project on Google Cloud Platform and enable the Natural Language API.
         </AlertDescription>
       </Alert>
 
@@ -32,7 +32,7 @@ const GoogleNlpConfig: React.FC<GoogleNlpConfigProps> = ({
         <Input
           id="google-api-key"
           type="password"
-          placeholder="Inserisci la tua Google Cloud API key"
+          placeholder="Enter your Google Cloud API key"
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
         />
