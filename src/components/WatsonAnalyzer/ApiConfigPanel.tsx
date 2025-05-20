@@ -1,3 +1,4 @@
+
 import React from 'react';
 import {
   Card,
@@ -89,9 +90,9 @@ const ApiConfigPanel = ({
   return (
     <Card className="bg-background border-border">
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg font-semibold">Configurazione API</CardTitle>
+        <CardTitle className="text-lg font-semibold">API Configuration</CardTitle>
         <CardDescription>
-          Configura le API per l'analisi del linguaggio naturale
+          Configure APIs for natural language analysis
         </CardDescription>
       </CardHeader>
 
@@ -158,7 +159,7 @@ const ApiConfigPanel = ({
         <Collapsible defaultOpen>
           <CollapsibleTrigger asChild>
             <div className="flex justify-between items-center py-2 cursor-pointer">
-              <h3 className="text-sm font-medium">Funzionalità di Analisi</h3>
+              <h3 className="text-sm font-medium">Analysis Features</h3>
               <Button variant="ghost" size="sm" className="p-0 h-7 w-7">
                 <ChevronDown className="h-4 w-4" />
               </Button>
@@ -178,7 +179,7 @@ const ApiConfigPanel = ({
         <Collapsible defaultOpen>
           <CollapsibleTrigger asChild>
             <div className="flex justify-between items-center py-2 cursor-pointer">
-              <h3 className="text-sm font-medium">Limiti</h3>
+              <h3 className="text-sm font-medium">Limits</h3>
               <Button variant="ghost" size="sm" className="p-0 h-7 w-7">
                 <ChevronDown className="h-4 w-4" />
               </Button>
@@ -198,7 +199,7 @@ const ApiConfigPanel = ({
         <Collapsible defaultOpen>
           <CollapsibleTrigger asChild>
             <div className="flex justify-between items-center py-2 cursor-pointer">
-              <h3 className="text-sm font-medium">Lingua</h3>
+              <h3 className="text-sm font-medium">Language</h3>
               <Button variant="ghost" size="sm" className="p-0 h-7 w-7">
                 <ChevronDown className="h-4 w-4" />
               </Button>
@@ -218,7 +219,7 @@ const ApiConfigPanel = ({
         <Collapsible defaultOpen>
           <CollapsibleTrigger asChild>
             <div className="flex justify-between items-center py-2 cursor-pointer">
-              <h3 className="text-sm font-medium">Modello di Tono</h3>
+              <h3 className="text-sm font-medium">Tone Model</h3>
               <Button variant="ghost" size="sm" className="p-0 h-7 w-7">
                 <ChevronDown className="h-4 w-4" />
               </Button>
@@ -239,7 +240,7 @@ const ApiConfigPanel = ({
         <Collapsible defaultOpen>
           <CollapsibleTrigger asChild>
             <div className="flex justify-between items-center py-2 cursor-pointer">
-              <h3 className="text-sm font-medium">Carica Credenziali</h3>
+              <h3 className="text-sm font-medium">Load Credentials</h3>
               <Button variant="ghost" size="sm" className="p-0 h-7 w-7">
                 <ChevronDown className="h-4 w-4" />
               </Button>
