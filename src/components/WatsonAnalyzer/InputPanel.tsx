@@ -121,7 +121,7 @@ const InputPanel: React.FC<InputPanelProps> = ({
         </Button>
         
         {enableReanalyze && (
-          <Alert variant="info" className="p-2 bg-blue-50">
+          <Alert variant="warning" className="p-2 bg-blue-50">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription className="text-xs">
               Analysis features have changed. Click Analyze to update results.
