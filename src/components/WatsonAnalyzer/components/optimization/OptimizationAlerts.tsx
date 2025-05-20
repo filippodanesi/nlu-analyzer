@@ -18,7 +18,7 @@ const OptimizationAlerts: React.FC<OptimizationAlertsProps> = ({
 }) => {
   if (needsOptimization) {
     return (
-      <Alert variant="default" className="bg-red-50 text-red-800 border-red-200">
+      <Alert variant="info" className="bg-blue-50 text-blue-800 border-blue-200">
         <AlertTitle>Optimization Recommended</AlertTitle>
         <AlertDescription>
           Some of your target keywords ({keywordsToOptimize.join(', ')}) were not found in the analysis.
@@ -28,7 +28,7 @@ const OptimizationAlerts: React.FC<OptimizationAlertsProps> = ({
     );
   } else if (keywordsWithPartialMatch.length > 0) {
     return (
-      <Alert variant="default" className="bg-amber-50 text-amber-800 border-amber-200">
+      <Alert variant="warning" className="bg-amber-50 text-amber-800 border-amber-200">
         <AlertTitle>Partial Optimization Recommended</AlertTitle>
         <AlertDescription>
           Some keywords have only partial matches. Consider optimization to improve exact keyword matching.
