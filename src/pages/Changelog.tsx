@@ -10,67 +10,78 @@ import Footer from '@/components/WatsonAnalyzer/components/Footer';
 const Changelog: React.FC = () => {
   const versions = [
     {
+      version: "1.1.6",
+      date: "May 20, 2025",
+      features: [
+        "ENHANCEMENT: Improved entity detection visualization with type grouping",
+        "ENHANCEMENT: Added alerts for low entity detection",
+        "FIX: Added info variant to Alert component",
+        "IMPLEMENT: Enabled tone analysis by default",
+        "ENHANCE: Increased default keyword limit to 20"
+      ]
+    },
+    {
       version: "1.1.5",
       date: "May 20, 2025",
       features: [
-        "Fixed import errors in useOptimizationProcess.ts",
-        "Corrected import paths for optimization modules",
-        "Improved error handling for AI models"
+        "FIX: Fixed import errors in useOptimizationProcess.ts",
+        "FIX: Corrected import paths for optimization modules",
+        "ENHANCEMENT: Improved error handling for AI models"
       ]
     },
     {
       version: "1.1.4",
       date: "May 19, 2025",
       features: [
-        "Enhanced product entity identification in text analysis",
-        "Improved keyword matching in optimized texts",
-        "Enhanced entity recognition in optimized text"
+        "ENHANCEMENT: Enhanced product entity identification in text analysis",
+        "ENHANCEMENT: Improved keyword matching in optimized texts",
+        "ENHANCEMENT: Enhanced entity recognition in optimized text"
       ]
     },
     {
       version: "1.1.3",
       date: "May 18, 2025",
       features: [
-        "Fixed issue with o4-mini model",
-        "Updated openAiUtils.ts to use max_completion_tokens instead of max_tokens",
-        "Improved AI model-specific error messages"
+        "FIX: Fixed issue with o4-mini model",
+        "UPDATE: Updated openAiUtils.ts to use max_completion_tokens instead of max_tokens",
+        "ENHANCEMENT: Improved AI model-specific error messages"
       ]
     },
     {
       version: "1.1.2",
       date: "May 17, 2025",
       features: [
-        "Optimized user interface for text analysis",
-        "Enhanced user experience in the results panel",
-        "Refined keyword recognition system"
+        "ENHANCEMENT: Optimized user interface for text analysis",
+        "ENHANCEMENT: Enhanced user experience in the results panel",
+        "ENHANCEMENT: Refined keyword recognition system"
       ]
     },
     {
       version: "1.1.1",
       date: "May 16, 2025",
       features: [
-        "Added support for additional languages in tone analysis",
-        "Improved entity processing algorithm",
-        "Optimized performance for analyzing long texts"
+        "IMPLEMENT: Added support for additional languages in tone analysis",
+        "ENHANCEMENT: Improved entity processing algorithm",
+        "ENHANCEMENT: Optimized performance for analyzing long texts"
       ]
     },
     {
       version: "1.1.0",
       date: "May 15, 2025",
       features: [
-        "Added text optimization functionality with AI",
-        "Implemented support for OpenAI and Claude",
-        "Integrated cost monitoring for AI APIs"
+        "MAJOR: Added text optimization functionality with AI",
+        "IMPLEMENT: Implemented support for OpenAI and Claude",
+        "IMPLEMENT: Integrated cost monitoring for AI APIs"
       ]
     },
     {
       version: "1.0.0",
       date: "May 14, 2025",
       features: [
-        "Initial application release",
-        "Implemented basic interface for text analysis",
-        "Integrated with IBM Watson Natural Language Understanding API",
-        "Added support for keywords, entities, concepts, and categories analysis"
+        "MAJOR: Initial application release",
+        "IMPLEMENT: Implemented basic interface for text analysis",
+        "IMPLEMENT: Integrated with IBM Watson Natural Language Understanding API",
+        "IMPLEMENT: Added support for keywords, entities, concepts, and categories analysis"
       ]
     }
   ];
