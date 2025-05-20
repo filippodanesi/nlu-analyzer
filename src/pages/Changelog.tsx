@@ -11,66 +11,66 @@ const Changelog: React.FC = () => {
   const versions = [
     {
       version: "1.1.5",
-      date: "20 Maggio 2025",
+      date: "May 20, 2025",
       features: [
-        "Risoluzione di errori di importazione in useOptimizationProcess.ts",
-        "Correzione dei percorsi di importazione per i moduli di ottimizzazione",
-        "Miglioramento della gestione degli errori per i modelli AI"
+        "Fixed import errors in useOptimizationProcess.ts",
+        "Corrected import paths for optimization modules",
+        "Improved error handling for AI models"
       ]
     },
     {
       version: "1.1.4",
-      date: "19 Maggio 2025",
+      date: "May 19, 2025",
       features: [
-        "Miglioramento dell'identificazione di entità prodotto nell'analisi del testo",
-        "Perfezionamento della corrispondenza delle parole chiave nei testi ottimizzati",
-        "Miglioramento del riconoscimento di entità nel testo ottimizzato"
+        "Enhanced product entity identification in text analysis",
+        "Improved keyword matching in optimized texts",
+        "Enhanced entity recognition in optimized text"
       ]
     },
     {
       version: "1.1.3",
-      date: "18 Maggio 2025",
+      date: "May 18, 2025",
       features: [
-        "Correzione dell'errore con il modello o4-mini",
-        "Aggiornamento di openAiUtils.ts per utilizzare max_completion_tokens invece di max_tokens",
-        "Miglioramento dei messaggi di errore specifici per i modelli AI"
+        "Fixed issue with o4-mini model",
+        "Updated openAiUtils.ts to use max_completion_tokens instead of max_tokens",
+        "Improved AI model-specific error messages"
       ]
     },
     {
       version: "1.1.2",
-      date: "17 Maggio 2025",
+      date: "May 17, 2025",
       features: [
-        "Ottimizzazione dell'interfaccia utente per l'analisi dei testi",
-        "Miglioramento dell'esperienza utente nel pannello dei risultati",
-        "Perfezionamento del sistema di riconoscimento delle parole chiave"
+        "Optimized user interface for text analysis",
+        "Enhanced user experience in the results panel",
+        "Refined keyword recognition system"
       ]
     },
     {
       version: "1.1.1",
-      date: "16 Maggio 2025",
+      date: "May 16, 2025",
       features: [
-        "Aggiunta del supporto per nuove lingue nell'analisi del tono",
-        "Miglioramento dell'algoritmo di elaborazione delle entità",
-        "Ottimizzazione delle prestazioni nell'analisi dei testi lunghi"
+        "Added support for additional languages in tone analysis",
+        "Improved entity processing algorithm",
+        "Optimized performance for analyzing long texts"
       ]
     },
     {
       version: "1.1.0",
-      date: "15 Maggio 2025",
+      date: "May 15, 2025",
       features: [
-        "Aggiunta della funzionalità di ottimizzazione del testo con AI",
-        "Implementazione del supporto per OpenAI e Claude",
-        "Integrazione del monitoraggio dei costi per le API di AI"
+        "Added text optimization functionality with AI",
+        "Implemented support for OpenAI and Claude",
+        "Integrated cost monitoring for AI APIs"
       ]
     },
     {
       version: "1.0.0",
-      date: "14 Maggio 2025",
+      date: "May 14, 2025",
       features: [
-        "Versione iniziale dell'applicazione",
-        "Implementazione dell'interfaccia di base per l'analisi del testo",
-        "Integrazione con IBM Watson Natural Language Understanding API",
-        "Supporto per l'analisi di keywords, entità, concetti e categorie"
+        "Initial application release",
+        "Implemented basic interface for text analysis",
+        "Integrated with IBM Watson Natural Language Understanding API",
+        "Added support for keywords, entities, concepts, and categories analysis"
       ]
     }
   ];
@@ -83,7 +83,7 @@ const Changelog: React.FC = () => {
           <div className="flex items-center space-x-4">
             <Link to="/" className="flex items-center text-primary hover:text-primary/80">
               <ArrowLeft className="h-4 w-4 mr-2" />
-              <span>Torna alla Home</span>
+              <span>Back to Home</span>
             </Link>
           </div>
           <h1 className="text-xl font-bold">Changelog</h1>
@@ -95,12 +95,12 @@ const Changelog: React.FC = () => {
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="text-xl">
-              Roadmap e Storico degli Aggiornamenti
+              Update History and Roadmap
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground mb-6">
-              Questo changelog tiene traccia di tutti gli aggiornamenti e le migliorie apportate a IBM Watson Natural Language Understanding Analyzer nel tempo.
+              This changelog tracks all updates and improvements made to the IBM Watson Natural Language Understanding Analyzer over time.
             </p>
             
             <div className="space-y-8">
@@ -117,7 +117,7 @@ const Changelog: React.FC = () => {
                     
                     <div className="flex-grow">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold">Versione {version.version}</h3>
+                        <h3 className="text-lg font-semibold">Version {version.version}</h3>
                         <Badge variant="outline">{version.date}</Badge>
                       </div>
                       
@@ -135,10 +135,10 @@ const Changelog: React.FC = () => {
         </Card>
         
         <div className="bg-muted rounded-lg p-6 text-center">
-          <h3 className="font-medium mb-2">Prossime funzionalità in arrivo</h3>
+          <h3 className="font-medium mb-2">Upcoming Features</h3>
           <p className="text-muted-foreground">
-            Stiamo lavorando a nuove funzionalità per migliorare l'esperienza di analisi e ottimizzazione del testo.
-            Resta aggiornato per le prossime versioni!
+            We're working on new features to enhance the text analysis and optimization experience.
+            Stay tuned for upcoming versions!
           </p>
         </div>
       </main>
