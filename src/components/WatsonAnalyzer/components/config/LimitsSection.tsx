@@ -21,19 +21,12 @@ interface LimitsSectionProps {
     concepts: number;
     categories: number;
   };
-  setLimits: (limits: any) => void;
+  handleLimitChange: (feature: string, value: number) => void;
 }
 
-export const LimitsSection: React.FC<LimitsSectionProps> = ({ limits, setLimits }) => {
+export const LimitsSection: React.FC<LimitsSectionProps> = ({ limits, handleLimitChange }) => {
   // Check if entity limit is too low (might explain limited entity detection)
   const hasLowEntityLimit = limits.entities < 10;
-  
-  const handleLimitChange = (feature: string, value: number) => {
-    setLimits({
-      ...limits,
-      [feature]: value
-    });
-  };
   
   return (
     <div className="space-y-3">
@@ -43,7 +36,7 @@ export const LimitsSection: React.FC<LimitsSectionProps> = ({ limits, setLimits 
         <Alert variant="info" className="p-2 text-xs">
           <InfoIcon className="h-3.5 w-3.5" />
           <AlertDescription className="text-xs">
-            Setting a higher entity limit can improve detection.
+            Setting higher entities limit may improve entity detection.
           </AlertDescription>
         </Alert>
       )}

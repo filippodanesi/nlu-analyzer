@@ -3,8 +3,6 @@ import { useCredentialsConfig } from './useCredentialsConfig';
 import { useAnalysisFeatures } from './useAnalysisFeatures';
 import { useInputManagement } from './useInputManagement';
 import { useAnalysisExecution } from './useAnalysisExecution';
-import { useAnalysisProvider } from './useAnalysisProvider';
-import { useGoogleNlpConfig } from './useGoogleNlpConfig';
 
 export const useWatsonAnalyzer = () => {
   // Get credentials configuration
@@ -15,12 +13,6 @@ export const useWatsonAnalyzer = () => {
   
   // Get input management
   const input = useInputManagement();
-
-  // Get provider configuration
-  const provider = useAnalysisProvider();
-  
-  // Get Google NLP configuration
-  const googleConfig = useGoogleNlpConfig();
   
   // Get analysis execution
   const analysis = useAnalysisExecution({
@@ -32,9 +24,7 @@ export const useWatsonAnalyzer = () => {
     getCurrentApiKey: credentials.getCurrentApiKey,
     getCurrentUrl: credentials.getCurrentUrl,
     getAuthType: credentials.getAuthType,
-    updateTextStats: input.updateTextStats,
-    provider: provider.provider,
-    getGoogleApiKey: googleConfig.getCurrentApiKey
+    updateTextStats: input.updateTextStats
   });
 
   return {
@@ -68,14 +58,6 @@ export const useWatsonAnalyzer = () => {
     results: analysis.results,
     textStats: input.textStats,
     
-    // Provider
-    provider: provider.provider,
-    setProvider: provider.setProvider,
-    
-    // Google NLP
-    googleApiKey: googleConfig.apiKey,
-    setGoogleApiKey: googleConfig.setApiKey,
-    
     // Actions
     handleAnalyze: analysis.handleAnalyze,
     getTargetKeywordsList: input.getTargetKeywordsList,
@@ -91,7 +73,3 @@ export type {
 export type { 
   TextStats 
 } from './useInputManagement';
-
-export type {
-  AnalysisProvider
-} from './useAnalysisProvider';

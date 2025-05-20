@@ -31,7 +31,6 @@ import JsonResponseDisplay from './components/JsonResponseDisplay';
 import ToneTab from './components/ToneTab';
 import ExportResults from './components/ExportResults';
 import { TONE_SUPPORTED_LANGUAGES } from './hooks/useAnalysisFeatures';
-import type { AnalysisProvider } from './hooks/useAnalysisProvider';
 
 interface ResultsPanelProps {
   results: any;
@@ -41,14 +40,12 @@ interface ResultsPanelProps {
     sentenceCount: number;
     charCount: number;
   };
-  provider: AnalysisProvider;
 }
 
 const ResultsPanel: React.FC<ResultsPanelProps> = ({
   results,
   targetKeywords,
   textStats,
-  provider
 }) => {
   const [isJsonOpen, setIsJsonOpen] = React.useState(false);
 
@@ -71,9 +68,6 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
     results.classifications.length > 0 && 
     (TONE_SUPPORTED_LANGUAGES.includes(results.language) || results.language === 'en' || results.language === 'fr');
 
-  // Determine provider name for display
-  const providerName = provider === 'watson' ? 'IBM Watson NLU' : 'Google Cloud NLP';
-
   return (
     <Card className="w-full bg-background border-border">
       <CardHeader className="pb-2">
@@ -81,7 +75,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
           <div>
             <CardTitle className="text-lg font-semibold">Analysis Results</CardTitle>
             <CardDescription>
-              Information extracted from text using {providerName}
+              Information extracted from the text
             </CardDescription>
           </div>
           <ExportResults results={results} isDisabled={!results} />
@@ -123,14 +117,8 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
               <ToneTab classifications={results.classifications} />
             ) : (
               <PlaceholderTab 
-                message={provider === 'watson' 
-                  ? "Enable tone analysis in the features panel to activate this function." 
-                  : "Tone analysis is not supported by Google Cloud NLP in this integration."
-                } 
-                helpText={provider === 'watson'
-                  ? "Tone analysis is only available for English and French languages, and detects seven emotional tones in text."
-                  : "Use the IBM Watson NLU provider to access tone analysis."
-                }
+                message="Enable Tone Analysis in the features panel to activate this function." 
+                helpText="Tone analysis is only available for English and French languages, and detects seven emotional tones in the text."
               />
             )}
           </TabsContent>
@@ -155,9 +143,9 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
       <CardFooter className="flex justify-between pt-2 text-xs text-muted-foreground">
         <span className="flex items-center gap-1">
           <FileJson className="h-3.5 w-3.5" />
-          {providerName} Analyzer
+          IBM Watson Natural Language Understanding Analyzer
         </span>
-        <span>v1.1.7</span>
+        <span>v1.1.6</span>
       </CardFooter>
     </Card>
   );
