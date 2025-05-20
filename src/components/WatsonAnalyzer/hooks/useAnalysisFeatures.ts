@@ -26,12 +26,12 @@ export const useAnalysisFeatures = () => {
     entities: true,
     concepts: true,
     categories: true,
-    classifications: false, // Default disabled for tone analysis
+    classifications: true, // Default enabled for tone analysis (changed from false)
   });
   
   // Limits state
   const [limits, setLimits] = useState<WatsonLimits>({
-    keywords: 10,
+    keywords: 20, // Changed from 10 to 20
     entities: 10,
     concepts: 5,
     categories: 3,

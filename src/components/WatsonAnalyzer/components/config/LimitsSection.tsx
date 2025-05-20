@@ -6,6 +6,13 @@ import {
 import { 
   Label 
 } from "@/components/ui/label";
+import { 
+  Alert,
+  AlertDescription 
+} from "@/components/ui/alert";
+import { 
+  InfoIcon
+} from "lucide-react";
 
 interface LimitsSectionProps {
   limits: {
@@ -18,9 +25,22 @@ interface LimitsSectionProps {
 }
 
 export const LimitsSection: React.FC<LimitsSectionProps> = ({ limits, handleLimitChange }) => {
+  // Check if entity limit is too low (might explain limited entity detection)
+  const hasLowEntityLimit = limits.entities < 10;
+  
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-medium">Limits</h3>
+      <h3 className="text-sm font-medium">Analysis Limits</h3>
+      
+      {hasLowEntityLimit && (
+        <Alert variant="info" className="p-2 text-xs">
+          <InfoIcon className="h-3.5 w-3.5" />
+          <AlertDescription className="text-xs">
+            Setting higher entities limit may improve entity detection.
+          </AlertDescription>
+        </Alert>
+      )}
+      
       <div className="space-y-2">
         <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">

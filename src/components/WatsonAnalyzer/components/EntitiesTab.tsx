@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { AlertCircle, Info } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -10,6 +11,7 @@ import {
   TableRow
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface EntitiesTabProps {
   entities: any[];
@@ -36,16 +38,40 @@ const EntitiesTab: React.FC<EntitiesTabProps> = ({ entities, containsTargetKeywo
     return text.trim().split(/\s+/).length;
   };
 
+  // Group entities by type for better visualization
+  const entityTypes = [...new Set(entities.map(entity => entity.type))];
+
   return (
     <div className="space-y-4">
+      {entities.length <= 2 && (
+        <Alert variant="info" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Only a few entities were detected. Try using more specific named entities in your text 
+            (like people, organizations, locations, dates, etc.) to improve entity recognition.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      <div className="mb-3">
+        <div className="flex flex-wrap gap-2">
+          {entityTypes.map(type => (
+            <Badge key={type} variant="outline" className="bg-secondary">
+              {type}: {entities.filter(e => e.type === type).length}
+            </Badge>
+          ))}
+        </div>
+      </div>
+      
       <ScrollArea className="h-[400px]">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-1/3">Text</TableHead>
-              <TableHead>Words</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Relevance</TableHead>
+              <TableHead className="w-1/4">Text</TableHead>
+              <TableHead className="w-1/6">Type</TableHead>
+              <TableHead className="w-1/6">Confidence</TableHead>
+              <TableHead className="w-1/6">Relevance</TableHead>
+              <TableHead className="w-1/6">Count</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -59,11 +85,12 @@ const EntitiesTab: React.FC<EntitiesTabProps> = ({ entities, containsTargetKeywo
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline" className="bg-secondary/50">
-                      {wordCount}
+                      {entity.type}
                     </Badge>
                   </TableCell>
-                  <TableCell>{entity.type}</TableCell>
+                  <TableCell>{entity.confidence ? (entity.confidence * 100).toFixed(1) + '%' : 'N/A'}</TableCell>
                   <TableCell>{(entity.relevance * 100).toFixed(1)}%</TableCell>
+                  <TableCell>{entity.count}</TableCell>
                 </TableRow>
               );
             })}
