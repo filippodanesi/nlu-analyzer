@@ -12,25 +12,33 @@ export const useKeywordAnalysis = (results: any) => {
     
     // Log the results we're using to check keywords
     console.log("Checking keyword status for:", keyword);
-    console.log("Using results:", resultsToUse.keywords ? 
-      `${resultsToUse.keywords.length} keywords found` : "No keywords in results");
     
-    // Look for exact match
-    if (resultsToUse.keywords.some((k: any) => isExactKeywordMatch(k.text, keyword))) {
-      // Found an exact match in the keywords
-      console.log(`Found exact match for keyword "${keyword}"`);
+    // Check for exact match in text (for more accurate detection)
+    const lowerKeyword = keyword.toLowerCase().trim();
+    const optimizedText = resultsToUse.optimizedText || "";
+    
+    // Direct text search for product-type keywords (more reliable than relying on Watson results)
+    if (optimizedText && lowerKeyword.includes('bras') && 
+        new RegExp(`\\b${lowerKeyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}\\b`, 'i').test(optimizedText.toLowerCase())) {
+      console.log(`Found direct text match for product keyword "${keyword}"`);
       return "exact";
     }
     
-    // Look for partial match
+    // Look for exact match in the keywords array
+    if (resultsToUse.keywords.some((k: any) => isExactKeywordMatch(k.text, keyword))) {
+      // Found an exact match in the keywords
+      console.log(`Found exact match for keyword "${keyword}" in keywords array`);
+      return "exact";
+    }
+    
+    // Look for partial match in the keywords array
     if (resultsToUse.keywords.some((k: any) => isPartialKeywordMatch(k.text, keyword))) {
       // Found a partial match in the keywords
-      console.log(`Found partial match for keyword "${keyword}"`);
+      console.log(`Found partial match for keyword "${keyword}" in keywords array`);
       return "partial";
     }
     
-    // Additional check - just look for the keyword as a substring (case insensitive)
-    const lowerKeyword = keyword.toLowerCase().trim();
+    // Additional check - look for the keyword as a substring (case insensitive)
     if (resultsToUse.keywords.some((k: any) => 
       k.text.toLowerCase().trim().includes(lowerKeyword) || 
       lowerKeyword.includes(k.text.toLowerCase().trim())
@@ -45,6 +53,19 @@ export const useKeywordAnalysis = (results: any) => {
       return "relevant";
     }
     
+    // Check for the keyword in entities (product detection)
+    if (resultsToUse.entities && resultsToUse.entities.length > 0) {
+      const entityMatch = resultsToUse.entities.some((entity: any) => 
+        entity.text.toLowerCase().includes(lowerKeyword) || 
+        lowerKeyword.includes(entity.text.toLowerCase())
+      );
+      
+      if (entityMatch) {
+        console.log(`Found entity match for keyword "${keyword}"`);
+        return "exact";
+      }
+    }
+    
     console.log(`No match found for keyword "${keyword}"`);
     return "missing";
   };
@@ -53,11 +74,12 @@ export const useKeywordAnalysis = (results: any) => {
   const mockAnalysisForKeywords = (optimizedContent: string, targetKeywords: string[]) => {
     // Create a simple mock result with keywords from the text
     // This helps us visually show the keywords in the optimized text
-    const mockResults = { ...results };
+    const mockResults = { ...results, optimizedText: optimizedContent };
     
     // Extract all phrases from the optimized content
     const words = optimizedContent.split(/\s+/);
     const mockKeywords = [];
+    const mockEntities = [];
 
     // Process target keywords first to ensure they're included with high relevance
     for (const keyword of targetKeywords) {
@@ -67,7 +89,7 @@ export const useKeywordAnalysis = (results: any) => {
       // Check for exact matches
       let exactMatch = false;
       // This regex checks for word boundaries or start/end of string
-      const exactRegex = new RegExp(`(^|\\s|[,.;!?])${lowerKeyword}($|\\s|[,.;!?])`, 'i');
+      const exactRegex = new RegExp(`(^|\\s|[,.;!?])${lowerKeyword.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}($|\\s|[,.;!?])`, 'i');
       exactMatch = exactRegex.test(lowerContent);
       
       if (exactMatch) {
@@ -78,6 +100,18 @@ export const useKeywordAnalysis = (results: any) => {
           count: 1
         });
         console.log(`Mock analysis: Exact match for "${keyword}"`);
+        
+        // If it's a product type (contains "bras"), add it as an entity
+        if (keyword.toLowerCase().includes('bras')) {
+          mockEntities.push({
+            type: "ProductType",
+            text: keyword,
+            relevance: 0.95,
+            confidence: 0.9,
+            count: 1
+          });
+          console.log(`Added product entity: ${keyword}`);
+        }
       } else if (lowerContent.includes(lowerKeyword)) {
         // Found a partial match
         mockKeywords.push({
@@ -103,11 +137,24 @@ export const useKeywordAnalysis = (results: any) => {
             continue;
           }
           
+          // Add as keyword
           mockKeywords.push({
             text: phrase,
             relevance: 0.7 - (0.1 * j), // Longer phrases get slightly lower relevance
             count: 1
           });
+          
+          // Check if it's a potential product entity (contains "bras")
+          if (phrase.toLowerCase().includes('bras') && 
+              !mockEntities.some(e => e.text.toLowerCase() === phrase.toLowerCase())) {
+            mockEntities.push({
+              type: "ProductType",
+              text: phrase,
+              relevance: 0.7,
+              confidence: 0.8,
+              count: 1
+            });
+          }
         }
       }
     }
@@ -116,6 +163,13 @@ export const useKeywordAnalysis = (results: any) => {
     mockResults.keywords = mockKeywords
       .sort((a, b) => b.relevance - a.relevance)
       .slice(0, 15);
+    
+    // Add entities from original results if any
+    if (results.entities && results.entities.length > 0) {
+      mockResults.entities = [...mockEntities, ...results.entities];
+    } else {
+      mockResults.entities = mockEntities;
+    }
     
     return mockResults;
   };

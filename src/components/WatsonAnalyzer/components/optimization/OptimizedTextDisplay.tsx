@@ -35,13 +35,14 @@ const OptimizedTextDisplay: React.FC<OptimizedTextDisplayProps> = ({ originalTex
           <Textarea 
             readOnly
             value={optimizedText}
-            className="min-h-[200px] font-mono text-sm"
+            className="min-h-[200px] font-mono text-sm bg-green-50 text-green-900"
           />
         ) : (
           <Alert>
             <InfoIcon className="h-4 w-4" />
+            <AlertTitle>No optimized text yet</AlertTitle>
             <AlertDescription>
-              No optimized text available yet. Click the "Optimize Text" button to generate optimized content.
+              Click the "Optimize Text" button to generate optimized content with your target keywords.
             </AlertDescription>
           </Alert>
         )}

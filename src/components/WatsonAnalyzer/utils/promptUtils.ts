@@ -28,6 +28,12 @@ export const generateOptimizationPrompt = (
     analysisResults.categories.slice(0, 2).map((cat: any) => cat.label).join(', ') :
     'None detected';
   
+  // Identify potential product types from target keywords
+  const potentialProductTypes = targetKeywords
+    .filter(kw => kw.includes('bras') || kw.includes('underwear') || /fit|foam|liner|padded|molded|cushioned/.test(kw))
+    .map(kw => `${kw} (ProductType)`)
+    .join(', ');
+
   return `### TASK
 Optimize this text for SEO while preserving its meaning, intent, and paragraph structure.
 
@@ -41,13 +47,16 @@ ${keywordsString}
 - Entities: ${entities}
 - Top keywords: ${topKeywords}
 - Categories: ${categories}
+- Potential product types: ${potentialProductTypes}
 
 ### ENTITY TAXONOMY (closed set)
 Brand, ProductType, Material, Feature, Benefit
 
 ### KNOWLEDGE SNIPPETS
-Triumph = global lingerie brand (est. 1886) – NOT the Canadian band  
-"Experience <Brand>" → <Brand> is the entity, "Experience" is a verb/slogan.
+- Target keywords should be treated as exact product entities whenever they contain terms like "bras", "underwear", etc.
+- "foam bras", "cushioned bras", "molded bras", etc. should be marked as ProductType entities
+- Triumph = global lingerie brand (est. 1886) – NOT the Canadian band  
+- "Experience <Brand>" → <Brand> is the entity, "Experience" is a verb/slogan.
 
 ### FEW-SHOT EXAMPLES
 1. **Positive**  
@@ -64,11 +73,12 @@ Triumph = global lingerie brand (est. 1886) – NOT the Canadian band
 
 ### INSTRUCTIONS
 1. Identify entities using the taxonomy; ignore sentence-initial verbs.
-2. Favour multi-word keyphrases (2-5 tokens); exclude generics ('styles').
-3. Replace partial Watson matches with exact target keywords where natural.
-4. Place target keywords at paragraph starts/ends without adding new sections.
+2. Make sure to include ALL target keywords verbatim in the optimized text.
+3. Place target keywords at strategic positions like paragraph starts/ends.
+4. Add missing keywords that weren't in the original text in a natural way.
 5. Output **only** the optimized text – no JSON, no explanations.
 
 ### REMEMBER
 Think step-by-step internally but do **not** reveal that reasoning.`;
 };
+

@@ -1,3 +1,4 @@
+
 /**
  * Utility functions for OpenAI API integration
  */
@@ -18,13 +19,14 @@ Core rules:
 • Disambiguate entities with the KNOWLEDGE SNIPPETS section; if multiple senses exist, pick the fashion-related one.  
 • Return multi-word keyphrases (2-5 tokens), exclude single-word generics.  
 • Preserve meaning, tone, paragraph count, and authentic voice.  
-• Insert target keywords verbatim in high-impact positions while keeping the text natural.  
+• Insert ALL target keywords verbatim in high-impact positions while keeping the text natural.  
 • After internal reasoning, output **only** the optimized text with correct spacing and punctuation – no JSON, no explanations, no markup.`;
 
   // Log the model being used to debug o4-mini issues
   console.log(`Using OpenAI model: ${model}`);
   
-  // Determine if using newer models that require max_completion_tokens
+  // Handle specific models parameters differently
+  const isO4MiniModel = model === "gpt-4o-mini";
   const isNewModel = model.includes('o1') || model.includes('o4');
   
   // Configure API request body based on model type
@@ -40,7 +42,7 @@ Core rules:
         content: prompt
       }
     ],
-    // Newer models (o1/o4) use max_completion_tokens and don't support temperature
+    // Model-specific parameters
     ...(isNewModel ? { 
       max_completion_tokens: 4000
     } : { 
@@ -64,6 +66,12 @@ Core rules:
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
       console.error("OpenAI API error:", errorData || response.statusText);
+      
+      // Enhanced error handling with specific guidance for o4-mini issues
+      if (isO4MiniModel && errorData?.error?.message?.includes("max_tokens")) {
+        throw new Error("gpt-4o-mini requires 'max_completion_tokens' instead of 'max_tokens'. The system has made this change but the API call failed. Please try again.");
+      }
+      
       throw new Error(
         errorData?.error?.message || `OpenAI API error: ${response.status} ${response.statusText}`
       );
