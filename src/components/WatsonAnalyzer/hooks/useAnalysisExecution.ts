@@ -179,8 +179,8 @@ export const useAnalysisExecution = ({
       // Map Watson features to Google NLP features
       const googleFeatures = mapWatsonToGoogleFeatures(features);
       
-      // Call Google NLP API
-      return await analyzeTextWithGoogleNLP(text, googleApiKey, googleFeatures);
+      // Call Google NLP API with the selected model
+      return await analyzeTextWithGoogleNLP(text, googleApiKey, googleFeatures, toneModel);
     } catch (error) {
       console.error('Error analyzing text with Google NLP:', error);
       throw error;

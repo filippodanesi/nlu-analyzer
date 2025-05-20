@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Card,
@@ -230,6 +229,7 @@ const ApiConfigPanel = ({
               <ToneModelSection
                 toneModel={toneModel}
                 setToneModel={setToneModel}
+                provider={provider}
               />
             </div>
           </CollapsibleContent>

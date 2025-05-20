@@ -12,7 +12,8 @@ export const analyzeTextWithGoogleNLP = async (
     sentiment: boolean;
     syntax: boolean;
     classification: boolean;
-  }
+  },
+  model: string = 'default'
 ) => {
   try {
     // Prepare request body
@@ -30,9 +31,34 @@ export const analyzeTextWithGoogleNLP = async (
       encodingType: "UTF8"
     };
 
+    // Apply model-specific configurations
+    if (model === "content-classification") {
+      // Enhance classification settings for content-classification model
+      requestBody.features.classifyText = true;
+    } else if (model === "entity-sentiment") {
+      // Force entity sentiment analysis on for entity-sentiment model
+      requestBody.features.extractEntitySentiment = true;
+    }
+
+    // Select the appropriate API endpoint based on the features
+    let apiEndpoint = 'annotateText'; // default endpoint
+
+    // For pure entity sentiment analysis
+    if (features.entities && !features.sentiment && !features.syntax && !features.classification && model === "entity-sentiment") {
+      apiEndpoint = 'analyzeEntitySentiment';
+      // Adjust request body for specific endpoint
+      delete requestBody.features;
+    } 
+    // For pure classification
+    else if (!features.entities && !features.sentiment && !features.syntax && features.classification) {
+      apiEndpoint = 'classifyText';
+      // Adjust request body for specific endpoint
+      delete requestBody.features;
+    }
+
     // Send request to Google NLP API
     const response = await fetch(
-      `https://language.googleapis.com/v1/documents:annotateText?key=${apiKey}`,
+      `https://language.googleapis.com/v1/documents:${apiEndpoint}?key=${apiKey}`,
       {
         method: "POST",
         headers: {
