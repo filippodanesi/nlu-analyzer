@@ -82,6 +82,10 @@ export const useOptimizationProcess = ({ text, results, targetKeywords, apiKey, 
       
       // Create analysis results for the optimized text to check keywords
       const mockResults = mockAnalysisForKeywords(optimizedContent, targetKeywords);
+      
+      // Store optimized text within the mock results for better analysis
+      mockResults.optimizedText = optimizedContent;
+      
       setOptimizedResults(mockResults);
       console.log("Created mock results for optimized text:", mockResults);
       
@@ -106,8 +110,10 @@ export const useOptimizationProcess = ({ text, results, targetKeywords, apiKey, 
         errorMessage = "Authentication failed. Please check your API key in the AI Configuration.";
       } else if (errorMessage.includes("CORS")) {
         errorMessage = "CORS error detected. Try using a different CORS proxy in settings or switch to OpenAI.";
-      } else if (errorMessage.includes("o4") || errorMessage.includes("max_tokens") || errorMessage.includes("max_completion_tokens")) {
-        errorMessage = "Error with o4 model. This may be due to parameter incompatibilities. Try switching to a different model like gpt-4o.";
+      } else if (errorMessage.includes("o4") && errorMessage.includes("max_tokens")) {
+        errorMessage = "Error with o4-mini model. Use a different model like gpt-4o or try again (the system has updated the parameters).";
+      } else if (errorMessage.includes("max_completion_tokens") || errorMessage.includes("The property")) {
+        errorMessage = "API parameter error. Try switching to a different model such as gpt-4o or gpt-3.5-turbo.";
       }
       
       toast({
@@ -116,9 +122,11 @@ export const useOptimizationProcess = ({ text, results, targetKeywords, apiKey, 
         variant: "destructive",
       });
       
-      // Clear optimization state on error
-      setOptimizedText("");
-      setOptimizedResults(null);
+      // Don't clear optimization state on error if we already have results
+      if (!optimizedText) {
+        setOptimizedText("");
+        setOptimizedResults(null);
+      }
     } finally {
       setIsOptimizing(false);
     }
