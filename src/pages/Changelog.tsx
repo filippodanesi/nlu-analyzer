@@ -17,20 +17,12 @@ const getFeatureTypeVariant = (feature: string) => {
   return "default";
 };
 
-// Helper to determine version badge variant
-const getVersionBadgeVariant = (features: string[]) => {
-  if (features.some(f => f.startsWith("MAJOR"))) return "destructive";
-  if (features.some(f => f.startsWith("FIX"))) return "outline";
-  if (features.some(f => f.startsWith("ENHANCEMENT") || f.startsWith("ENHANCE"))) return "secondary";
-  if (features.some(f => f.startsWith("IMPLEMENT"))) return "default";
-  return "default";
-};
-
 const Changelog: React.FC = () => {
   const versions = [
     {
       version: "1.1.6",
       date: "May 20, 2025",
+      type: "IMPROVE",
       features: [
         "ENHANCEMENT: Improved entity detection visualization with type grouping",
         "ENHANCEMENT: Added alerts for low entity detection",
@@ -42,6 +34,7 @@ const Changelog: React.FC = () => {
     {
       version: "1.1.5",
       date: "May 20, 2025",
+      type: "FIX",
       features: [
         "FIX: Fixed import errors in useOptimizationProcess.ts",
         "FIX: Corrected import paths for optimization modules",
@@ -51,6 +44,7 @@ const Changelog: React.FC = () => {
     {
       version: "1.1.4",
       date: "May 19, 2025",
+      type: "IMPROVE",
       features: [
         "ENHANCEMENT: Enhanced product entity identification in text analysis",
         "ENHANCEMENT: Improved keyword matching in optimized texts",
@@ -60,6 +54,7 @@ const Changelog: React.FC = () => {
     {
       version: "1.1.3",
       date: "May 18, 2025",
+      type: "FIX",
       features: [
         "FIX: Fixed issue with o4-mini model",
         "UPDATE: Updated openAiUtils.ts to use max_completion_tokens instead of max_tokens",
@@ -69,6 +64,7 @@ const Changelog: React.FC = () => {
     {
       version: "1.1.2",
       date: "May 17, 2025",
+      type: "IMPROVE",
       features: [
         "ENHANCEMENT: Optimized user interface for text analysis",
         "ENHANCEMENT: Enhanced user experience in the results panel",
@@ -78,6 +74,7 @@ const Changelog: React.FC = () => {
     {
       version: "1.1.1",
       date: "May 16, 2025",
+      type: "IMPROVE",
       features: [
         "IMPLEMENT: Added support for additional languages in tone analysis",
         "ENHANCEMENT: Improved entity processing algorithm",
@@ -87,6 +84,7 @@ const Changelog: React.FC = () => {
     {
       version: "1.1.0",
       date: "May 15, 2025",
+      type: "MAJOR",
       features: [
         "MAJOR: Added text optimization functionality with AI",
         "IMPLEMENT: Implemented support for OpenAI and Claude",
@@ -96,6 +94,7 @@ const Changelog: React.FC = () => {
     {
       version: "1.0.0",
       date: "May 14, 2025",
+      type: "MAJOR",
       features: [
         "MAJOR: Initial application release",
         "IMPLEMENT: Implemented basic interface for text analysis",
@@ -148,14 +147,13 @@ const Changelog: React.FC = () => {
                     <div className="flex-grow">
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="text-lg font-semibold">Version {version.version}</h3>
-                        <Badge variant={getVersionBadgeVariant(version.features)}>
-                          {version.features.some(f => f.startsWith("MAJOR")) 
-                            ? "MAJOR" 
-                            : version.features.some(f => f.startsWith("FIX")) 
-                              ? "FIX" 
-                              : "IMPROVE"}
+                        <Badge 
+                          variant="outline" 
+                          className="border-gray-200 text-foreground font-normal"
+                        >
+                          {version.type}
                         </Badge>
-                        <Badge variant="outline">{version.date}</Badge>
+                        <span className="text-sm text-muted-foreground">{version.date}</span>
                       </div>
                       
                       <ul className="list-disc list-inside pl-2 space-y-1">
