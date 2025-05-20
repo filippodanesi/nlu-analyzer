@@ -21,22 +21,29 @@ interface LimitsSectionProps {
     concepts: number;
     categories: number;
   };
-  handleLimitChange: (feature: string, value: number) => void;
+  setLimits: (limits: any) => void;
 }
 
-export const LimitsSection: React.FC<LimitsSectionProps> = ({ limits, handleLimitChange }) => {
+export const LimitsSection: React.FC<LimitsSectionProps> = ({ limits, setLimits }) => {
   // Check if entity limit is too low (might explain limited entity detection)
   const hasLowEntityLimit = limits.entities < 10;
   
+  const handleLimitChange = (feature: string, value: number) => {
+    setLimits({
+      ...limits,
+      [feature]: value
+    });
+  };
+  
   return (
     <div className="space-y-3">
-      <h3 className="text-sm font-medium">Analysis Limits</h3>
+      <h3 className="text-sm font-medium">Limiti di Analisi</h3>
       
       {hasLowEntityLimit && (
         <Alert variant="info" className="p-2 text-xs">
           <InfoIcon className="h-3.5 w-3.5" />
           <AlertDescription className="text-xs">
-            Setting higher entities limit may improve entity detection.
+            Impostare un limite più alto per le entità può migliorare il rilevamento.
           </AlertDescription>
         </Alert>
       )}
@@ -56,7 +63,7 @@ export const LimitsSection: React.FC<LimitsSectionProps> = ({ limits, handleLimi
           </div>
           
           <div className="space-y-1">
-            <Label htmlFor="entities-limit">Entities</Label>
+            <Label htmlFor="entities-limit">Entità</Label>
             <Input
               id="entities-limit"
               type="number"
@@ -68,7 +75,7 @@ export const LimitsSection: React.FC<LimitsSectionProps> = ({ limits, handleLimi
           </div>
           
           <div className="space-y-1">
-            <Label htmlFor="concepts-limit">Concepts</Label>
+            <Label htmlFor="concepts-limit">Concetti</Label>
             <Input
               id="concepts-limit"
               type="number"
@@ -80,7 +87,7 @@ export const LimitsSection: React.FC<LimitsSectionProps> = ({ limits, handleLimi
           </div>
           
           <div className="space-y-1">
-            <Label htmlFor="categories-limit">Categories</Label>
+            <Label htmlFor="categories-limit">Categorie</Label>
             <Input
               id="categories-limit"
               type="number"
