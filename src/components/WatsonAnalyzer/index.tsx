@@ -7,6 +7,7 @@ import ResultsPanel from './ResultsPanel';
 import TextOptimizationPanel from './components/TextOptimizationPanel';
 import { useWatsonAnalyzer } from './hooks/useWatsonAnalyzer';
 import { useOptimization } from './hooks/useOptimization';
+import { Link } from 'react-router-dom';
 
 // Import refactored components
 import Header from './components/Header';
@@ -84,6 +85,14 @@ const WatsonAnalyzer: React.FC = () => {
 
       {/* Main content */}
       <main className="container max-w-7xl mx-auto px-4 py-8">
+        <div className="flex justify-end mb-4">
+          <Link 
+            to="/changelog" 
+            className="text-sm text-primary hover:text-primary/80 underline underline-offset-4"
+          >
+            Changelog v1.1.5
+          </Link>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-1 space-y-6">
             <ApiConfigPanel
