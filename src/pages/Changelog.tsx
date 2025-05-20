@@ -7,6 +7,25 @@ import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import Footer from '@/components/WatsonAnalyzer/components/Footer';
 
+// Helper function to get badge variant based on feature type
+const getFeatureTypeVariant = (feature: string) => {
+  if (feature.startsWith("FIX")) return "destructive";
+  if (feature.startsWith("ENHANCEMENT") || feature.startsWith("ENHANCE")) return "secondary";
+  if (feature.startsWith("IMPLEMENT")) return "default";
+  if (feature.startsWith("MAJOR")) return "outline";
+  if (feature.startsWith("UPDATE")) return "secondary";
+  return "default";
+};
+
+// Helper to determine version badge variant
+const getVersionBadgeVariant = (features: string[]) => {
+  if (features.some(f => f.startsWith("MAJOR"))) return "destructive";
+  if (features.some(f => f.startsWith("FIX"))) return "outline";
+  if (features.some(f => f.startsWith("ENHANCEMENT") || f.startsWith("ENHANCE"))) return "secondary";
+  if (features.some(f => f.startsWith("IMPLEMENT"))) return "default";
+  return "default";
+};
+
 const Changelog: React.FC = () => {
   const versions = [
     {
@@ -129,12 +148,27 @@ const Changelog: React.FC = () => {
                     <div className="flex-grow">
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="text-lg font-semibold">Version {version.version}</h3>
+                        <Badge variant={getVersionBadgeVariant(version.features)}>
+                          {version.features.some(f => f.startsWith("MAJOR")) 
+                            ? "MAJOR" 
+                            : version.features.some(f => f.startsWith("FIX")) 
+                              ? "FIX" 
+                              : "IMPROVE"}
+                        </Badge>
                         <Badge variant="outline">{version.date}</Badge>
                       </div>
                       
                       <ul className="list-disc list-inside pl-2 space-y-1">
                         {version.features.map((feature, idx) => (
-                          <li key={idx} className="text-muted-foreground">{feature}</li>
+                          <li key={idx} className="text-muted-foreground">
+                            <Badge 
+                              variant={getFeatureTypeVariant(feature)}
+                              className="mr-2 px-1 py-0 text-xs font-normal"
+                            >
+                              {feature.split(":")[0]}
+                            </Badge>
+                            {feature.split(": ")[1]}
+                          </li>
                         ))}
                       </ul>
                     </div>
