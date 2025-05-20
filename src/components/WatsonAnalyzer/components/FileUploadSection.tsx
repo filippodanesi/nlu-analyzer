@@ -3,7 +3,7 @@ import React, { useState, useRef } from 'react';
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { File, Upload } from "lucide-react";
+import { File, Upload, Copy } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 
 interface FileUploadSectionProps {
@@ -56,6 +56,15 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
     }
   };
 
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Text copied",
+      description: "Text has been copied to your clipboard",
+      duration: 2000,
+    });
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-2">
@@ -93,7 +102,19 @@ const FileUploadSection: React.FC<FileUploadSectionProps> = ({
 
       {text && (
         <div className="space-y-2">
-          <Label htmlFor="file-preview">Preview</Label>
+          <div className="flex justify-between items-center">
+            <Label htmlFor="file-preview">Preview</Label>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 px-2 opacity-70 hover:opacity-100"
+              onClick={copyToClipboard}
+              title="Copy text"
+            >
+              <Copy className="h-3.5 w-3.5 mr-1" />
+              Copy
+            </Button>
+          </div>
           <Textarea
             id="file-preview"
             value={text}

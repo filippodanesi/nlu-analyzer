@@ -9,6 +9,8 @@ import {
   CardFooter 
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import InputMethodToggle from './components/InputMethodToggle';
 import TextInputSection from './components/TextInputSection';
 import FileUploadSection from './components/FileUploadSection';
@@ -106,7 +108,7 @@ const InputPanel: React.FC<InputPanelProps> = ({
         />
       </CardContent>
 
-      <CardFooter>
+      <CardFooter className="flex flex-col space-y-3">
         <Button 
           onClick={() => {
             onAnalyze();
@@ -117,6 +119,15 @@ const InputPanel: React.FC<InputPanelProps> = ({
         >
           {isAnalyzing ? "Analyzing..." : "Analyze"}
         </Button>
+        
+        {enableReanalyze && (
+          <Alert variant="info" className="p-2 bg-blue-50">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription className="text-xs">
+              Analysis features have changed. Click Analyze to update results.
+            </AlertDescription>
+          </Alert>
+        )}
       </CardFooter>
     </Card>
   );
