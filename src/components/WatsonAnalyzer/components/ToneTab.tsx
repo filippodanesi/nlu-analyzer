@@ -3,12 +3,13 @@ import React from 'react';
 import { AlertCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface ToneTabProps {
   classifications: any[];
 }
 
-// Funzione per ottenere il colore del badge in base al tono
+// Function to get tone badge color
 const getToneColor = (toneName: string) => {
   switch (toneName) {
     case 'excited': return 'bg-green-500 hover:bg-green-600';
@@ -17,7 +18,7 @@ const getToneColor = (toneName: string) => {
     case 'sympathetic': return 'bg-yellow-500 hover:bg-yellow-600';
     case 'frustrated': return 'bg-orange-500 hover:bg-orange-600';
     case 'sad': return 'bg-gray-500 hover:bg-gray-600';
-    case 'impolite': return 'bg-red-500 hover:bg-red-600';
+    case 'impolite': return 'bg-rose-500 hover:bg-rose-600';
     default: return '';
   }
 };
@@ -26,19 +27,33 @@ const ToneTab: React.FC<ToneTabProps> = ({ classifications }) => {
   // Check if classifications exist and are not empty
   if (!classifications || classifications.length === 0) {
     return (
-      <div className="flex items-center justify-center p-8 border rounded-md">
-        <div className="flex items-center space-x-2 text-muted-foreground">
-          <AlertCircle size={16} />
-          <p>No tone analysis results found. Make sure tone analysis is enabled in the features panel.</p>
+      <div className="space-y-4">
+        <Alert variant="info" className="bg-blue-50 text-blue-800 border-blue-200">
+          <AlertDescription className="flex items-center">
+            <AlertCircle className="h-4 w-4 mr-2" />
+            No tone analysis results found. Make sure tone analysis is enabled in the features panel and your text is in English or French.
+          </AlertDescription>
+        </Alert>
+        <div className="p-4 border rounded-md text-muted-foreground text-sm">
+          <p>Tone analysis detects emotional tones in your text, including:</p>
+          <ul className="list-disc pl-5 mt-2 space-y-1">
+            <li>Excited: enthusiasm and interest</li>
+            <li>Satisfied: positive response to quality</li>
+            <li>Polite: respectful and courteous</li>
+            <li>Sympathetic: emotional understanding</li>
+            <li>Frustrated: annoyance and irritation</li>
+            <li>Sad: unpleasant passive emotion</li>
+            <li>Impolite: disrespectful and rude</li>
+          </ul>
         </div>
       </div>
     );
   }
 
-  // Ordina i toni per confidenza (dal più alto al più basso)
+  // Sort tones by confidence (from highest to lowest)
   const sortedTones = [...classifications].sort((a, b) => b.confidence - a.confidence);
 
-  // Descrizioni dei toni
+  // Tone descriptions
   const toneDescriptions: Record<string, string> = {
     'excited': 'Showing personal enthusiasm and interest',
     'frustrated': 'Feeling annoyed and irritable',

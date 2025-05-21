@@ -114,8 +114,9 @@ export const useAnalysisExecution = ({
       };
     }
     
-    // For tone analysis, include classifications if enabled and language is supported or auto
-    if (features.classifications && TONE_SUPPORTED_LANGUAGES.includes(language)) {
+    // For tone analysis - include classifications for all languages, will be validated server-side
+    if (features.classifications) {
+      console.log(`Adding classifications with model: ${toneModel}, language: ${language}`);
       featuresParams.classifications = {
         model: toneModel
       };
@@ -126,6 +127,8 @@ export const useAnalysisExecution = ({
       features: featuresParams,
       language: language
     };
+
+    console.log("Sending API request with data:", JSON.stringify(requestData));
 
     try {
       // Determine the authentication method based on environment variables
@@ -153,6 +156,7 @@ export const useAnalysisExecution = ({
       }
 
       const data = await response.json();
+      console.log("API response received:", data);
       setResults(data);
       
       // Save the features used for this analysis to track changes

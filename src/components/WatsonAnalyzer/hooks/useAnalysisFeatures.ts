@@ -26,12 +26,12 @@ export const useAnalysisFeatures = () => {
     entities: true,
     concepts: true,
     categories: true,
-    classifications: true, // Default enabled for tone analysis (changed from false)
+    classifications: true, // Default enabled for tone analysis
   });
   
   // Limits state
   const [limits, setLimits] = useState<WatsonLimits>({
-    keywords: 20, // Changed from 10 to 20
+    keywords: 20,
     entities: 10,
     concepts: 5,
     categories: 3,
@@ -45,15 +45,15 @@ export const useAnalysisFeatures = () => {
   
   // Update the tone model based on the selected language
   useEffect(() => {
-    // Tone analysis is only available for English and French
-    if (language === "en") {
-      setToneModel("tone-classifications-en-v1");
-    } else if (language === "fr") {
+    // Set tone model based on language
+    if (language === "fr") {
       setToneModel("tone-classifications-fr-v1");
-    } else if (language === "auto") {
-      // Default to English tone model for auto-detection
+    } else {
+      // Default to English tone model for English or auto-detection
       setToneModel("tone-classifications-en-v1");
     }
+    
+    console.log(`Language changed to: ${language}, tone model set to: ${language === "fr" ? "tone-classifications-fr-v1" : "tone-classifications-en-v1"}`);
   }, [language]);
   
   return {

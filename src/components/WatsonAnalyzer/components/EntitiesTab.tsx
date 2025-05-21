@@ -6,7 +6,6 @@ import EntityStatsDisplay from './Entities/EntityStatsDisplay';
 import EmptyEntitiesState from './Entities/EmptyEntitiesState';
 import { 
   countWords,
-  hasMultiWordEntities,
   getEntityTypes,
   getMultiWordEntitiesCount
 } from './Entities/entityUtils';

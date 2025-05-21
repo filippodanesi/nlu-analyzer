@@ -43,13 +43,13 @@ const EntityTable: React.FC<EntityTableProps> = ({
                 <TableCell className={`font-medium ${hasTargetKeyword ? "text-green-600" : ""}`}>
                   {entity.text}
                   {wordCount > 1 && (
-                    <Badge variant="outline" className="ml-2 bg-blue-500/10 text-xs">
+                    <Badge variant="outline" className="ml-2 text-xs">
                       {wordCount} words
                     </Badge>
                   )}
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline" className="bg-secondary/50">
+                  <Badge variant="outline">
                     {entity.type}
                   </Badge>
                 </TableCell>
