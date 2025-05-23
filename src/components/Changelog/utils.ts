@@ -6,6 +6,6 @@ export const getFeatureTypeVariant = (feature: string) => {
   if (feature.startsWith("IMPLEMENT") || feature.startsWith("NEW")) return "default";
   if (feature.startsWith("MAJOR") || feature.startsWith("BREAKING")) return "outline";
   if (feature.startsWith("UPDATE")) return "secondary";
-  if (feature.startsWith("COST") || feature.startsWith("PRICING")) return "warning";
+  if (feature.startsWith("COST") || feature.startsWith("PRICING")) return "outline";
   return "default";
 };
