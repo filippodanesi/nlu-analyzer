@@ -90,7 +90,7 @@ const WatsonAnalyzer: React.FC = () => {
             to="/changelog" 
             className="text-sm text-primary hover:text-primary/80 underline underline-offset-4"
           >
-            Changelog v1.1.6
+            Changelog v1.1.7
           </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

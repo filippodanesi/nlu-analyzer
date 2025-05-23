@@ -20,6 +20,17 @@ const getFeatureTypeVariant = (feature: string) => {
 const Changelog: React.FC = () => {
   const versions = [
     {
+      version: "1.1.7",
+      date: "May 23, 2025",
+      type: "ADD",
+      features: [
+        "IMPLEMENT: Added support for Claude 3.7 Sonnet model",
+        "ENHANCEMENT: Improved model selection in Anthropic configuration",
+        "UPDATE: Updated Claude optimization process to work with multiple models",
+        "ENHANCEMENT: Added model-specific display names in optimization notifications"
+      ]
+    },
+    {
       version: "1.1.6",
       date: "May 20, 2025",
       type: "IMPROVE",
