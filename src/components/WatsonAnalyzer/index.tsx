@@ -138,12 +138,14 @@ const WatsonAnalyzer: React.FC = () => {
                   textStats={textStats}
                 />
 
-                <TextOptimizationPanel
-                  text={text}
-                  results={results}
-                  targetKeywords={targetKeywordsList}
-                  onOptimizedTextSelect={handleOptimizedTextSelect}
-                />
+                {showOptimization && (
+                  <TextOptimizationPanel
+                    text={text}
+                    results={results}
+                    targetKeywords={targetKeywordsList}
+                    onOptimizedTextSelect={handleOptimizedTextSelect}
+                  />
+                )}
               </>
             )}
           </div>
