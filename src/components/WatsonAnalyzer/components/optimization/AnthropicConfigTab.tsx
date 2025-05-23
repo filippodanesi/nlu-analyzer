@@ -47,7 +47,7 @@ const AnthropicConfigTab: React.FC<AnthropicConfigTabProps> = ({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="claude-sonnet-4-20250514">Claude 4 Sonnet</SelectItem>
-            <SelectItem value="claude-3-7-sonnet-20250219">Claude 3.7 Sonnet</SelectItem>
+            <SelectItem value="claude-3-haiku-20240307">Claude 3 Haiku</SelectItem>
           </SelectContent>
         </Select>
       </div>

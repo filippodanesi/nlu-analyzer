@@ -24,7 +24,7 @@ const Changelog: React.FC = () => {
       date: "May 23, 2025",
       type: "ADD",
       features: [
-        "IMPLEMENT: Added support for Claude 3.7 Sonnet model",
+        "IMPLEMENT: Added support for Claude 4 Sonnet model",
         "ENHANCEMENT: Improved model selection in Anthropic configuration",
         "UPDATE: Updated Claude optimization process to work with multiple models",
         "ENHANCEMENT: Added model-specific display names in optimization notifications"

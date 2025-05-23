@@ -86,7 +86,8 @@ export const optimizeWithClaude = async (
     console.log(`Using Claude model: ${claudeModel}`);
     
     // Get model name for display in toast
-    const modelDisplayName = claudeModel.includes("4-") ? "Claude 4" : "Claude 3.7";
+    const modelDisplayName = claudeModel.includes("4-") ? "Claude 4" : 
+                             claudeModel.includes("3-haiku") ? "Claude 3 Haiku" : "Claude";
     
     // Enhanced unified system prompt for better entity handling
     const systemPrompt = `You are an expert SEO content optimizer with deep expertise in NER.
