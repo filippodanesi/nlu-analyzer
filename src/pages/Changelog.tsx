@@ -12,10 +12,12 @@ const Changelog: React.FC = () => {
       date: "May 23, 2025",
       type: "ADD",
       features: [
-        "IMPLEMENT: Added support for Claude 4 Sonnet model",
-        "ENHANCEMENT: Improved model selection in Anthropic configuration",
-        "UPDATE: Updated Claude optimization process to work with multiple models",
-        "ENHANCEMENT: Added model-specific display names in optimization notifications"
+        "IMPLEMENT: Added support for Claude 4 Sonnet model with accurate pricing",
+        "ENHANCEMENT: Updated cost tracking with precise Claude model pricing ($3/$15 per MTok for Sonnet 4)",
+        "UPDATE: Restricted Claude models to only Sonnet 4 and Sonnet 3.7 for optimal performance",
+        "FIX: Corrected cost calculation dashboard to match actual Claude API usage",
+        "ENHANCEMENT: Improved model selection in Anthropic configuration with latest pricing",
+        "IMPLEMENT: Added detailed cost tooltips showing input/output token pricing"
       ]
     },
     {
