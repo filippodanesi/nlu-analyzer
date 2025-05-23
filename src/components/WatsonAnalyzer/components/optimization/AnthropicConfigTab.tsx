@@ -32,7 +32,7 @@ const AnthropicConfigTab: React.FC<AnthropicConfigTabProps> = ({
       <Alert variant="default" className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
         <Info className="h-4 w-4" />
         <AlertDescription>
-          Using Claude 4 Sonnet for advanced AI optimization
+          Claude models for advanced AI optimization
         </AlertDescription>
       </Alert>
 
@@ -47,6 +47,7 @@ const AnthropicConfigTab: React.FC<AnthropicConfigTabProps> = ({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="claude-sonnet-4-20250514">Claude 4 Sonnet</SelectItem>
+            <SelectItem value="claude-3-7-sonnet-20250219">Claude 3.7 Sonnet</SelectItem>
           </SelectContent>
         </Select>
       </div>

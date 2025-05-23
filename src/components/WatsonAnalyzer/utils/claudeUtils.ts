@@ -57,7 +57,8 @@ The original text is preserved.`;
  */
 export const optimizeWithClaude = async (
   prompt: string, 
-  apiKey: string
+  apiKey: string,
+  model: string = "claude-sonnet-4-20250514"
 ): Promise<string> => {
   try {
     // Validate API key first
@@ -80,9 +81,12 @@ export const optimizeWithClaude = async (
       });
     }
     
-    // Use Claude 4 Sonnet model (latest)
-    const claudeModel = "claude-sonnet-4-20250514";
+    // Use the specified Claude model or default to Claude 4 Sonnet
+    const claudeModel = model || "claude-sonnet-4-20250514";
     console.log(`Using Claude model: ${claudeModel}`);
+    
+    // Get model name for display in toast
+    const modelDisplayName = claudeModel.includes("4-") ? "Claude 4" : "Claude 3.7";
     
     // Enhanced unified system prompt for better entity handling
     const systemPrompt = `You are an expert SEO content optimizer with deep expertise in NER.
@@ -103,8 +107,8 @@ Core rules:
     });
 
     toast({
-      title: "Optimizing with Claude 4",
-      description: "Using the latest Claude 4 Sonnet model for optimization...",
+      title: `Optimizing with ${modelDisplayName}`,
+      description: `Using ${claudeModel} for optimization...`,
     });
 
     try {
@@ -130,14 +134,14 @@ Core rules:
         
         // Return the text if found, otherwise handle appropriately
         if (textContent && 'text' in textContent) {
-          console.log("Claude optimization successful, received text response:", textContent.text.substring(0, 100) + "...");
+          console.log(`${modelDisplayName} optimization successful, received text response:`, textContent.text.substring(0, 100) + "...");
           return textContent.text.trim();
         } else {
-          console.warn("No text content found in Claude response:", response);
-          return "Claude responded with an unexpected format. Please try again.";
+          console.warn(`No text content found in ${modelDisplayName} response:`, response);
+          return `${modelDisplayName} responded with an unexpected format. Please try again.`;
         }
       } else {
-        return "Claude returned an empty response. Please try again.";
+        return `${modelDisplayName} returned an empty response. Please try again.`;
       }
     } catch (sdkError) {
       console.error("Anthropic SDK error:", sdkError);

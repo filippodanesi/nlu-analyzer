@@ -130,7 +130,7 @@ export const optimizeTextWithAI = async (
     
     // Check which API to use based on the model name
     if (model.startsWith("claude")) {
-      return await optimizeWithClaude(prompt, apiKey);
+      return await optimizeWithClaude(prompt, apiKey, model);
     } else {
       return await optimizeWithOpenAI(prompt, apiKey, model);
     }
