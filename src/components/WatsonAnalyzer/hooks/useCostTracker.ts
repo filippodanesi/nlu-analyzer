@@ -19,7 +19,7 @@ export interface CostRecord {
   estimatedCost: number;
 }
 
-// Costi per modello (prezzi per 1M token al 16/05/2024)
+// Costi aggiornati per modello (prezzi per 1M token al 23/05/2024)
 const MODEL_COSTS: Record<string, ModelCostData> = {
   'gpt-4o-mini': {
     name: 'GPT-4o-mini',
@@ -42,6 +42,15 @@ const MODEL_COSTS: Record<string, ModelCostData> = {
     tokensPerCharInput: 0.25, 
     tokensPerCharOutput: 0.25
   },
+  // Claude Sonnet 4
+  'claude-sonnet-4-20250514': {
+    name: 'Claude 4 Sonnet',
+    inputCostPer1M: 3.00,
+    outputCostPer1M: 15.00,
+    tokensPerCharInput: 0.25,
+    tokensPerCharOutput: 0.25
+  },
+  // Claude 3.7 Sonnet (legacy model)
   'claude-3-7-sonnet-20250219': {
     name: 'Claude 3.7 Sonnet',
     inputCostPer1M: 3.00,
@@ -49,10 +58,35 @@ const MODEL_COSTS: Record<string, ModelCostData> = {
     tokensPerCharInput: 0.25,
     tokensPerCharOutput: 0.25
   },
+  // Claude 3 Haiku
   'claude-3-haiku-20240307': {
     name: 'Claude 3 Haiku',
     inputCostPer1M: 0.25,
     outputCostPer1M: 1.25, 
+    tokensPerCharInput: 0.25,
+    tokensPerCharOutput: 0.25
+  },
+  // Claude Haiku 3.5
+  'claude-haiku-3-5': {
+    name: 'Claude Haiku 3.5',
+    inputCostPer1M: 0.80,
+    outputCostPer1M: 4.00,
+    tokensPerCharInput: 0.25,
+    tokensPerCharOutput: 0.25
+  },
+  // Claude Opus 4
+  'claude-opus-4': {
+    name: 'Claude Opus 4',
+    inputCostPer1M: 15.00,
+    outputCostPer1M: 75.00,
+    tokensPerCharInput: 0.25,
+    tokensPerCharOutput: 0.25
+  },
+  // Claude Opus 3 (legacy model)
+  'claude-opus-3': {
+    name: 'Claude Opus 3',
+    inputCostPer1M: 15.00,
+    outputCostPer1M: 75.00,
     tokensPerCharInput: 0.25,
     tokensPerCharOutput: 0.25
   }

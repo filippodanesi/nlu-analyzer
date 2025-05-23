@@ -1,9 +1,10 @@
 
 import React from 'react';
-import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle, DollarSign } from "lucide-react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { AlertCircle, DollarSign, ReceiptText } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import type { AIProvider } from '../../hooks/useTextOptimization';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface CostSummaryProps {
   costTracker: any;
@@ -30,9 +31,18 @@ const CostSummary: React.FC<CostSummaryProps> = ({ costTracker, activeProvider, 
   // Calculate the total cost across all operations
   const totalCost = costTracker.totalCost[activeProvider];
   
+  // Find the latest model used (for display purposes)
+  const latestModel = lastCostRecord?.model ? costTracker.getModelCostData(lastCostRecord.model)?.name : null;
+
   return (
     <Card className="bg-muted/30">
-      <CardContent className="pt-4 pb-3">
+      <CardHeader className="pb-2">
+        <h3 className="text-sm font-medium flex items-center">
+          <ReceiptText className="h-4 w-4 mr-1" />
+          API Usage Costs
+        </h3>
+      </CardHeader>
+      <CardContent className="pt-0 pb-3">
         <div className="flex flex-col gap-2">
           <div className="flex justify-between items-center">
             <span className="text-sm font-medium flex items-center">
@@ -52,10 +62,30 @@ const CostSummary: React.FC<CostSummaryProps> = ({ costTracker, activeProvider, 
           </div>
           
           {lastCostRecord && (
-            <div className="text-xs text-muted-foreground flex items-center mt-1">
-              <AlertCircle className="h-3 w-3 mr-1" />
-              Last operation: ${(lastCostRecord.estimatedCost).toFixed(5)}
-            </div>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="text-xs text-muted-foreground flex items-center mt-1 cursor-help">
+                    <AlertCircle className="h-3 w-3 mr-1" />
+                    Last operation: ${(lastCostRecord.estimatedCost).toFixed(5)}
+                    {latestModel && <span className="ml-1">({latestModel})</span>}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <div className="text-xs">
+                    <p>Input: {lastCostRecord.estimatedInputTokens} tokens</p>
+                    <p>Output: {lastCostRecord.estimatedOutputTokens} tokens</p>
+                    <p className="font-semibold mt-1">Model pricing:</p>
+                    {lastCostRecord.model && costTracker.getModelCostData(lastCostRecord.model) && (
+                      <>
+                        <p>Input: ${costTracker.getModelCostData(lastCostRecord.model).inputCostPer1M.toFixed(2)}/MTok</p>
+                        <p>Output: ${costTracker.getModelCostData(lastCostRecord.model).outputCostPer1M.toFixed(2)}/MTok</p>
+                      </>
+                    )}
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
         </div>
       </CardContent>
