@@ -1,24 +1,12 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, FileText } from "lucide-react";
-import { Link } from "react-router-dom";
 import Footer from '@/components/WatsonAnalyzer/components/Footer';
-
-// Helper function to get badge variant based on feature type
-const getFeatureTypeVariant = (feature: string) => {
-  if (feature.startsWith("FIX")) return "secondary";
-  if (feature.startsWith("ENHANCEMENT") || feature.startsWith("ENHANCE")) return "secondary";
-  if (feature.startsWith("IMPLEMENT")) return "default";
-  if (feature.startsWith("MAJOR")) return "outline";
-  if (feature.startsWith("UPDATE")) return "secondary";
-  return "default";
-};
+import ChangelogHeader from '@/components/Changelog/ChangelogHeader';
+import ChangelogContent from '@/components/Changelog/ChangelogContent';
+import { VersionData } from '@/components/Changelog/types';
 
 const Changelog: React.FC = () => {
-  const versions = [
+  const versions: VersionData[] = [
     {
       version: "1.1.7",
       date: "May 23, 2025",
@@ -117,84 +105,8 @@ const Changelog: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <header className="border-b border-border">
-        <div className="container max-w-7xl mx-auto px-4 py-6 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <Link to="/" className="flex items-center text-primary hover:text-primary/80">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              <span>Back to Home</span>
-            </Link>
-          </div>
-          <h1 className="text-xl font-bold">Changelog</h1>
-        </div>
-      </header>
-
-      {/* Main content */}
-      <main className="container max-w-5xl mx-auto px-4 py-8 flex-grow">
-        <Card className="mb-8 shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-xl flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Update History
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground mb-8">
-              This changelog tracks all updates and improvements made to the IBM Watson Natural Language Understanding Analyzer.
-            </p>
-            
-            <div className="space-y-12">
-              {versions.map((version, index) => (
-                <div key={version.version} className="relative">
-                  {/* Timeline connector */}
-                  {index < versions.length - 1 && (
-                    <div className="absolute left-[9px] top-11 w-0.5 h-[calc(100%-16px)] bg-muted"></div>
-                  )}
-                  
-                  <div className="flex gap-6">
-                    {/* Timeline bullet */}
-                    <div className="relative w-4 h-4 rounded-full bg-primary mt-1.5 flex-shrink-0"></div>
-                    
-                    <div className="flex-grow">
-                      <div className="flex flex-wrap items-center gap-3 mb-3">
-                        <h3 className="text-lg font-medium">Version {version.version}</h3>
-                        <span className="text-sm text-muted-foreground">{version.date}</span>
-                      </div>
-                      
-                      <ul className="space-y-2 pl-1">
-                        {version.features.map((feature, idx) => {
-                          const [type, description] = feature.split(": ");
-                          return (
-                            <li key={idx} className="flex items-start gap-2">
-                              <Badge 
-                                variant={getFeatureTypeVariant(feature)}
-                                className="mt-0.5 px-1.5 py-0 text-xs font-normal whitespace-nowrap"
-                              >
-                                {type}
-                              </Badge>
-                              <span className="text-muted-foreground">{description}</span>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-        
-        <div className="bg-muted/30 rounded-lg p-6 text-center">
-          <h3 className="font-medium mb-2">Upcoming Features</h3>
-          <p className="text-muted-foreground">
-            We're working on new features to enhance the text analysis and optimization experience.
-            Stay tuned for upcoming versions!
-          </p>
-        </div>
-      </main>
-
+      <ChangelogHeader />
+      <ChangelogContent versions={versions} />
       <Footer />
     </div>
   );
