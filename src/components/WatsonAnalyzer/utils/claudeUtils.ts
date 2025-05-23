@@ -80,8 +80,8 @@ export const optimizeWithClaude = async (
       });
     }
     
-    // Always use the preferred Claude model
-    const claudeModel = "claude-3-7-sonnet-20250219";
+    // Use Claude 4 Sonnet model (latest)
+    const claudeModel = "claude-sonnet-4-20250514";
     console.log(`Using Claude model: ${claudeModel}`);
     
     // Enhanced unified system prompt for better entity handling
@@ -103,8 +103,8 @@ Core rules:
     });
 
     toast({
-      title: "Optimizing with Claude",
-      description: "Using the Anthropic SDK for secure API access...",
+      title: "Optimizing with Claude 4",
+      description: "Using the latest Claude 4 Sonnet model for optimization...",
     });
 
     try {
@@ -167,4 +167,3 @@ Core rules:
     return getFallbackMessage(prompt, error instanceof Error ? error : new Error(String(error)));
   }
 };
-

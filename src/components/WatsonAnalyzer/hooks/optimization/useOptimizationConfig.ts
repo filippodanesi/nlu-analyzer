@@ -23,9 +23,9 @@ export const useOptimizationConfig = () => {
   
   const [aiModel, setAiModel] = useState(() => {
     const savedModel = sessionStorage.getItem('ai_model') || "gpt-4o-mini";
-    // Ensure we use the preferred Claude model
-    if (savedModel.startsWith("claude-3-")) {
-      return "claude-3-7-sonnet-20250219";
+    // Update to Claude 4 Sonnet if using Claude
+    if (savedModel.startsWith("claude")) {
+      return "claude-sonnet-4-20250514";
     }
     return savedModel;
   });

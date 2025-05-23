@@ -2,7 +2,6 @@
 import React from 'react';
 import EntityTable from './Entities/EntityTable';
 import EntityAlerts from './Entities/EntityAlerts';
-import EntityStatsDisplay from './Entities/EntityStatsDisplay';
 import EmptyEntitiesState from './Entities/EmptyEntitiesState';
 import { 
   countWords,
@@ -26,7 +25,6 @@ const EntitiesTab: React.FC<EntitiesTabProps> = ({ entities, containsTargetKeywo
   // Calculate some statistics for entities detection
   const totalEntityCount = entities.length;
   const entityTypeCount = entityTypes.length;
-  const multiWordEntitiesCount = getMultiWordEntitiesCount(entities);
 
   return (
     <div className="space-y-4">
@@ -34,14 +32,6 @@ const EntitiesTab: React.FC<EntitiesTabProps> = ({ entities, containsTargetKeywo
         entities={entities} 
         entityTypeCount={entityTypeCount} 
         totalEntityCount={totalEntityCount} 
-      />
-
-      <EntityStatsDisplay 
-        entityTypes={entityTypes}
-        entities={entities}
-        totalEntityCount={totalEntityCount}
-        entityTypeCount={entityTypeCount}
-        multiWordEntitiesCount={multiWordEntitiesCount}
       />
       
       <EntityTable 

@@ -70,7 +70,7 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
     if (provider === "openai" && aiModel.startsWith("claude")) {
       setAiModel("gpt-4o-mini");
     } else if (provider === "anthropic" && !aiModel.startsWith("claude")) {
-      setAiModel("claude-3-7-sonnet-20250219");
+      setAiModel("claude-sonnet-4-20250514");
     }
   };
 
@@ -157,21 +157,21 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
               <Alert variant="default" className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
                 <Info className="h-4 w-4" />
                 <AlertDescription>
-                  Using official Anthropic SDK for secure and reliable API access
+                  Using Claude 4 Sonnet for advanced AI optimization
                 </AlertDescription>
               </Alert>
 
               <div className="space-y-2">
                 <Label htmlFor="ai-model-claude">AI Model</Label>
                 <Select 
-                  value={aiModel.startsWith("claude") ? aiModel : "claude-3-7-sonnet-20250219"} 
+                  value={aiModel.startsWith("claude") ? aiModel : "claude-sonnet-4-20250514"} 
                   onValueChange={setAiModel}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select a model" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="claude-3-7-sonnet-20250219">Claude 3.7 Sonnet</SelectItem>
+                    <SelectItem value="claude-sonnet-4-20250514">Claude 4 Sonnet</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
