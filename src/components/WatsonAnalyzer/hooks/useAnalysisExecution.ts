@@ -85,6 +85,14 @@ export const useAnalysisExecution = ({
     // Calculate text statistics
     const stats = updateTextStats(text);
 
+    // Check if text is too long for tone analysis (2000 codepoints limit)
+    const textCodepoints = [...text].length;
+    const isToneTextTooLong = textCodepoints > 2000;
+    
+    if (features.classifications && isToneTextTooLong) {
+      console.log(`Text too long for tone analysis: ${textCodepoints} codepoints (limit: 2000)`);
+    }
+
     // Prepare parameters for API request
     const featuresParams: any = {};
     
@@ -114,12 +122,14 @@ export const useAnalysisExecution = ({
       };
     }
     
-    // For tone analysis - include classifications for all languages, will be validated server-side
-    if (features.classifications) {
+    // For tone analysis - only include if text is not too long
+    if (features.classifications && !isToneTextTooLong) {
       console.log(`Adding classifications with model: ${toneModel}, language: ${language}`);
       featuresParams.classifications = {
         model: toneModel
       };
+    } else if (features.classifications && isToneTextTooLong) {
+      console.log("Skipping tone analysis due to text length limit");
     }
 
     const requestData = {
@@ -157,14 +167,26 @@ export const useAnalysisExecution = ({
 
       const data = await response.json();
       console.log("API response received:", data);
+      
+      // Add warning about tone analysis if text was too long
+      if (features.classifications && isToneTextTooLong) {
+        if (!data.warnings) data.warnings = [];
+        data.warnings.push(`Tone analysis skipped: Text exceeds 2000 character limit (${textCodepoints} characters)`);
+      }
+      
       setResults(data);
       
       // Save the features used for this analysis to track changes
       setLastAnalyzedFeatures({...features});
       
+      let toastMessage = "The text was successfully analyzed.";
+      if (features.classifications && isToneTextTooLong) {
+        toastMessage += " Note: Tone analysis was skipped due to text length.";
+      }
+      
       toast({
         title: "Analysis completed",
-        description: "The text was successfully analyzed.",
+        description: toastMessage,
       });
     } catch (error) {
       console.error('Error analyzing text:', error);

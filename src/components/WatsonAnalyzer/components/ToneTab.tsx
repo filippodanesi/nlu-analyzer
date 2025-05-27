@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, FileText } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -28,12 +28,28 @@ const ToneTab: React.FC<ToneTabProps> = ({ classifications }) => {
   if (!classifications || classifications.length === 0) {
     return (
       <div className="space-y-4">
-        <Alert variant="info" className="bg-blue-50 text-blue-800 border-blue-200">
+        <Alert variant="warning" className="bg-amber-50 text-amber-800 border-amber-200">
           <AlertDescription className="flex items-center">
-            <AlertCircle className="h-4 w-4 mr-2" />
-            No tone analysis results found. Make sure tone analysis is enabled in the features panel and your text is in English or French.
+            <FileText className="h-4 w-4 mr-2" />
+            Tone analysis not available. This could be due to text length (2000+ characters), unsupported language, or API settings.
           </AlertDescription>
         </Alert>
+        
+        <Alert variant="default" className="bg-blue-50 text-blue-800 border-blue-200">
+          <AlertCircle className="h-4 w-4 mr-2" />
+          <AlertDescription>
+            <div>
+              <p className="font-medium mb-2">To enable tone analysis:</p>
+              <ul className="list-disc pl-5 space-y-1 text-sm">
+                <li>Ensure your text is under 2000 characters</li>
+                <li>Use English or French language content</li>
+                <li>Make sure tone analysis is enabled in features</li>
+                <li>Try shorter excerpts for analysis</li>
+              </ul>
+            </div>
+          </AlertDescription>
+        </Alert>
+        
         <div className="p-4 border rounded-md text-muted-foreground text-sm">
           <p>Tone analysis detects emotional tones in your text, including:</p>
           <ul className="list-disc pl-5 mt-2 space-y-1">
