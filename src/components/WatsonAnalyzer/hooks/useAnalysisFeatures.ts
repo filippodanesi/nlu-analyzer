@@ -33,8 +33,8 @@ export const useAnalysisFeatures = () => {
   const [limits, setLimits] = useState<WatsonLimits>({
     keywords: 20,
     entities: 10,
-    concepts: 5,
-    categories: 3,
+    concepts: 10,
+    categories: 5,
   });
   
   // Language state
