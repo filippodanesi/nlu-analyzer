@@ -132,7 +132,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
           <FileJson className="h-3.5 w-3.5" />
           IBM Watson Natural Language Understanding Analyzer
         </span>
-        <span>v1.1.6</span>
+        <span>v1.1.7</span>
       </CardFooter>
     </Card>
   );
