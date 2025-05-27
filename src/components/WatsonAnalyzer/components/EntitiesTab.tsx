@@ -9,6 +9,7 @@ import EntityTable from './Entities/EntityTable';
 import EntityStatsDisplay from './Entities/EntityStatsDisplay';
 import EntityAlerts from './Entities/EntityAlerts';
 import EmptyEntitiesState from './Entities/EmptyEntitiesState';
+import { countWords, getMultiWordEntitiesCount } from './Entities/entityUtils';
 
 interface EntitiesTabProps {
   entities: any[];
@@ -26,31 +27,17 @@ const EntitiesTab: React.FC<EntitiesTabProps> = ({ entities, containsTargetKeywo
   // Get entity types for filtering
   const entityTypes = [...new Set(entities.map(entity => entity.type))].sort();
   
+  // Calculate stats
+  const totalEntityCount = entities.length;
+  const entityTypeCount = entityTypes.length;
+  const multiWordEntitiesCount = getMultiWordEntitiesCount(entities);
+  
   // Filter entities based on confidence and type selection
   const filteredEntities = entities.filter(entity => {
     const passesConfidenceFilter = showLowConfidence || (entity.confidence && entity.confidence > 0.5);
     const passesTypeFilter = selectedTypes.length === 0 || selectedTypes.includes(entity.type);
     return passesConfidenceFilter && passesTypeFilter;
   });
-
-  // Check for potential issues with entity recognition
-  const hasMultiWordIssues = entities.some(entity => {
-    const text = entity.text || '';
-    const type = entity.type || '';
-    
-    if (text.includes(' ') && ['Organization', 'Company', 'Brand'].includes(type)) {
-      const words = text.split(' ');
-      const firstWord = words[0].toLowerCase();
-      const commonVerbs = ['experience', 'discover', 'buy', 'shop', 'find', 'get', 'try'];
-      return commonVerbs.includes(firstWord);
-    }
-    return false;
-  });
-
-  const hasSectionTitleIssues = entities.some(entity => 
-    entity.type === 'Organization' && 
-    (entity.text.includes('of ') || entity.text.includes('The ') || entity.text.length > 20)
-  );
 
   const toggleTypeFilter = (type: string) => {
     setSelectedTypes(prev => 
@@ -63,13 +50,19 @@ const EntitiesTab: React.FC<EntitiesTabProps> = ({ entities, containsTargetKeywo
   return (
     <div className="space-y-4">
       {/* Entity Statistics */}
-      <EntityStatsDisplay entities={entities} />
+      <EntityStatsDisplay 
+        entityTypes={entityTypes}
+        entities={entities}
+        totalEntityCount={totalEntityCount}
+        entityTypeCount={entityTypeCount}
+        multiWordEntitiesCount={multiWordEntitiesCount}
+      />
 
       {/* Alerts for potential issues */}
       <EntityAlerts 
-        hasMultiWordIssues={hasMultiWordIssues}
-        hasSectionTitleIssues={hasSectionTitleIssues}
         entities={entities}
+        entityTypeCount={entityTypeCount}
+        totalEntityCount={totalEntityCount}
       />
 
       {/* Filters */}
@@ -114,6 +107,7 @@ const EntitiesTab: React.FC<EntitiesTabProps> = ({ entities, containsTargetKeywo
       <EntityTable 
         entities={filteredEntities}
         containsTargetKeyword={containsTargetKeyword}
+        countWords={countWords}
       />
 
       {filteredEntities.length === 0 && entities.length > 0 && (
