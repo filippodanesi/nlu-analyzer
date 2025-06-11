@@ -39,7 +39,8 @@ export const optimizeWithOpenAI = async (
   12. Product descriptions must be unique, informative, and between 200 to 500 words. Avoid thin content at all costs.
   13. Do not output JSON, explanations, markdown, or bullet points — only return the optimized plain text with correct punctuation and original formatting (no added line breaks or structural changes).
   14. Do NOT refer to colors or mention sizes. Descriptions must remain generic and suitable for use across all product variants.
-  15. Maintain the original language of the input content. Do not translate unless explicitly instructed.`;  
+  15. The optimized text should be between 100 and 150 words.
+  16. Maintain the original language of the input content. Do not translate unless explicitly instructed.`;  
 
   // Log the model being used to debug o4-mini issues
   console.log(`Using OpenAI model: ${model}`);
