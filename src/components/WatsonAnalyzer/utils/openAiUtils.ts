@@ -29,18 +29,30 @@ export const optimizeWithOpenAI = async (
   9. When multiple interpretations of an entity are possible, prefer the fashion-related meaning using provided KNOWLEDGE SNIPPETS as guidance.
   10. Communicate benefits emotionally but concretely, using Triumph’s brand attributes: empathy, intuition, dynamism, courage, dedication, and open-mindedness.
   11. Ensure every product description answers the following customer-centric questions:
-     – What is this product?
-     – What problems does it solve?
-     – What makes it different from other products?
-     – What is it made of?
-     – Where does it come from?
-     – How do I use this product?
-     – Why should I buy this product?
+      – What is this product?
+      – What problems does it solve?
+      – What makes it different from other products?
+      – What is it made of?
+      – Where does it come from?
+      – How do I use this product?
+      – Why should I buy this product?
   12. Product descriptions must be unique, informative, and between 200 to 500 words. Avoid thin content at all costs.
   13. Do not output JSON, explanations, markdown, or bullet points — only return the optimized plain text with correct punctuation and original formatting (no added line breaks or structural changes).
   14. Do NOT refer to colors or mention sizes. Descriptions must remain generic and suitable for use across all product variants.
   15. The optimized text should be between 100 and 150 words.
-  16. Maintain the original language of the input content. Do not translate unless explicitly instructed.`;  
+  16. Maintain the original language of the input content. Do not translate unless explicitly instructed.
+  
+  — STRUCTURE RULES (MANDATORY) —
+  
+  During optimization, follow this precise output structure:
+  1. Start with the material composition line exactly as given (e.g. “48% Polyester, 40% Polyamide, 12% Elastane”).
+  2. Follow with a **brief paragraph introduction** (2–3 lines max), elegant and descriptive, aligned with the brand tone. This paragraph sets the product context but must not be excessively long.
+  3. Add a bulleted list using en dashes (–) to highlight key product features (e.g. – Lace push-up bra). Use consistent formatting. Prefer 3–6 concise, concrete feature bullets.
+  4. Finish with the certification line and Item Nr. (if present in the original). Do not omit these or move them to other parts of the text.
+  
+  Do NOT alter the position or format of these structural elements. Never omit the composition, certification, or Item Nr. if present in the original input.
+  
+  This structure must be respected **even if the input text does not follow it**. Rearrange and rewrite to fit this structure while applying all brand, tone, and SEO guidelines above.`;   
 
   // Log the model being used to debug o4-mini issues
   console.log(`Using OpenAI model: ${model}`);
