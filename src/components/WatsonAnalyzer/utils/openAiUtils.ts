@@ -52,7 +52,20 @@ export const optimizeWithOpenAI = async (
   
   Do NOT alter the position or format of these structural elements. Never omit the composition, certification, or Item Nr. if present in the original input.
   
-  This structure must be respected **even if the input text does not follow it**. Rearrange and rewrite to fit this structure while applying all brand, tone, and SEO guidelines above.`;   
+  This structure must be respected **even if the input text does not follow it**. Rearrange and rewrite to fit this structure while applying all brand, tone, and SEO guidelines above.
+  
+  — HUMAN STYLE REQUIREMENTS (MANDATORY) —
+  
+  To reduce the appearance of AI-generated content:
+  1. Vary sentence structure and length to improve natural rhythm (increase perplexity and burstiness).
+  2. Avoid redundancy. Ensure clarity and engagement throughout.
+  3. Do NOT use overused or “AI-signature” phrases such as: 
+     “Indeed”, “Furthermore”, “However”, “Notably”, “In terms of”, “Moreover”, “Unlock the potential of”, “Delve into the world of”, “Pave the way for”, “At the forefront of”, “Embark on a journey”, “Spearhead the initiative”, “Navigate the complexities”, “It is worth mentioning”, etc.
+  4. Avoid generic ChatGPT-style words such as “realm”, “landscape”, “testament”, “showcase”.
+  5. Use direct, simple language. When appropriate, use first-person or conversational phrasing to enhance relatability, as long as tone guidelines are followed.
+  6. Avoid formulaic transitions. Let ideas flow naturally and authentically.
+  
+  Always aim for a refined, confident, human voice — not generic or overly formal. Prioritize clarity and emotional connection over stylistic embellishment.`;
 
   // Log the model being used to debug o4-mini issues
   console.log(`Using OpenAI model: ${model}`);
