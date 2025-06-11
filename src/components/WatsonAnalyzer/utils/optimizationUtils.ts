@@ -88,7 +88,7 @@ export const optimizeTextWithAI = async (
   targetKeywords: string[],
   analysisResults: any,
   apiKey: string,
-  model: string = "gpt-4o-mini"
+  model: string = "o4-mini"
 ): Promise<string> => {
   try {
     // Get entity analysis for better context

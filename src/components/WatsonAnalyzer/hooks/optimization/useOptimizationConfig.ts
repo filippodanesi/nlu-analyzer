@@ -22,16 +22,16 @@ export const useOptimizationConfig = () => {
   });
   
   const [aiModel, setAiModel] = useState(() => {
-    const savedModel = sessionStorage.getItem('ai_model') || "gpt-4o-mini";
+    const savedModel = sessionStorage.getItem('ai_model') || "o4-mini";
     // Update to Claude 4 Sonnet if using Claude
     if (savedModel.startsWith("claude")) {
-      return "claude-sonnet-4-20250514";
+      return "claude-sonnet-4-0";
     }
     return savedModel;
   });
   
   const [aiProvider, setAiProvider] = useState<AIProvider>(() => {
-    const savedModel = sessionStorage.getItem('ai_model') || "gpt-4o-mini";
+    const savedModel = sessionStorage.getItem('ai_model') || "o4-mini";
     return savedModel.startsWith("claude") ? "anthropic" : "openai";
   });
 

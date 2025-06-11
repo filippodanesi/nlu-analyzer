@@ -9,7 +9,7 @@
 export const optimizeWithOpenAI = async (
   prompt: string, 
   apiKey: string,
-  model: string = "gpt-4o-mini"
+  model: string = "o4-mini"
 ): Promise<string> => {
   // Enhanced unified system prompt for better entity handling
 const systemPrompt = `You are a senior SEO content optimizer and linguistic stylist, specialized in fashion and lingerie. You work exclusively for Triumph and are deeply familiar with the Triumph Brand Book, tone of voice, and values.
@@ -33,8 +33,8 @@ Follow these rules:
   console.log(`Using OpenAI model: ${model}`);
   
   // Handle specific models parameters differently
-  const isO4MiniModel = model === "gpt-4o-mini";
-  const isNewModel = model.includes('o1') || model.includes('o4');
+  const isO4MiniModel = model === "o4-mini";
+  const isNewModel = model.includes('o3') || model.includes('o4');
   
   // Configure API request body based on model type
   const requestBody = {
@@ -76,7 +76,7 @@ Follow these rules:
       
       // Enhanced error handling with specific guidance for o4-mini issues
       if (isO4MiniModel && errorData?.error?.message?.includes("max_tokens")) {
-        throw new Error("gpt-4o-mini requires 'max_completion_tokens' instead of 'max_tokens'. The system has made this change but the API call failed. Please try again.");
+        throw new Error("o4-mini requires 'max_completion_tokens' instead of 'max_tokens'. The system has made this change but the API call failed. Please try again.");
       }
       
       throw new Error(

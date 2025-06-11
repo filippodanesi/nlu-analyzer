@@ -12,8 +12,8 @@ const Changelog: React.FC = () => {
       type: "MAJOR",
       features: [
         "MAJOR: Added multi-model optimization support for OpenAI and Anthropic",
-        "IMPLEMENT: Integrated OpenAI models (o1-mini, o1) for text optimization",
-        "IMPLEMENT: Added Anthropic Claude models (Claude 3.5 Sonnet, Claude 3 Opus) support",
+        "IMPLEMENT: Integrated OpenAI models (o4-mini, o3) for text optimization",
+        "IMPLEMENT: Added Anthropic Claude models (Claude 4 Sonnet, Claude 4 Opus) support",
         "ENHANCEMENT: Created unified AnalyzerService for seamless model switching",
         "IMPLEMENT: Added cost-effective and high-performance model categorization",
         "ENHANCEMENT: Improved model selection with provider-specific configurations",

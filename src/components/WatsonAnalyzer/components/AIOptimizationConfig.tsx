@@ -60,9 +60,9 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
     }
     // Set a default model for the selected provider
     if (provider === "openai" && aiModel.startsWith("claude")) {
-      setAiModel("gpt-4o-mini");
-    } else if (provider === "anthropic" && !aiModel.startsWith("claude")) {
-      setAiModel("claude-sonnet-4-20250514");
+      setAiModel("o4-mini");
+          } else if (provider === "anthropic" && !aiModel.startsWith("claude")) {
+        setAiModel("claude-sonnet-4-0");
     }
   };
 
