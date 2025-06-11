@@ -94,6 +94,7 @@ export const optimizeWithClaude = async (
 
 Core rules:
 • Use the ENTITY TAXONOMY provided in the user prompt (Brand, ProductType, Material, Feature, Benefit).  
+• Never use words like "sexy", "boobs", "tits" and similar. Always use and elegant and polite language.
 • Never merge a sentence-initial verb with a brand name.  
 • Disambiguate entities with the KNOWLEDGE SNIPPETS section; if multiple senses exist, pick the fashion-related one.  
 • Return multi-word keyphrases (2-5 tokens), exclude single-word generics.  
