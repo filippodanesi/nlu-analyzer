@@ -28,9 +28,18 @@ export const optimizeWithOpenAI = async (
   8. Avoid verb-brand fusion at the start of sentences (e.g. write “Discover the Triumph Fit” not “DiscoverTriumphFit”).
   9. When multiple interpretations of an entity are possible, prefer the fashion-related meaning using provided KNOWLEDGE SNIPPETS as guidance.
   10. Communicate benefits emotionally but concretely, using Triumph’s brand attributes: empathy, intuition, dynamism, courage, dedication, and open-mindedness.
-  11. Do not output JSON, explanations, markdown, or bullet points — only return the optimized plain text with correct punctuation and original formatting (no added line breaks or structural changes).
-  12. Do NOT refer to colors or mention sizes. Descriptions must remain generic and suitable for use across all product variants.
-  13. Maintain the original language of the input content. Do not translate unless explicitly instructed.`; 
+  11. Ensure every product description answers the following customer-centric questions:
+     – What is this product?
+     – What problems does it solve?
+     – What makes it different from other products?
+     – What is it made of?
+     – Where does it come from?
+     – How do I use this product?
+     – Why should I buy this product?
+  12. Product descriptions must be unique, informative, and between 200 to 500 words. Avoid thin content at all costs.
+  13. Do not output JSON, explanations, markdown, or bullet points — only return the optimized plain text with correct punctuation and original formatting (no added line breaks or structural changes).
+  14. Do NOT refer to colors or mention sizes. Descriptions must remain generic and suitable for use across all product variants.
+  15. Maintain the original language of the input content. Do not translate unless explicitly instructed.`;  
 
   // Log the model being used to debug o4-mini issues
   console.log(`Using OpenAI model: ${model}`);
