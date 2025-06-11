@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Footer from '@/components/WatsonAnalyzer/components/Footer';
 import ChangelogHeader from '@/components/Changelog/ChangelogHeader';
@@ -7,6 +6,20 @@ import { VersionData } from '@/components/Changelog/types';
 
 const Changelog: React.FC = () => {
   const versions: VersionData[] = [
+    {
+      version: "1.1.8",
+      date: "May 24, 2025",
+      type: "MAJOR",
+      features: [
+        "MAJOR: Added multi-model optimization support for OpenAI and Anthropic",
+        "IMPLEMENT: Integrated OpenAI models (o1-mini, o1) for text optimization",
+        "IMPLEMENT: Added Anthropic Claude models (Claude 3.5 Sonnet, Claude 3 Opus) support",
+        "ENHANCEMENT: Created unified AnalyzerService for seamless model switching",
+        "IMPLEMENT: Added cost-effective and high-performance model categorization",
+        "ENHANCEMENT: Improved model selection with provider-specific configurations",
+        "UPDATE: Enhanced optimization workflow with multiple AI provider support"
+      ]
+    },
     {
       version: "1.1.7",
       date: "May 23, 2025",
