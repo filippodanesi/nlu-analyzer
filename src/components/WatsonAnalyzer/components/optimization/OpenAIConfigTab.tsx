@@ -30,16 +30,15 @@ const OpenAIConfigTab: React.FC<OpenAIConfigTabProps> = ({
       <div className="space-y-2">
         <Label htmlFor="ai-model-openai">AI Model</Label>
         <Select 
-          value={aiModel.startsWith("gpt") || aiModel.startsWith("o4") ? aiModel : "gpt-4o-mini"} 
+          value={aiModel.startsWith("o3") || aiModel.startsWith("o4") ? aiModel : "o4-mini"} 
           onValueChange={setAiModel}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select a model" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="gpt-4o-mini">OpenAI GPT-4o-mini</SelectItem>
-            <SelectItem value="gpt-4o">OpenAI GPT-4o</SelectItem>
-            <SelectItem value="o4-mini-2025-04-16">OpenAI o4-mini</SelectItem>
+            <SelectItem value="o4-mini">OpenAI o4-mini</SelectItem>
+            <SelectItem value="o3">OpenAI o3</SelectItem>
           </SelectContent>
         </Select>
       </div>

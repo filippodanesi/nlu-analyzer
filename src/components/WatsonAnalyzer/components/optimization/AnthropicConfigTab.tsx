@@ -39,15 +39,15 @@ const AnthropicConfigTab: React.FC<AnthropicConfigTabProps> = ({
       <div className="space-y-2">
         <Label htmlFor="ai-model-claude">AI Model</Label>
         <Select 
-          value={aiModel.startsWith("claude") ? aiModel : "claude-sonnet-4-20250514"} 
+          value={aiModel.startsWith("claude") ? aiModel : "claude-sonnet-4-0"} 
           onValueChange={setAiModel}
         >
           <SelectTrigger>
             <SelectValue placeholder="Select a model" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="claude-sonnet-4-20250514">Claude 4 Sonnet ($3/$15 per MTok)</SelectItem>
-            <SelectItem value="claude-3-7-sonnet-20250219">Claude 3.7 Sonnet ($3/$15 per MTok)</SelectItem>
+            <SelectItem value="claude-sonnet-4-0">Claude Sonnet 4 ($3/$15 per MTok)</SelectItem>
+            <SelectItem value="claude-opus-4-0">Claude Opus 4 ($15/$75 per MTok)</SelectItem>
           </SelectContent>
         </Select>
         <p className="text-xs text-muted-foreground">Prices shown as Input/Output per million tokens</p>
