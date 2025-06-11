@@ -46,8 +46,8 @@ const AnthropicConfigTab: React.FC<AnthropicConfigTabProps> = ({
             <SelectValue placeholder="Select a model" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="claude-sonnet-4-0">Claude Sonnet 4 ($3/$15 per MTok)</SelectItem>
-            <SelectItem value="claude-opus-4-0">Claude Opus 4 ($15/$75 per MTok)</SelectItem>
+            <SelectItem value="claude-sonnet-4-0">Claude Sonnet 4</SelectItem>
+            <SelectItem value="claude-opus-4-0">Claude Opus 4</SelectItem>
           </SelectContent>
         </Select>
         <p className="text-xs text-muted-foreground">Prices shown as Input/Output per million tokens</p>

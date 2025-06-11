@@ -37,8 +37,8 @@ const OpenAIConfigTab: React.FC<OpenAIConfigTabProps> = ({
             <SelectValue placeholder="Select a model" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="o4-mini">OpenAI o4-mini</SelectItem>
-            <SelectItem value="o3">OpenAI o3</SelectItem>
+            <SelectItem value="o4-mini">o4-mini</SelectItem>
+            <SelectItem value="o3">o3</SelectItem>
           </SelectContent>
         </Select>
       </div>
