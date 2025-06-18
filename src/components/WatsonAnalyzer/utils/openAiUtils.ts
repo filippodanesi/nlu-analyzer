@@ -4,7 +4,7 @@
  */
 
 /**
- * Optimizes text using OpenAI GPT API
+ * Optimizes text using OpenAI API
  */
 export const optimizeWithOpenAI = async (
   prompt: string, 
