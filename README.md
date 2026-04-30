@@ -1,4 +1,3 @@
-
 # Watson NLU & AI Text Optimizer
 
 Powerful tool for analyzing and optimizing text content using IBM Watson's Natural Language Understanding (NLU) service combined with advanced AI models. This application provides an elegant way to extract insights from text data and improve content through AI-powered optimization.
@@ -155,6 +154,8 @@ To use all features of this application, you'll need:
 - **Secure Input** - API key fields use password masking for security
 - **Client-Side Processing** - All API requests are made directly from your browser
 
+> **Note:** Because this is a fully client-side app, any API key you paste is used to call provider APIs directly from your browser. Use a key with the minimum scope needed and avoid running the public build with shared keys.
+
 ## URL Scraping
 
 Extract content from websites using:
@@ -167,10 +168,10 @@ Extract content from websites using:
 
 The application offers AI-powered text optimization using:
 
-1. **OpenAI's GPT Models**
-   - GPT-4o-mini and GPT-4o for efficient and powerful text generation
-2. **Anthropic's Claude Models**
-   - Claude 3.7 Sonnet for nuanced text optimization
+1. **OpenAI Models**
+   - `o4-mini` for cost-effective generation and `o3` for advanced reasoning
+2. **Anthropic Claude Models**
+   - `claude-sonnet-4-6` for cost-effective optimization and `claude-opus-4-7` for the highest-quality rewrites
 3. **Optimization Features**
    - Keyword integration suggestions
    - Content improvements based on NLU analysis
@@ -181,7 +182,7 @@ The application offers AI-powered text optimization using:
 - Built with React, TypeScript, and Tailwind CSS
 - UI inspired by Vercel's minimalist design principles
 - NLP functionality powered by IBM Watson's NLU service
-- Text optimization powered by OpenAI GPT models and Anthropic Claude
+- Text optimization powered by OpenAI models and Anthropic Claude
 
 ## License
 
