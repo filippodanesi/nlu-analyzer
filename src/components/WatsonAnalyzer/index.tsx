@@ -7,6 +7,7 @@ import TextOptimizationPanel from './components/TextOptimizationPanel';
 import { useWatsonAnalyzer } from './hooks/useWatsonAnalyzer';
 import { useOptimization } from './hooks/useOptimization';
 import { Link } from 'react-router-dom';
+import { currentVersion } from '@/data/changelog';
 
 // Import refactored components
 import Header from './components/Header';
@@ -89,7 +90,7 @@ const WatsonAnalyzer: React.FC = () => {
             to="/changelog" 
             className="text-sm text-primary hover:text-primary/80 underline underline-offset-4"
           >
-            Changelog v1.1.8
+            {`Changelog v${currentVersion}`}
           </Link>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
