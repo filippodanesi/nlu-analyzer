@@ -19,72 +19,32 @@ export interface CostRecord {
   estimatedCost: number;
 }
 
-// Costi aggiornati per modello (prezzi per 1M token al 23/05/2024)
+// Keys must match the IDs declared in src/lib/models.ts so that
+// trackOperation can resolve cost data for any model the user can pick.
 const MODEL_COSTS: Record<string, ModelCostData> = {
-  'gpt-4o-mini': {
-    name: 'GPT-4o-mini',
-    inputCostPer1M: 1.00,
-    outputCostPer1M: 3.00,
-    tokensPerCharInput: 0.25,
-    tokensPerCharOutput: 0.25
-  },
-  'gpt-4o': {
-    name: 'GPT-4o',
-    inputCostPer1M: 5.00,
-    outputCostPer1M: 15.00,
-    tokensPerCharInput: 0.25,
-    tokensPerCharOutput: 0.25
-  },
-  'o4-mini-2025-04-16': {
+  'o4-mini': {
     name: 'o4-mini',
     inputCostPer1M: 1.10,
     outputCostPer1M: 4.40,
-    tokensPerCharInput: 0.25, 
+    tokensPerCharInput: 0.25,
     tokensPerCharOutput: 0.25
   },
-  // Claude Sonnet 4
-  'claude-sonnet-4-20250514': {
-    name: 'Claude 4 Sonnet',
+  'o3': {
+    name: 'o3',
+    inputCostPer1M: 2.00,
+    outputCostPer1M: 8.00,
+    tokensPerCharInput: 0.25,
+    tokensPerCharOutput: 0.25
+  },
+  'claude-sonnet-4-6': {
+    name: 'Claude Sonnet 4.6',
     inputCostPer1M: 3.00,
     outputCostPer1M: 15.00,
     tokensPerCharInput: 0.25,
     tokensPerCharOutput: 0.25
   },
-  // Claude 3.7 Sonnet (legacy model)
-  'claude-3-7-sonnet-20250219': {
-    name: 'Claude 3.7 Sonnet',
-    inputCostPer1M: 3.00,
-    outputCostPer1M: 15.00,
-    tokensPerCharInput: 0.25,
-    tokensPerCharOutput: 0.25
-  },
-  // Claude 3 Haiku
-  'claude-3-haiku-20240307': {
-    name: 'Claude 3 Haiku',
-    inputCostPer1M: 0.25,
-    outputCostPer1M: 1.25, 
-    tokensPerCharInput: 0.25,
-    tokensPerCharOutput: 0.25
-  },
-  // Claude Haiku 3.5
-  'claude-haiku-3-5': {
-    name: 'Claude Haiku 3.5',
-    inputCostPer1M: 0.80,
-    outputCostPer1M: 4.00,
-    tokensPerCharInput: 0.25,
-    tokensPerCharOutput: 0.25
-  },
-  // Claude Opus 4
-  'claude-opus-4': {
-    name: 'Claude Opus 4',
-    inputCostPer1M: 15.00,
-    outputCostPer1M: 75.00,
-    tokensPerCharInput: 0.25,
-    tokensPerCharOutput: 0.25
-  },
-  // Claude Opus 3 (legacy model)
-  'claude-opus-3': {
-    name: 'Claude Opus 3',
+  'claude-opus-4-7': {
+    name: 'Claude Opus 4.7',
     inputCostPer1M: 15.00,
     outputCostPer1M: 75.00,
     tokensPerCharInput: 0.25,
@@ -97,6 +57,8 @@ const DEFAULT_BUDGETS = {
   openai: 5.00,  // $5 per OpenAI
   anthropic: 5.00 // $5 per Claude
 };
+
+const isAnthropicModel = (model: string) => model.startsWith('claude');
 
 export const useCostTracker = () => {
   // Storico dei costi
@@ -129,8 +91,8 @@ export const useCostTracker = () => {
     if (provider) {
       // Resetta solo per un provider specifico
       setCostHistory(prev => prev.filter(record => {
-        const isOpenAI = ['gpt-4o-mini', 'gpt-4o', 'o4-mini-2025-04-16'].includes(record.model);
-        return provider === 'openai' ? !isOpenAI : isOpenAI;
+        const recordProvider = isAnthropicModel(record.model) ? 'anthropic' : 'openai';
+        return recordProvider !== provider;
       }));
       setRemainingBudget(prev => ({
         ...prev,
@@ -178,7 +140,7 @@ export const useCostTracker = () => {
     const estimatedCost = inputCost + outputCost;
 
     // Determina il provider in base al modello
-    const provider = model.startsWith('claude') ? 'anthropic' : 'openai';
+    const provider = isAnthropicModel(model) ? 'anthropic' : 'openai';
 
     // Registra il costo
     const costRecord: CostRecord = {
