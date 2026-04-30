@@ -22,17 +22,17 @@ export const models: ModelConfig[] = [
     costEffective: false,
   },
   {
-    id: 'claude-sonnet-4-0',
-    name: 'Claude Sonnet 4',
+    id: 'claude-sonnet-4-6',
+    name: 'Claude Sonnet 4.6',
     provider: 'anthropic',
-    description: 'Cost-effective Anthropic model with good performance',
+    description: 'Cost-effective Anthropic model with strong general performance',
     costEffective: true,
   },
   {
-    id: 'claude-opus-4-0',
-    name: 'Claude Opus 4',
+    id: 'claude-opus-4-7',
+    name: 'Claude Opus 4.7',
     provider: 'anthropic',
-    description: 'High-performance Anthropic model with superior capabilities',
+    description: 'Most capable Anthropic model for complex reasoning',
     costEffective: false,
   },
 ];
@@ -51,4 +51,4 @@ export const getCostEffectiveModels = (): ModelConfig[] => {
 
 export const getHighPerformanceModels = (): ModelConfig[] => {
   return models.filter(model => !model.costEffective);
-}; 
+};

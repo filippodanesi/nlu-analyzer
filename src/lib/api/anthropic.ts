@@ -7,6 +7,7 @@ export class AnthropicService {
   constructor(apiKey: string) {
     this.client = new Anthropic({
       apiKey: apiKey,
+      dangerouslyAllowBrowser: true,
     });
   }
 
@@ -27,10 +28,14 @@ export class AnthropicService {
         ],
       });
 
-      return response.content[0].text;
+      const block = response.content[0];
+      if (!block || block.type !== 'text') {
+        throw new Error('Anthropic returned no text content block');
+      }
+      return block.text;
     } catch (error) {
       console.error('Error analyzing text with Anthropic:', error);
       throw error;
     }
   }
-} 
+}
