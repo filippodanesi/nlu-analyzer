@@ -44,6 +44,10 @@ export default defineConfig(({ mode }) => {
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
+        // @mendable/firecrawl-js pulls zod-to-json-schema, which imports the
+        // `zod/v3` subpath (only present in zod v4). The project pins zod v3,
+        // whose main export already IS the v3 API, so map the subpath back to it.
+        "zod/v3": "zod",
       },
     },
     define: {

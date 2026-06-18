@@ -11,12 +11,6 @@ import {
   TableRow
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 
 interface KeywordsTabProps {
   keywords: any[];
@@ -26,9 +20,8 @@ interface KeywordsTabProps {
   isPartialKeywordMatch?: (text: string, targetKeyword: string) => boolean;
 }
 
-const KeywordsTab: React.FC<KeywordsTabProps> = ({ 
-  keywords, 
-  containsTargetKeyword, 
+const KeywordsTab: React.FC<KeywordsTabProps> = ({
+  keywords,
   targetKeywords,
   isExactKeywordMatch,
   isPartialKeywordMatch
@@ -44,54 +37,19 @@ const KeywordsTab: React.FC<KeywordsTabProps> = ({
     );
   }
 
-  // Log the keywords and target keywords for debugging
-  console.log("Keywords from API:", keywords);
-  console.log("Target keywords:", targetKeywords);
-
-  // Check the type of match with target keywords
-  const checkKeywordMatch = (text: string) => {
+  // Classify an extracted keyword against the user's target keywords.
+  const checkKeywordMatch = (text: string): "exact" | "partial" | "none" => {
     if (!targetKeywords.length) return "none";
-    
-    // Convert text to lowercase for comparison
-    const lowerText = text.toLowerCase().trim();
-    console.log(`Checking keyword match for: "${lowerText}"`);
-    
-    // Check for exact matches
-    for (const keyword of targetKeywords) {
-      const lowerKeyword = keyword.toLowerCase().trim();
-      if (isExactKeywordMatch && isExactKeywordMatch(lowerText, lowerKeyword)) {
-        console.log(`✓ Exact match found for "${lowerText}" with "${lowerKeyword}"`);
-        return "exact";
-      }
+    if (isExactKeywordMatch && targetKeywords.some(kw => isExactKeywordMatch(text, kw))) {
+      return "exact";
     }
-    
-    // Check for partial matches
-    for (const keyword of targetKeywords) {
-      const lowerKeyword = keyword.toLowerCase().trim();
-      if (isPartialKeywordMatch && isPartialKeywordMatch(lowerText, lowerKeyword)) {
-        console.log(`~ Partial match found for "${lowerText}" with "${lowerKeyword}"`);
-        return "partial";
-      }
+    if (isPartialKeywordMatch && targetKeywords.some(kw => isPartialKeywordMatch(text, kw))) {
+      return "partial";
     }
-    
-    // Double-check if there's any match using direct string includes
-    for (const keyword of targetKeywords) {
-      const lowerKeyword = keyword.toLowerCase().trim();
-      if (lowerText.includes(lowerKeyword)) {
-        console.log(`• Direct includes match for "${lowerText}" with "${lowerKeyword}"`);
-        // If we got here, one of our matcher functions might be failing
-        return "partial";
-      }
-    }
-    
-    console.log(`✗ No match for "${lowerText}"`);
     return "none";
   };
-  
-  // Count words in a phrase
-  const countWords = (text: string) => {
-    return text.trim().split(/\s+/).length;
-  };
+
+  const countWords = (text: string) => text.trim().split(/\s+/).length;
 
   return (
     <div className="space-y-4">
@@ -108,27 +66,25 @@ const KeywordsTab: React.FC<KeywordsTabProps> = ({
             {keywords.map((keyword: any, index: number) => {
               const matchType = checkKeywordMatch(keyword.text);
               const wordCount = countWords(keyword.text);
-              
+
               let rowClassName = "";
               let textClassName = "font-medium";
-              
+
               if (matchType === "exact") {
-                rowClassName = "bg-green-500/10";
-                textClassName = "font-medium text-green-600";
+                rowClassName = "bg-emerald-500/10";
+                textClassName = "font-medium text-emerald-700 dark:text-emerald-400";
               } else if (matchType === "partial") {
-                rowClassName = "bg-orange-500/10";
-                textClassName = "font-medium text-orange-600";
+                rowClassName = "bg-amber-500/10";
+                textClassName = "font-medium text-amber-700 dark:text-amber-400";
               }
-              
+
               return (
                 <TableRow key={index} className={rowClassName}>
                   <TableCell className={textClassName}>
                     {keyword.text}
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="bg-secondary/50">
-                      {wordCount}
-                    </Badge>
+                    <Badge variant="outline">{wordCount}</Badge>
                   </TableCell>
                   <TableCell>{(keyword.relevance * 100).toFixed(1)}%</TableCell>
                 </TableRow>
@@ -137,17 +93,17 @@ const KeywordsTab: React.FC<KeywordsTabProps> = ({
           </TableBody>
         </Table>
       </ScrollArea>
-      
+
       {targetKeywords.length > 0 && (
-        <div className="flex flex-col gap-1 mt-2 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-green-500/70"></div>
-            <span>Exact match</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-orange-500/70"></div>
-            <span>Partial match</span>
-          </div>
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-emerald-500/70" />
+            Exact match
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-amber-500/70" />
+            Partial match
+          </span>
         </div>
       )}
     </div>

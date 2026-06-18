@@ -1,50 +1,56 @@
 
 import React from 'react';
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { CheckCircle2, Sparkles } from "lucide-react";
 
-interface OptimizationAlertsProps {
-  needsOptimization: boolean;
+interface OptimizationGuidanceProps {
+  totalKeywords: number;
   keywordsToOptimize: string[];
   keywordsWithPartialMatch: string[];
+  hasOptimized: boolean;
 }
 
 /**
- * Displays appropriate alerts based on keyword optimization status
+ * A single, prescriptive line that tells the user exactly what to do next to
+ * improve the text. Replaces the previous three coloured alert variants.
  */
-const OptimizationAlerts: React.FC<OptimizationAlertsProps> = ({ 
-  needsOptimization,
+const OptimizationGuidance: React.FC<OptimizationGuidanceProps> = ({
+  totalKeywords,
   keywordsToOptimize,
-  keywordsWithPartialMatch 
+  keywordsWithPartialMatch,
+  hasOptimized,
 }) => {
-  if (needsOptimization) {
-    return (
-      <Alert variant="info" className="bg-blue-50 text-blue-800 border-blue-200">
-        <AlertTitle>Optimization Recommended</AlertTitle>
-        <AlertDescription>
-          Some of your target keywords ({keywordsToOptimize.join(', ')}) were not found in the analysis.
-          AI optimization can help integrate these keywords into the text.
-        </AlertDescription>
-      </Alert>
-    );
-  } else if (keywordsWithPartialMatch.length > 0) {
-    return (
-      <Alert variant="warning" className="bg-amber-50 text-amber-800 border-amber-200">
-        <AlertTitle>Partial Optimization Recommended</AlertTitle>
-        <AlertDescription>
-          Some keywords have only partial matches. Consider optimization to improve exact keyword matching.
-        </AlertDescription>
-      </Alert>
-    );
+  const missing = keywordsToOptimize.length;
+  const partial = keywordsWithPartialMatch.length;
+  const isWellOptimized = missing === 0 && partial === 0;
+
+  const Icon = isWellOptimized ? CheckCircle2 : Sparkles;
+  const accent = isWellOptimized ? "text-emerald-600 dark:text-emerald-400" : "text-foreground";
+
+  let headline: string;
+  let detail: string;
+
+  if (isWellOptimized) {
+    headline = `All ${totalKeywords} target keyword${totalKeywords === 1 ? "" : "s"} are in the text.`;
+    detail = hasOptimized
+      ? "The optimized version covers every keyword — copy it below to use it."
+      : "Your text is already well optimized for these keywords.";
   } else {
-    return (
-      <Alert variant="default" className="bg-green-50 text-green-800 border-green-200">
-        <AlertTitle>Well Optimized Text</AlertTitle>
-        <AlertDescription>
-          All your target keywords have exact matches in the analysis.
-        </AlertDescription>
-      </Alert>
-    );
+    const parts: string[] = [];
+    if (missing) parts.push(`${missing} missing`);
+    if (partial) parts.push(`${partial} only partial`);
+    headline = `${parts.join(" · ")} of ${totalKeywords} target keyword${totalKeywords === 1 ? "" : "s"}.`;
+    detail = 'Click "Optimize Text" to weave them in naturally — your tone, language and structure stay intact.';
   }
+
+  return (
+    <div className="flex items-start gap-3 rounded-md border border-border bg-muted/40 p-3">
+      <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${accent}`} />
+      <div className="space-y-0.5">
+        <p className="text-sm font-medium">{headline}</p>
+        <p className="text-xs text-muted-foreground">{detail}</p>
+      </div>
+    </div>
+  );
 };
 
-export default OptimizationAlerts;
+export default OptimizationGuidance;

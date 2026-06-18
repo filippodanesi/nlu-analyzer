@@ -23,9 +23,9 @@ export const useOptimizationConfig = () => {
   
   const [aiModel, setAiModel] = useState(() => {
     const savedModel = sessionStorage.getItem('ai_model') || "o4-mini";
-    // Update to Claude 4 Sonnet if using Claude
-    if (savedModel.startsWith("claude")) {
-      return "claude-sonnet-4-0";
+    // Map any legacy Claude id onto a model that still exists in models.ts
+    if (savedModel.startsWith("claude") && savedModel !== "claude-opus-4-7") {
+      return "claude-sonnet-4-6";
     }
     return savedModel;
   });

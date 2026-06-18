@@ -59,15 +59,15 @@ const OptimizedTextDisplay: React.FC<OptimizedTextDisplayProps> = ({ originalTex
       <TabsContent value="optimized">
         {optimizedText ? (
           <div className="relative">
-            <Textarea 
+            <Textarea
               readOnly
               value={optimizedText}
-              className="min-h-[200px] font-mono text-sm bg-green-50 text-green-900 pr-10"
+              className="min-h-[200px] font-mono text-sm border-emerald-500/30 bg-emerald-500/5 pr-10"
             />
             <Button
               variant="ghost"
               size="icon"
-              className="absolute top-2 right-2 h-8 w-8 opacity-70 hover:opacity-100 bg-green-50"
+              className="absolute top-2 right-2 h-8 w-8 opacity-70 hover:opacity-100 bg-background"
               onClick={() => copyToClipboard(optimizedText, "Optimized")}
               title="Copy optimized text"
             >

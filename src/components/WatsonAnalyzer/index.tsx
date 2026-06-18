@@ -132,10 +132,11 @@ const WatsonAnalyzer: React.FC = () => {
 
             {results && (
               <>
-                <ResultsPanel 
-                  results={results} 
+                <ResultsPanel
+                  results={results}
                   targetKeywords={targetKeywordsList}
                   textStats={textStats}
+                  text={text}
                 />
 
                 {showOptimization && (
