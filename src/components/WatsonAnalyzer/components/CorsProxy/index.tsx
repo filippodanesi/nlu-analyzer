@@ -26,15 +26,12 @@ const CorsProxy: React.FC<CorsProxyProps> = ({ className }) => {
     
     // Get and display the current active proxy
     setCurrentProxyUrl(getCorsProxyUrl());
-    
-    // Test the current proxy automatically when component mounts
-    handleTestProxy();
-    
-    // Add event listener for storage changes
+
+    // Keep the displayed proxy in sync when it changes elsewhere.
+    // Testing is on-demand only (via the dialog) to avoid hitting a third-party
+    // proxy on every page load and spamming the console with CORS errors.
     const handleStorageChange = () => {
       setCurrentProxyUrl(getCorsProxyUrl());
-      // Re-test the proxy when it changes
-      handleTestProxy();
     };
     
     window.addEventListener('storage', handleStorageChange);
@@ -116,8 +113,7 @@ const CorsProxy: React.FC<CorsProxyProps> = ({ className }) => {
         const endTime = Date.now();
         const responseTime = endTime - startTime;
         setProxyStatus('working');
-        console.log(`CORS proxy test successful in ${responseTime}ms`);
-        
+
         // Only show toast if dialog is open (avoid spam during auto-tests)
         if (isOpen) {
           toast({
