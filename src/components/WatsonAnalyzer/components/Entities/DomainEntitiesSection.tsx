@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader, Sparkles } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { useOptimizationConfig } from "../../hooks/optimization/useOptimizationConfig";
+import AIOptimizationConfig from "../AIOptimizationConfig";
 import {
   extractDomainEntities,
   ENTITY_TYPES,
@@ -21,7 +22,16 @@ interface DomainEntitiesSectionProps {
  * Results are clearly labelled as AI-derived and carry no fabricated scores.
  */
 const DomainEntitiesSection: React.FC<DomainEntitiesSectionProps> = ({ text }) => {
-  const { apiKey, aiModel, aiProvider } = useOptimizationConfig();
+  const {
+    apiKey,
+    setApiKey,
+    aiModel,
+    setAiModel,
+    aiProvider,
+    setAiProvider,
+    openAIKey,
+    anthropicKey,
+  } = useOptimizationConfig();
   const [entities, setEntities] = useState<DomainEntity[] | null>(null);
   const [isExtracting, setIsExtracting] = useState(false);
 
@@ -58,21 +68,33 @@ const DomainEntitiesSection: React.FC<DomainEntitiesSectionProps> = ({ text }) =
             Brand · ProductType · Material · Feature · Benefit — the taxonomy Watson's general model can't detect.
           </p>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleExtract}
-          disabled={isExtracting || !apiKey || !text}
-          className="shrink-0 gap-1.5"
-        >
-          {isExtracting ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
-          {entities ? "Re-extract" : "Extract with AI"}
-        </Button>
+        <div className="flex shrink-0 items-center gap-2">
+          <AIOptimizationConfig
+            apiKey={apiKey}
+            setApiKey={setApiKey}
+            aiModel={aiModel}
+            setAiModel={setAiModel}
+            aiProvider={aiProvider}
+            setAiProvider={setAiProvider}
+            openAIKey={openAIKey}
+            anthropicKey={anthropicKey}
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExtract}
+            disabled={isExtracting || !apiKey || !text}
+            className="gap-1.5"
+          >
+            {isExtracting ? <Loader className="h-3.5 w-3.5 animate-spin" /> : <Sparkles className="h-3.5 w-3.5" />}
+            {entities ? "Re-extract" : "Extract with AI"}
+          </Button>
+        </div>
       </div>
 
       {!apiKey && (
         <p className="text-xs text-muted-foreground">
-          Add an AI key in the AI Optimization panel to enable this.
+          Set a Claude or OpenAI key via <span className="font-medium">Configure AI</span> to enable extraction.
         </p>
       )}
 
