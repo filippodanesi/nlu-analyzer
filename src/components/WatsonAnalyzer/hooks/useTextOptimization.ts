@@ -1,11 +1,10 @@
 
-import { useState } from 'react';
 import { useOptimizationConfig } from './optimization/useOptimizationConfig';
-import { useKeywordAnalysis } from './optimization/useKeywordAnalysis';
 import { useOptimizationProcess } from './optimization/useOptimizationProcess';
+import { matchKeywordInText, type KeywordMatch } from '../utils/keywordUtils';
 
-// Define the keyword status type
-export type KeywordStatus = "missing" | "exact" | "partial" | "relevant";
+// A target keyword is either present as a whole phrase, present partially, or absent.
+export type KeywordStatus = KeywordMatch;
 
 // Re-export the AIProvider type
 export type { AIProvider } from './optimization/useOptimizationConfig';
@@ -19,10 +18,7 @@ interface UseTextOptimizationProps {
 export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOptimizationProps) => {
   // Get optimization configuration
   const config = useOptimizationConfig();
-  
-  // Get keyword analysis utilities
-  const { checkKeywordStatus } = useKeywordAnalysis(results);
-  
+
   // Get optimization process
   const optimizationProcess = useOptimizationProcess({
     text,
@@ -32,40 +28,38 @@ export const useTextOptimization = ({ text, results, targetKeywords }: UseTextOp
     aiModel: config.aiModel,
     aiProvider: config.aiProvider
   });
-  
-  // Use optimizedResults if available, otherwise use original results
-  const resultsForKeywords = optimizationProcess.optimizedResults || results;
-  
-  // Get lists of keywords based on their status
-  const keywordsToOptimize = targetKeywords.filter(kw => 
-    checkKeywordStatus(kw) === "missing"
-  );
-  
-  const keywordsWithPartialMatch = targetKeywords.filter(kw => 
-    checkKeywordStatus(kw) === "partial"
-  );
-  
-  // Check if we need optimization
-  const needsOptimization = keywordsToOptimize.length > 0;
-  
+
+  // The badges describe the text the user is currently acting on: the optimized
+  // output once it exists, otherwise the original input. Status is measured
+  // directly against that text, never against fabricated analysis data.
+  const activeText = optimizationProcess.optimizedText || text;
+
+  const checkKeywordStatus = (keyword: string): KeywordStatus =>
+    matchKeywordInText(activeText, keyword);
+
+  const keywordsToOptimize = targetKeywords.filter(kw => checkKeywordStatus(kw) === "missing");
+  const keywordsWithPartialMatch = targetKeywords.filter(kw => checkKeywordStatus(kw) === "partial");
+
+  // Optimization helps whenever a keyword is missing or only partially present.
+  const needsOptimization = keywordsToOptimize.length > 0 || keywordsWithPartialMatch.length > 0;
+
   return {
     // Cost tracking
     costTracker: optimizationProcess.costTracker,
     lastCostRecord: optimizationProcess.lastCostRecord,
-    
+
     // AI configuration
     ...config,
-    
+
     // Optimization state & actions
     isOptimizing: optimizationProcess.isOptimizing,
     optimizedText: optimizationProcess.optimizedText,
-    optimizedResults: optimizationProcess.optimizedResults,
     handleOptimize: optimizationProcess.handleOptimize,
-    
+
     // Keywords data
     keywordsToOptimize,
     keywordsWithPartialMatch,
     needsOptimization,
-    checkKeywordStatus: (keyword: string) => checkKeywordStatus(keyword, resultsForKeywords)
+    checkKeywordStatus
   };
 };

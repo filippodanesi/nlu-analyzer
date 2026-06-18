@@ -7,7 +7,7 @@ import { toast } from "@/hooks/use-toast";
 import AIOptimizationConfig from "./AIOptimizationConfig";
 import KeywordStatusBadge from "./optimization/KeywordStatusBadge";
 import KeywordStatusLegend from "./optimization/KeywordStatusLegend";
-import OptimizationAlerts from "./optimization/OptimizationAlerts";
+import OptimizationGuidance from "./optimization/OptimizationAlerts";
 import OptimizedTextDisplay from "./optimization/OptimizedTextDisplay";
 import CostSummary from "./optimization/CostSummary";
 import { useTextOptimization } from "../hooks/useTextOptimization";
@@ -26,36 +26,25 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
   onOptimizedTextSelect
 }) => {
   const {
-    // Cost tracking
     costTracker,
     lastCostRecord,
-    
-    // API configuration
     apiKey,
     setApiKey,
     aiModel,
     setAiModel,
     aiProvider,
     setAiProvider,
-    
-    // Provider-specific API keys
     openAIKey,
     anthropicKey,
-    
-    // Optimization states
     isOptimizing,
     optimizedText,
-    optimizedResults,
     keywordsToOptimize,
     keywordsWithPartialMatch,
     needsOptimization,
     handleOptimize,
     checkKeywordStatus
   } = useTextOptimization({ text, results, targetKeywords });
-  
-  // Use optimizedResults if available, otherwise use original results
-  const resultsForKeywords = optimizedResults || results;
-  
+
   const handleUseOptimized = () => {
     onOptimizedTextSelect(optimizedText);
     toast({
@@ -75,13 +64,13 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
           <div>
             <CardTitle className="text-lg font-semibold">AI Optimization</CardTitle>
             <CardDescription>
-              Optimize text for target keywords using AI
+              Rewrite the text so it includes your target keywords
             </CardDescription>
           </div>
-          <AIOptimizationConfig 
-            apiKey={apiKey} 
-            setApiKey={setApiKey} 
-            aiModel={aiModel} 
+          <AIOptimizationConfig
+            apiKey={apiKey}
+            setApiKey={setApiKey}
+            aiModel={aiModel}
             setAiModel={setAiModel}
             aiProvider={aiProvider}
             setAiProvider={setAiProvider}
@@ -92,60 +81,64 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Cost Summary Card */}
-        <CostSummary 
-          costTracker={costTracker} 
-          activeProvider={aiProvider}
-          lastCostRecord={lastCostRecord}
+        {/* 1. What to do next */}
+        <OptimizationGuidance
+          totalKeywords={targetKeywords.length}
+          keywordsToOptimize={keywordsToOptimize}
+          keywordsWithPartialMatch={keywordsWithPartialMatch}
+          hasOptimized={!!optimizedText}
         />
-        
-        {targetKeywords.length > 0 && (
+
+        {/* 2. Per-keyword status */}
+        <div className="space-y-2">
           <div className="flex flex-wrap gap-2">
             {targetKeywords.map((keyword, index) => (
-              <KeywordStatusBadge 
-                key={index} 
-                keyword={keyword} 
-                status={checkKeywordStatus(keyword)} 
+              <KeywordStatusBadge
+                key={index}
+                keyword={keyword}
+                status={checkKeywordStatus(keyword)}
               />
             ))}
           </div>
-        )}
+          <KeywordStatusLegend />
+        </div>
 
-        <KeywordStatusLegend />
-
-        <OptimizationAlerts 
-          needsOptimization={needsOptimization}
-          keywordsToOptimize={keywordsToOptimize}
-          keywordsWithPartialMatch={keywordsWithPartialMatch}
-        />
-
-        <OptimizedTextDisplay 
+        {/* 3. The text */}
+        <OptimizedTextDisplay
           originalText={text}
           optimizedText={optimizedText}
+        />
+
+        {/* 4. Cost (secondary) */}
+        <CostSummary
+          costTracker={costTracker}
+          activeProvider={aiProvider}
+          lastCostRecord={lastCostRecord}
         />
       </CardContent>
 
       <CardFooter className="flex justify-between gap-2">
-        <Button 
+        <Button
           onClick={handleOptimize}
-          disabled={isOptimizing || (!needsOptimization && keywordsWithPartialMatch.length === 0) || !apiKey}
+          disabled={isOptimizing || !needsOptimization || !apiKey}
           className="flex-1"
-          variant={(needsOptimization || keywordsWithPartialMatch.length > 0) ? "default" : "outline"}
+          variant={needsOptimization ? "default" : "outline"}
         >
           {isOptimizing ? (
             <>
-              <Loader className="mr-2 h-4 w-4 animate-spin" /> 
+              <Loader className="mr-2 h-4 w-4 animate-spin" />
               Optimizing...
             </>
           ) : (
             'Optimize Text'
           )}
         </Button>
-        
+
         {optimizedText && (
-          <Button 
+          <Button
             onClick={handleUseOptimized}
             className="flex-1"
+            variant="outline"
           >
             Use Optimized Text
           </Button>

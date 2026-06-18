@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { toast } from "@/components/ui/use-toast";
 import { TextStats } from './useInputManagement';
 import { WatsonFeatures, WatsonLimits, TONE_SUPPORTED_LANGUAGES } from './useAnalysisFeatures';
@@ -30,22 +30,6 @@ export const useAnalysisExecution = ({
   // Analysis state
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [results, setResults] = useState<any>(null);
-  const [lastAnalyzedFeatures, setLastAnalyzedFeatures] = useState<WatsonFeatures | null>(null);
-
-  // Reset results when features change significantly from last analyzed features
-  useEffect(() => {
-    // Only check if we have previous results and features
-    if (results && lastAnalyzedFeatures) {
-      // Check if tone analysis was toggled
-      const toneWasToggled = 
-        features.classifications !== lastAnalyzedFeatures.classifications;
-      
-      // If tone analysis was toggled, we should mark that a new analysis is needed
-      if (toneWasToggled) {
-        console.log("Tone analysis feature was toggled, new analysis will be needed");
-      }
-    }
-  }, [features, lastAnalyzedFeatures, results]);
 
   const handleAnalyze = async () => {
     if (!text) {
@@ -88,10 +72,6 @@ export const useAnalysisExecution = ({
     // Check if text is too long for tone analysis (2000 codepoints limit)
     const textCodepoints = [...text].length;
     const isToneTextTooLong = textCodepoints > 2000;
-    
-    if (features.classifications && isToneTextTooLong) {
-      console.log(`Text too long for tone analysis: ${textCodepoints} codepoints (limit: 2000)`);
-    }
 
     // Prepare parameters for API request
     const featuresParams: any = {};
@@ -124,12 +104,9 @@ export const useAnalysisExecution = ({
     
     // For tone analysis - only include if text is not too long
     if (features.classifications && !isToneTextTooLong) {
-      console.log(`Adding classifications with model: ${toneModel}, language: ${language}`);
       featuresParams.classifications = {
         model: toneModel
       };
-    } else if (features.classifications && isToneTextTooLong) {
-      console.log("Skipping tone analysis due to text length limit");
     }
 
     const requestData = {
@@ -138,12 +115,10 @@ export const useAnalysisExecution = ({
       language: language
     };
 
-    console.log("Sending API request with data:", JSON.stringify(requestData));
-
     try {
       // Determine the authentication method based on environment variables
       const authType = getAuthType();
-      let headers = {
+      const headers: Record<string, string> = {
         'Content-Type': 'application/json'
       };
       
@@ -166,19 +141,15 @@ export const useAnalysisExecution = ({
       }
 
       const data = await response.json();
-      console.log("API response received:", data);
-      
+
       // Add warning about tone analysis if text was too long
       if (features.classifications && isToneTextTooLong) {
         if (!data.warnings) data.warnings = [];
         data.warnings.push(`Tone analysis skipped: Text exceeds 2000 character limit (${textCodepoints} characters)`);
       }
-      
+
       setResults(data);
-      
-      // Save the features used for this analysis to track changes
-      setLastAnalyzedFeatures({...features});
-      
+
       let toastMessage = "The text was successfully analyzed.";
       if (features.classifications && isToneTextTooLong) {
         toastMessage += " Note: Tone analysis was skipped due to text length.";

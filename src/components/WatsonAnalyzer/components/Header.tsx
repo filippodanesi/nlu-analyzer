@@ -17,10 +17,10 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ credentialsFileExists }) => {
   return (
-    <header className="bg-white dark:bg-gray-900 shadow">
+    <header className="border-b border-border bg-background">
       <div className="container max-w-7xl mx-auto py-4 px-4 flex items-center justify-between">
         <div className="flex items-center">
-          <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+          <h1 className="text-base font-medium tracking-tight text-foreground">
             Watson NLU &amp; AI Text Optimizer
           </h1>
         </div>
@@ -34,7 +34,7 @@ const Header: React.FC<HeaderProps> = ({ credentialsFileExists }) => {
                   href="https://github.com/filippodanesi/ibm-watson-nlu-analyzer"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <Github className="h-5 w-5" />
                 </a>

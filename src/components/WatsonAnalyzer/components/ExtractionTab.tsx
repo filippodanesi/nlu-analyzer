@@ -19,9 +19,10 @@ interface ExtractionTabProps {
   results: any;
   containsTargetKeyword: (text: string) => boolean;
   targetKeywords: string[];
+  text: string;
 }
 
-const ExtractionTab: React.FC<ExtractionTabProps> = ({ results, containsTargetKeyword, targetKeywords }) => {
+const ExtractionTab: React.FC<ExtractionTabProps> = ({ results, containsTargetKeyword, targetKeywords, text }) => {
   return (
     <Tabs defaultValue="entities">
       <TabsList className="w-full grid grid-cols-4">
@@ -32,9 +33,10 @@ const ExtractionTab: React.FC<ExtractionTabProps> = ({ results, containsTargetKe
       </TabsList>
 
       <TabsContent value="entities" className="pt-4">
-        <EntitiesTab 
-          entities={results.entities || []} 
-          containsTargetKeyword={containsTargetKeyword} 
+        <EntitiesTab
+          entities={results.entities || []}
+          containsTargetKeyword={containsTargetKeyword}
+          text={text}
         />
       </TabsContent>
 

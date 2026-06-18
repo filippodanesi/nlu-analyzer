@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { AlertCircle, Info } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 interface EntityAlertsProps {
   entities: any[];
@@ -9,44 +8,20 @@ interface EntityAlertsProps {
   totalEntityCount: number;
 }
 
-const EntityAlerts: React.FC<EntityAlertsProps> = ({ 
-  entities, 
-  entityTypeCount, 
-  totalEntityCount 
-}) => {
+/**
+ * Quiet, contextual hints about the entity results. Only surfaces a note when
+ * detection looks thin — no permanent onboarding banners.
+ */
+const EntityAlerts: React.FC<EntityAlertsProps> = ({ entities }) => {
+  if (entities.length > 5) return null;
+
   return (
-    <>
-      <Alert variant="info" className="mb-4">
-        <Info className="h-4 w-4" />
-        <AlertDescription>
-          Named Entity Recognition (NER) identifies elements like people, organizations, locations, dates and more.
-          For example: In "Rita is an IBM employee based in London", "Rita" is a person, "IBM" is an organization, 
-          and "London" is a location.
-        </AlertDescription>
-      </Alert>
-
-      {entities.length <= 5 && (
-        <Alert variant="warning" className="mb-4">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Limited entity detection</AlertTitle>
-          <AlertDescription>
-            Only {entities.length} {entities.length === 1 ? 'entity was' : 'entities were'} detected. 
-            Try including more diverse named entities in your text like people, organizations, locations, 
-            dates, etc. Consider increasing the entity limit in the configuration panel.
-          </AlertDescription>
-        </Alert>
-      )}
-
-      {entityTypeCount === 1 && totalEntityCount > 1 && (
-        <Alert variant="info" className="mb-4">
-          <Info className="h-4 w-4" />
-          <AlertDescription>
-            All detected entities are of the same type ({entities[0].type}). Consider diversifying your text with different 
-            entity types for more comprehensive analysis.
-          </AlertDescription>
-        </Alert>
-      )}
-    </>
+    <p className="flex items-start gap-2 text-xs text-muted-foreground">
+      <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+      Only {entities.length} {entities.length === 1 ? 'entity was' : 'entities were'} detected. Watson's
+      general model recognises people, organisations, locations and dates — add more named entities, or
+      raise the entity limit in the configuration panel.
+    </p>
   );
 };
 

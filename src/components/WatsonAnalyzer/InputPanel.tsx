@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertCircle } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import InputMethodToggle from './components/InputMethodToggle';
 import TextInputSection from './components/TextInputSection';
 import FileUploadSection from './components/FileUploadSection';
@@ -115,18 +114,16 @@ const InputPanel: React.FC<InputPanelProps> = ({
             setEnableReanalyze(false);
           }}
           disabled={(!text || isAnalyzing) && !enableReanalyze}
-          className="w-full bg-vercel text-white hover:bg-vercel/90"
+          className="w-full"
         >
           {isAnalyzing ? "Analyzing..." : "Analyze"}
         </Button>
-        
+
         {enableReanalyze && (
-          <Alert variant="warning" className="p-2 bg-blue-50">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription className="text-xs">
-              Analysis features have changed. Click Analyze to update results.
-            </AlertDescription>
-          </Alert>
+          <p className="flex items-center gap-2 text-xs text-muted-foreground">
+            <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+            Analysis features changed — click Analyze to update results.
+          </p>
         )}
       </CardFooter>
     </Card>

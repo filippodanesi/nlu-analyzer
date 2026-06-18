@@ -21,6 +21,8 @@ import {
 } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, FileJson } from "lucide-react";
+import { currentVersion } from '@/data/changelog';
+import { matchKeywordInText } from './utils/keywordUtils';
 
 // Import custom components
 import TextStatsCard from './components/TextStatsCard';
@@ -39,27 +41,23 @@ interface ResultsPanelProps {
     sentenceCount: number;
     charCount: number;
   };
+  text: string;
 }
 
 const ResultsPanel: React.FC<ResultsPanelProps> = ({
   results,
   targetKeywords,
   textStats,
+  text,
 }) => {
   const [isJsonOpen, setIsJsonOpen] = React.useState(false);
 
   if (!results) return null;
 
-  // Enhanced function to check if a string contains any target keywords
+  // True when the text contains any target keyword (whole-word/phrase aware).
   const containsTargetKeyword = (text: string) => {
     if (!text || !targetKeywords || targetKeywords.length === 0) return false;
-    
-    const lowerText = text.toLowerCase().trim();
-    // Check if any of the target keywords are included in the text
-    return targetKeywords.some(keyword => {
-      const lowerKeyword = keyword.toLowerCase().trim();
-      return lowerText.includes(lowerKeyword);
-    });
+    return targetKeywords.some(keyword => matchKeywordInText(text, keyword) !== "missing");
   };
 
   return (
@@ -90,10 +88,11 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
 
           {/* Extraction Tab */}
           <TabsContent value="extraction" className="pt-4">
-            <ExtractionTab 
-              results={results} 
+            <ExtractionTab
+              results={results}
               containsTargetKeyword={containsTargetKeyword}
               targetKeywords={targetKeywords}
+              text={text}
             />
           </TabsContent>
 
@@ -132,7 +131,7 @@ const ResultsPanel: React.FC<ResultsPanelProps> = ({
           <FileJson className="h-3.5 w-3.5" />
           IBM Watson Natural Language Understanding Analyzer
         </span>
-        <span>v1.1.8</span>
+        <span>v{currentVersion}</span>
       </CardFooter>
     </Card>
   );

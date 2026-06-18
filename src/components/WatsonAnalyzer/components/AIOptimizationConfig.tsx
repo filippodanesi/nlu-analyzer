@@ -62,7 +62,7 @@ const AIOptimizationConfig: React.FC<AIOptimizationConfigProps> = ({
     if (provider === "openai" && aiModel.startsWith("claude")) {
       setAiModel("o4-mini");
           } else if (provider === "anthropic" && !aiModel.startsWith("claude")) {
-        setAiModel("claude-sonnet-4-0");
+        setAiModel("claude-sonnet-4-6");
     }
   };
 

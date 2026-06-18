@@ -9,23 +9,24 @@ import EntityTable from './Entities/EntityTable';
 import EntityStatsDisplay from './Entities/EntityStatsDisplay';
 import EntityAlerts from './Entities/EntityAlerts';
 import EmptyEntitiesState from './Entities/EmptyEntitiesState';
+import DomainEntitiesSection from './Entities/DomainEntitiesSection';
 import { countWords, getMultiWordEntitiesCount } from './Entities/entityUtils';
+import { Separator } from "@/components/ui/separator";
 
 interface EntitiesTabProps {
   entities: any[];
   containsTargetKeyword: (text: string) => boolean;
+  text: string;
 }
 
-const EntitiesTab: React.FC<EntitiesTabProps> = ({ entities, containsTargetKeyword }) => {
+const EntitiesTab: React.FC<EntitiesTabProps> = ({ entities, containsTargetKeyword, text }) => {
   const [showLowConfidence, setShowLowConfidence] = useState(true);
   const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
 
-  if (!entities || entities.length === 0) {
-    return <EmptyEntitiesState />;
-  }
+  const hasEntities = !!entities && entities.length > 0;
 
   // Get entity types for filtering
-  const entityTypes = [...new Set(entities.map(entity => entity.type))].sort();
+  const entityTypes = [...new Set((entities || []).map(entity => entity.type))].sort();
   
   // Calculate stats
   const totalEntityCount = entities.length;
@@ -48,9 +49,17 @@ const EntitiesTab: React.FC<EntitiesTabProps> = ({ entities, containsTargetKeywo
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      <DomainEntitiesSection text={text} />
+
+      <Separator />
+
+      {!hasEntities ? (
+        <EmptyEntitiesState />
+      ) : (
+      <div className="space-y-4">
       {/* Entity Statistics */}
-      <EntityStatsDisplay 
+      <EntityStatsDisplay
         entityTypes={entityTypes}
         entities={entities}
         totalEntityCount={totalEntityCount}
@@ -111,12 +120,12 @@ const EntitiesTab: React.FC<EntitiesTabProps> = ({ entities, containsTargetKeywo
       />
 
       {filteredEntities.length === 0 && entities.length > 0 && (
-        <Alert variant="info" className="bg-blue-50 text-blue-800 border-blue-200">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            No entities match the current filters. Try adjusting your filter settings.
-          </AlertDescription>
-        </Alert>
+        <p className="flex items-center gap-2 text-xs text-muted-foreground">
+          <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+          No entities match the current filters. Try adjusting your filter settings.
+        </p>
+      )}
+      </div>
       )}
     </div>
   );
