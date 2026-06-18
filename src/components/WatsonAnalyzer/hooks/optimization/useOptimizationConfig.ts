@@ -44,22 +44,6 @@ export const useOptimizationConfig = () => {
     }
   }, [aiProvider, openAIKey, anthropicKey]);
 
-  // CORS proxy configuration
-  const [corsProxyUrl, setCorsProxyUrl] = useState(() => {
-    return sessionStorage.getItem('cors_proxy_url') || "";
-  });
-
-  // Update corsProxyUrl when it changes in sessionStorage
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const newProxyUrl = sessionStorage.getItem('cors_proxy_url') || "";
-      setCorsProxyUrl(newProxyUrl);
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
-
   // Save to sessionStorage when values change
   const storeApiKey = (key: string) => {
     if (key) {
@@ -97,8 +81,6 @@ export const useOptimizationConfig = () => {
     setAiModel: storeAiModel,
     aiProvider,
     setAiProvider,
-    corsProxyUrl,
-    setCorsProxyUrl,
     openAIKey,
     anthropicKey,
   };

@@ -45,15 +45,6 @@ export const useAnalysisExecution = ({
     const currentApiKey = getCurrentApiKey();
     const currentUrl = getCurrentUrl();
 
-    if (!currentApiKey) {
-      toast({
-        title: "API Key required",
-        description: "Please enter your IBM Watson NLU API key or enable secrets.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     if (!currentUrl) {
       toast({
         title: "URL required",
@@ -116,28 +107,24 @@ export const useAnalysisExecution = ({
     };
 
     try {
-      // Determine the authentication method based on environment variables
       const authType = getAuthType();
-      const headers: Record<string, string> = {
-        'Content-Type': 'application/json'
-      };
-      
-      // Add authorization header based on auth type
-      if (authType === "iam") {
-        headers['Authorization'] = `Basic ${btoa(`apikey:${currentApiKey}`)}`;
-      } else {
-        headers['Authorization'] = `Bearer ${currentApiKey}`;
-      }
 
-      const response = await fetch(currentUrl, {
+      // Watson NLU has no browser CORS support, so the request is proxied
+      // through our serverless function (see api/nlu.ts).
+      const response = await fetch('/api/nlu', {
         method: 'POST',
-        headers,
-        body: JSON.stringify(requestData)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          url: currentUrl,
+          apiKey: currentApiKey,
+          authType,
+          payload: requestData,
+        }),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'API request failed');
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.error || 'API request failed');
       }
 
       const data = await response.json();
