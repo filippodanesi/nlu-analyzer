@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { FirecrawlService } from '../utils/FirecrawlService';
+import { JinaReaderService } from '../utils/JinaReaderService';
 import { toast } from "@/components/ui/use-toast";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -20,52 +20,19 @@ const UrlInputSection: React.FC<UrlInputSectionProps> = ({
   const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
-  const [apiKey, setApiKey] = useState('');
+  const [apiKey, setApiKey] = useState(() => JinaReaderService.getApiKey() || '');
 
-  const handleScrape = async () => {
+  const handleExtract = async () => {
     if (!url) {
       toast({
         title: "URL required",
-        description: "Please enter a URL to scrape",
+        description: "Please enter a URL to extract",
         variant: "destructive",
       });
       return;
     }
 
-    // Check if API key exists
-    const savedApiKey = FirecrawlService.getApiKey();
-    if (!savedApiKey) {
-      setShowApiKeyDialog(true);
-      return;
-    }
-
-    await scrapeUrl();
-  };
-
-  const saveApiKey = () => {
-    if (!apiKey) {
-      toast({
-        title: "API key required",
-        description: "Please enter a valid Firecrawl API key",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    FirecrawlService.saveApiKey(apiKey);
-    setShowApiKeyDialog(false);
-    
-    toast({
-      title: "API key saved",
-      description: "Your Firecrawl API key has been saved"
-    });
-
-    scrapeUrl();
-  };
-
-  const scrapeUrl = async () => {
     setIsLoading(true);
-    
     try {
       // Format the URL properly if it doesn't include http/https
       let formattedUrl = url;
@@ -73,29 +40,25 @@ const UrlInputSection: React.FC<UrlInputSectionProps> = ({
         formattedUrl = `https://${formattedUrl}`;
       }
 
-      const response = await FirecrawlService.scrapeUrl(formattedUrl);
-      
+      const response = await JinaReaderService.readUrl(formattedUrl);
+
       if (response.success) {
-        setText(response.data.markdown || '');
+        setText(response.text);
         toast({
-          title: "Scraping successful",
-          description: "Clean content has been extracted from the URL"
+          title: "Content extracted",
+          description: "Clean text has been extracted from the URL via Jina Reader.",
         });
       } else {
-        // Safe type checking before accessing error property
-        const errorMessage = 'error' in response ? response.error : "Failed to scrape the URL"; 
-          
         toast({
-          title: "Scraping failed",
-          description: errorMessage,
+          title: "Extraction failed",
+          description: 'error' in response ? response.error : "Failed to extract the URL",
           variant: "destructive",
         });
       }
     } catch (error) {
-      console.error('Error scraping URL:', error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to scrape the URL",
+        description: error instanceof Error ? error.message : "Failed to extract the URL",
         variant: "destructive",
       });
     } finally {
@@ -103,13 +66,23 @@ const UrlInputSection: React.FC<UrlInputSectionProps> = ({
     }
   };
 
-  // Handler for text changes in the textarea
+  const saveApiKey = () => {
+    if (apiKey.trim()) {
+      JinaReaderService.saveApiKey(apiKey);
+      toast({ title: "Jina API key saved", description: "Higher rate limits are now enabled." });
+    } else {
+      JinaReaderService.clearApiKey();
+      toast({ title: "Jina API key removed" });
+    }
+    setShowApiKeyDialog(false);
+  };
+
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="flex items-center gap-2">
         <Input
           type="url"
@@ -118,20 +91,28 @@ const UrlInputSection: React.FC<UrlInputSectionProps> = ({
           onChange={(e) => setUrl(e.target.value)}
           className="flex-1"
         />
-        <Button 
-          onClick={handleScrape}
+        <Button
+          onClick={handleExtract}
           disabled={isLoading || !url}
           className="shrink-0"
         >
-          {isLoading ? "Scraping..." : "Scrape"}
+          {isLoading ? "Extracting..." : "Extract"}
         </Button>
       </div>
 
+      <button
+        type="button"
+        onClick={() => setShowApiKeyDialog(true)}
+        className="text-xs text-muted-foreground hover:text-foreground underline underline-offset-2"
+      >
+        {JinaReaderService.getApiKey() ? "Jina API key set — edit" : "Add a Jina API key for higher rate limits (optional)"}
+      </button>
+
       {text && (
         <div className="space-y-2">
-          <Label htmlFor="scraped-content">Scraped Content</Label>
+          <Label htmlFor="extracted-content">Extracted Content</Label>
           <Textarea
-            id="scraped-content"
+            id="extracted-content"
             value={text}
             onChange={handleTextChange}
             className="min-h-[200px] font-mono text-sm"
@@ -142,16 +123,19 @@ const UrlInputSection: React.FC<UrlInputSectionProps> = ({
       <Dialog open={showApiKeyDialog} onOpenChange={setShowApiKeyDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Firecrawl API Key Required</DialogTitle>
+            <DialogTitle>Jina Reader API Key (optional)</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <p className="text-sm text-muted-foreground">
-              To use the URL scraping feature, please enter your Firecrawl API key.
-              You can get one by signing up at <a href="https://firecrawl.dev" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">firecrawl.dev</a>.
+              URL extraction works without a key. Add a free key from{" "}
+              <a href="https://jina.ai/reader" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">
+                jina.ai/reader
+              </a>{" "}
+              for higher rate limits. Leave empty to remove a saved key.
             </p>
             <Input
               type="password"
-              placeholder="Enter your Firecrawl API key"
+              placeholder="jina_..."
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
             />
@@ -161,7 +145,7 @@ const UrlInputSection: React.FC<UrlInputSectionProps> = ({
               Cancel
             </Button>
             <Button onClick={saveApiKey}>
-              Save API Key
+              Save
             </Button>
           </DialogFooter>
         </DialogContent>
