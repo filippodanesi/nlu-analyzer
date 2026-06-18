@@ -5,8 +5,9 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { toast } from "@/hooks/use-toast";
 import { OPTIMIZATION_SYSTEM_PROMPT } from './optimizationSystemPrompt';
+import { AI_MODEL } from './aiConfig';
 
-const DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-6";
+const DEFAULT_CLAUDE_MODEL = AI_MODEL;
 
 /**
  * Fallback message for when the Anthropic SDK encounters an error
