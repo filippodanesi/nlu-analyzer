@@ -52,8 +52,6 @@ export const useAnalysisFeatures = () => {
       // Default to English tone model for English or auto-detection
       setToneModel("tone-classifications-en-v1");
     }
-    
-    console.log(`Language changed to: ${language}, tone model set to: ${language === "fr" ? "tone-classifications-fr-v1" : "tone-classifications-en-v1"}`);
   }, [language]);
   
   return {
