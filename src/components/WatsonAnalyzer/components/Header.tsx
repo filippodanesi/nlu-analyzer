@@ -8,9 +8,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
-// Import for CorsProxy
-import CorsProxy from './CorsProxy';
-
 interface HeaderProps {
   credentialsFileExists: boolean;
 }
@@ -26,7 +23,6 @@ const Header: React.FC<HeaderProps> = ({ credentialsFileExists }) => {
         </div>
 
         <div className="flex items-center space-x-4">
-          <CorsProxy className="mr-2" />
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
