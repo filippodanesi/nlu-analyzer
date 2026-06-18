@@ -9,7 +9,6 @@ import KeywordStatusBadge from "./optimization/KeywordStatusBadge";
 import KeywordStatusLegend from "./optimization/KeywordStatusLegend";
 import OptimizationGuidance from "./optimization/OptimizationAlerts";
 import OptimizedTextDisplay from "./optimization/OptimizedTextDisplay";
-import CostSummary from "./optimization/CostSummary";
 import { useTextOptimization } from "../hooks/useTextOptimization";
 
 interface TextOptimizationPanelProps {
@@ -26,16 +25,8 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
   onOptimizedTextSelect
 }) => {
   const {
-    costTracker,
-    lastCostRecord,
     apiKey,
     setApiKey,
-    aiModel,
-    setAiModel,
-    aiProvider,
-    setAiProvider,
-    openAIKey,
-    anthropicKey,
     isOptimizing,
     optimizedText,
     keywordsToOptimize,
@@ -67,16 +58,7 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
               Rewrite the text so it includes your target keywords
             </CardDescription>
           </div>
-          <AIOptimizationConfig
-            apiKey={apiKey}
-            setApiKey={setApiKey}
-            aiModel={aiModel}
-            setAiModel={setAiModel}
-            aiProvider={aiProvider}
-            setAiProvider={setAiProvider}
-            openAIKey={openAIKey}
-            anthropicKey={anthropicKey}
-          />
+          <AIOptimizationConfig apiKey={apiKey} setApiKey={setApiKey} />
         </div>
       </CardHeader>
 
@@ -107,13 +89,6 @@ const TextOptimizationPanel: React.FC<TextOptimizationPanelProps> = ({
         <OptimizedTextDisplay
           originalText={text}
           optimizedText={optimizedText}
-        />
-
-        {/* 4. Cost (secondary) */}
-        <CostSummary
-          costTracker={costTracker}
-          activeProvider={aiProvider}
-          lastCostRecord={lastCostRecord}
         />
       </CardContent>
 

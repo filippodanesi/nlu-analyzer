@@ -1,27 +1,23 @@
 /**
- * Coordinates text optimization with the selected AI provider.
+ * Coordinates text optimization with Claude.
  */
 import { generateOptimizationPrompt } from './promptUtils';
-import { optimizeWithOpenAI } from './openAiUtils';
 import { optimizeWithClaude } from './claudeUtils';
+import { AI_MODEL } from './aiConfig';
 
 // Re-export keyword utilities for backward compatibility
 export { isExactKeywordMatch, isPartialKeywordMatch, matchKeywordInText } from './keywordUtils';
 
 /**
- * Optimizes text using an AI API. The provider is chosen from the model name.
+ * Optimizes text using Claude (the single configured model).
  */
 export const optimizeTextWithAI = async (
   originalText: string,
   targetKeywords: string[],
   analysisResults: any,
   apiKey: string,
-  model: string = "o4-mini"
+  model: string = AI_MODEL
 ): Promise<string> => {
   const prompt = generateOptimizationPrompt(originalText, targetKeywords, analysisResults);
-
-  if (model.startsWith("claude")) {
-    return optimizeWithClaude(prompt, apiKey, model);
-  }
-  return optimizeWithOpenAI(prompt, apiKey, model);
+  return optimizeWithClaude(prompt, apiKey, model);
 };

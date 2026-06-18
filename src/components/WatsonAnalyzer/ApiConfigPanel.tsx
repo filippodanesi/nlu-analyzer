@@ -1,12 +1,14 @@
 
 import React from 'react';
-import { 
-  Card, 
-  CardContent, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
 import { ApiKeySection } from './components/config/ApiKeySection';
 import { AnalysisFeaturesSection } from './components/config/AnalysisFeaturesSection';
 import { LanguageSection } from './components/config/LanguageSection';
@@ -66,10 +68,12 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
   credentialsFileExists = false,
   setCredentialsFileExists
 }) => {
+  const [advancedOpen, setAdvancedOpen] = React.useState(false);
+
   const handleFeatureChange = (feature: string, value: boolean) => {
     setFeatures({ ...features, [feature]: value });
   };
-  
+
   const handleLimitChange = (feature: string, value: number) => {
     setLimits({ ...limits, [feature]: value });
   };
@@ -93,7 +97,7 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
 
         <Separator />
 
-        <ApiKeySection 
+        <ApiKeySection
           apiKey={apiKey}
           setApiKey={setApiKey}
           region={region}
@@ -113,24 +117,32 @@ const ApiConfigPanel: React.FC<ApiConfigPanelProps> = ({
 
         <Separator />
 
-        <AnalysisFeaturesSection 
+        <AnalysisFeaturesSection
           features={features}
           handleFeatureChange={handleFeatureChange}
         />
 
         <Separator />
 
-        <LanguageSection 
-          language={language}
-          setLanguage={setLanguage}
-        />
+        <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
+          <CollapsibleTrigger className="flex w-full items-center justify-between text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
+            Advanced
+            <ChevronDown className={`h-4 w-4 transition-transform ${advancedOpen ? "rotate-180" : ""}`} />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-4 pt-4">
+            <LanguageSection
+              language={language}
+              setLanguage={setLanguage}
+            />
 
-        <Separator />
+            <Separator />
 
-        <LimitsSection 
-          limits={limits}
-          handleLimitChange={handleLimitChange}
-        />
+            <LimitsSection
+              limits={limits}
+              handleLimitChange={handleLimitChange}
+            />
+          </CollapsibleContent>
+        </Collapsible>
       </CardContent>
     </Card>
   );

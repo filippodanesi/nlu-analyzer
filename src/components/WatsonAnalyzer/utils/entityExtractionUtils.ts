@@ -2,14 +2,15 @@
  * AI-based domain entity extraction.
  *
  * IBM Watson's general NER model does not know fashion product entities
- * (ProductType, Material, Feature, Benefit). This module asks the configured
- * AI model to extract entities using that taxonomy instead.
+ * (ProductType, Material, Feature, Benefit). This module asks Claude to extract
+ * entities using that taxonomy instead.
  *
  * Honesty rules (deliberate): we return typed phrases only — never fabricated
  * confidence/relevance scores — and we instruct the model to extract strictly
  * what appears in the text, not to invent entities.
  */
 import Anthropic from '@anthropic-ai/sdk';
+import { AI_MODEL } from './aiConfig';
 
 export const ENTITY_TYPES = ["Brand", "ProductType", "Material", "Feature", "Benefit"] as const;
 export type DomainEntityType = (typeof ENTITY_TYPES)[number];
@@ -59,7 +60,16 @@ const parseEntities = (raw: string): DomainEntity[] => {
   return result;
 };
 
-const extractWithClaude = async (text: string, apiKey: string, model: string): Promise<string> => {
+/**
+ * Extracts domain entities from text using Claude.
+ */
+export const extractDomainEntities = async (
+  text: string,
+  apiKey: string,
+  model: string = AI_MODEL
+): Promise<DomainEntity[]> => {
+  if (!text.trim()) return [];
+
   const client = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
   const response = await client.messages.create({
     model,
@@ -67,50 +77,9 @@ const extractWithClaude = async (text: string, apiKey: string, model: string): P
     messages: [{ role: "user", content: text }],
     max_tokens: 1024,
   });
+
   const block = response.content.find(
     (b) => "type" in b && b.type === "text" && "text" in b
   );
-  return block && "text" in block ? block.text : "";
-};
-
-const extractWithOpenAI = async (text: string, apiKey: string, model: string): Promise<string> => {
-  const isReasoningModel = model.includes("o3") || model.includes("o4");
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model,
-      messages: [
-        { role: "system", content: EXTRACTION_SYSTEM_PROMPT },
-        { role: "user", content: text },
-      ],
-      ...(isReasoningModel ? { max_completion_tokens: 1024 } : { temperature: 0, max_tokens: 1024 }),
-    }),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => null);
-    throw new Error(errorData?.error?.message || `OpenAI API error: ${response.status}`);
-  }
-  const data = await response.json();
-  return data.choices?.[0]?.message?.content || "";
-};
-
-/**
- * Extracts domain entities from text using the configured AI model.
- * The provider is inferred from the model id (Claude vs OpenAI).
- */
-export const extractDomainEntities = async (
-  text: string,
-  apiKey: string,
-  model: string
-): Promise<DomainEntity[]> => {
-  if (!text.trim()) return [];
-  const raw = model.startsWith("claude")
-    ? await extractWithClaude(text, apiKey, model)
-    : await extractWithOpenAI(text, apiKey, model);
-  return parseEntities(raw);
+  return parseEntities(block && "text" in block ? block.text : "");
 };

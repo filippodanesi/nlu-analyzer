@@ -22,20 +22,9 @@ interface DomainEntitiesSectionProps {
  * Results are clearly labelled as AI-derived and carry no fabricated scores.
  */
 const DomainEntitiesSection: React.FC<DomainEntitiesSectionProps> = ({ text }) => {
-  const {
-    apiKey,
-    setApiKey,
-    aiModel,
-    setAiModel,
-    aiProvider,
-    setAiProvider,
-    openAIKey,
-    anthropicKey,
-  } = useOptimizationConfig();
+  const { apiKey, setApiKey, aiModel } = useOptimizationConfig();
   const [entities, setEntities] = useState<DomainEntity[] | null>(null);
   const [isExtracting, setIsExtracting] = useState(false);
-
-  const providerLabel = aiProvider === "anthropic" ? "Claude" : "OpenAI";
 
   const handleExtract = async () => {
     setIsExtracting(true);
@@ -69,16 +58,7 @@ const DomainEntitiesSection: React.FC<DomainEntitiesSectionProps> = ({ text }) =
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
-          <AIOptimizationConfig
-            apiKey={apiKey}
-            setApiKey={setApiKey}
-            aiModel={aiModel}
-            setAiModel={setAiModel}
-            aiProvider={aiProvider}
-            setAiProvider={setAiProvider}
-            openAIKey={openAIKey}
-            anthropicKey={anthropicKey}
-          />
+          <AIOptimizationConfig apiKey={apiKey} setApiKey={setApiKey} />
           <Button
             variant="outline"
             size="sm"
@@ -94,7 +74,7 @@ const DomainEntitiesSection: React.FC<DomainEntitiesSectionProps> = ({ text }) =
 
       {!apiKey && (
         <p className="text-xs text-muted-foreground">
-          Set a Claude or OpenAI key via <span className="font-medium">Configure AI</span> to enable extraction.
+          Add your Anthropic API key via <span className="font-medium">Add AI key</span> to enable extraction.
         </p>
       )}
 
@@ -115,7 +95,7 @@ const DomainEntitiesSection: React.FC<DomainEntitiesSectionProps> = ({ text }) =
             );
           })}
           <p className="pt-1 text-xs text-muted-foreground">
-            AI-derived from the text via {providerLabel} — not Watson NLU. No confidence scores.
+            AI-derived from the text via Claude — not Watson NLU. No confidence scores.
           </p>
         </div>
       )}
